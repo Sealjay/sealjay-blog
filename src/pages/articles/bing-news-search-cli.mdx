@@ -1,0 +1,371 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const meta = {
+  author: 'Chris Lloyd-Jones',
+  date: '2021-02-10T01:47:31.000Z',
+  tags: ['How To', 'Bing Search', 'API', 'Python', 'CLI', 'Cognitive Services'],
+  title: 'CLI wizardry - Bing News Search on the fly',
+  slug: 'bing-news-search-cli',
+}
+
+// TODO: Check against sealjay.com
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+You've probably heard of Bing, one of the largest search engines around, love it or loathe it. But did you know it has a nifty API? Bing Search APIs have moved recently out of Cognitive Services (<a href="https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/bing-api-comparison">as of October 30, 2020</a>).
+
+<p>
+  These APIs include local business search, news, and image search. Wouldn't it
+  be cool if we could use Bing News Search to quickly and easily find out what's
+  going on in the world? Maybe you want to quickly check up on a coffee break,
+  remove the visuals from your pandemic doom-scrolling, or you need inspiration
+  for a tweet!
+</p>
+<p>
+  Today, I'm going to show you how to use Python to create a Command Line
+  Interface (CLI) to search for trending articles, phrases you're particularly
+  interested in, or just see what's happening in the world of business.
+</p>
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-3.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="924"
+    height="451"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/02/image-3.png 600w, __GHOST_URL__/content/images/2021/02/image-3.png 924w"
+    sizes="(min-width: 720px) 720px"
+  ></img>
+  <figcaption>
+    An example of a search for the "future of computing" with this handy tool!
+  </figcaption>
+</figure>
+{/*
+<figure class="kg-card kg-bookmark-card kg-card-hascaption">
+  <a class="kg-bookmark-container" href="https://github.com/Sealjay-clj/bingnews-cli">
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">Sealjay-clj/bingnews-cli</div>
+      <div class="kg-bookmark-description">A command line interface to show the potential for finding news with the Bing News Search API. - Sealjay-clj/bingnews-cli</div>
+    <div class="kg-bookmark-metadata">
+      <img class="kg-bookmark-icon" src="https://github.githubassets.com/favicons/favicon.svg"/><span class="kg-bookmark-author">GitHub</span>
+      <span class="kg-bookmark-publisher">Sealjay-clj</span>
+    </div>
+  </div>
+  <div class="kg-bookmark-thumbnail"><img src="https://avatars.githubusercontent.com/u/19361656?s&#x3D;400&amp;v&#x3D;4"/>
+  </div>
+  </a>
+</figure>
+<figcaption>You can also just jump right in, and explore the GitHub repository for this example</figcaption>*/}
+---
+<h2 id="what-you-ll-need">What you'll need</h2>
+<ul>
+  <li>
+    An Azure tenant ([create a free
+    account](https://azure.microsoft.com/en/free/) if you don't have one)
+  </li>
+  <li>Basic Python Proficiency</li>
+  <li>A local installation of Git</li>
+  <li>A local installation of your preferred Python distribution</li>
+  <li>Visual Studio Code (or similar code editor)</li>
+</ul>
+<p>
+  I'll walk you through the process of setting up a Bing Search API including
+  the News feature, and then walk you through the application.
+</p>
+---
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="creating-your-bing-news-resource">Creating your Bing News Resource</h3>
+<p>
+  <a href="https://portal.azure.com/#create/microsoft.bingsearch">
+    Use this link to jump directly to the Bing Search marketplace template
+  </a>
+  , or search for Bing Search v7 in the marketplace.
+</p>
+<p>
+  However you find this, creating the resource will need you to be familiar with
+  the pricing tier. Not all of the tiers include Bing News Search.
+</p>
+<p>
+  For the purposes of this exercise, I've used the 'Free' instance, which allows
+  up to 1,000 free transactions per month at the time of writing - but if you
+  intend to use the tool often, you'll want to look at{' '}
+  <a href="https://www.microsoft.com/en-us/bing/apis/pricing">the paid tiers</a>
+  .
+</p>
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-8.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="701"
+    height="355"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/02/image-8.png 600w, __GHOST_URL__/content/images/2021/02/image-8.png 701w"
+  />
+  <figcaption>Select the Free pricing tier</figcaption>
+</figure>
+<p>
+  Once you've read the privacy statement, filled in the form, and hit create,
+  the resource will deploy. Time to get a coffee!
+</p>
+<h3 id="getting-your-bing-news-endpoint-and-keys">
+  Getting your Bing News Endpoint and Keys
+</h3>
+<p>
+  When your resource is deployed, open it in the Azure Portal, and look at the
+  Overview screen.
+</p>
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-14.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="932"
+    height="492"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/02/image-14.png 600w, __GHOST_URL__/content/images/2021/02/image-14.png 932w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>Your deployment should look similar to this.</figcaption>
+</figure>
+<p>
+  Take a note of the Endpoint, as you'll need this URL for the application. My
+  endpoint isn't part of a multi-service subscription, so it doesn't have the
+  region in the URL, so it's just <code>https://api.bing.microsoft.com/</code>.
+</p>
+<p>
+  Click on either 'Keys and Endpoint' or the 'Click here to manage keys' link to
+  open the 'Keys and Endpoint' tab.
+</p>
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-10.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="760"
+    height="462"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/02/image-10.png 600w, __GHOST_URL__/content/images/2021/02/image-10.png 760w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>You'll see your Endpoint listed here again</figcaption>
+</figure>
+<p>
+  Keep hold of the endpoint from earlier, and click on the blue copy icon to
+  copy the API key, and keep this safe as well.
+</p>
+<h3 id="configuring-the-application">Configuring the Application</h3>
+<p>
+  Fire up a terminal, or open up an integration terminal in your preferred code
+  editor - I'm a fan of{' '}
+  <a href="https://code.visualstudio.com/">Visual Studio Code</a> -  and clone
+  the Git repository for the project.{' '}
+</p>
+<p>
+  Make sure you've changed your current working directory, to wherever you want
+  the code to go, and then run the clone command.
+</p>
+```bash git clone https://github.com/Sealjay-clj/bingnews-cli.git ```
+<p>
+  Rename the <code>.env.template</code> file in the <code>bingnews-cli/</code>{' '}
+  directory to <code>.env</code>, replacing the content there with the Bing
+  Search Key, and the Bing Search Endpoint you noted down earlier.
+</p>
+<script src="https://gist.github.com/Sealjay-clj/45a2522c586c88009f4c05271102c739.js"></script>
+<h3 id="install-the-python-dependencies">Install the Python Dependencies</h3>
+<p>
+  Rather than installing all of the dependencies into the global environment,
+  we'll create a separate environment.
+</p>
+<p>
+  To create a separate Python environment for your installation, and activate
+  it, there are two common options.
+</p>
+<p>
+  I prefer to use{' '}
+  <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a>, but
+  you can use a <code>venv</code> if you prefer.
+</p>
+<p>
+  a. <em>Using a Conda distribution</em>
+</p>
+<p>
+  If you are using a distribution of conda, you may want to create a new conda
+  environment, rather than use venv:
+</p>
+<code>
+$ conda create --name bingnews python=3.9 -y
+
+$ conda activate bingnews
+
+$ pip install -r requirements-dev.txt
+
+</code>
+<p>
+  b. <em>Using a Python virtual environment</em>
+  <br />
+  On Debian Linux distributions, you may need to run{' '}
+  <code>sudo apt-get install python3-venv</code> before these instructions. On
+  other distributions, I don't have a clue!
+</p>
+<pre>
+  <code class="language-bash">
+    $ python3 -m venv env $ source env/bin/activate $ pip3 install -r
+    requirements-dev.txt
+  </code>
+</pre>
+<p>
+  On Windows, you may need to use <code>python</code> and <code>pip</code>{' '}
+  commands where there are references to the <code>python3</code> and{' '}
+  <code>pip3</code> commands.
+</p>
+<p>
+  At this point, you should have a configured Python environment, and we're just
+  about ready to try this out! <code>cd bingnews-cli</code> into the same
+  directory as <code>bingnews.py</code>, and run{' '}
+  <code>python3 bingnews.py</code>.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-5.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="543"
+    height="182"
+  />
+</figure>
+<p>Hopefully, you're seeing a screen along these lines!</p>
+### How does it work?
+
+The application is surprisingly simple. Most of the intelligence takes place in Bing Search, and then Click is used to generate a CLI.{' '} [Click is a Python package](https://click.palletsprojects.com/en/7.x/) {' '} focussed on creating command line interfaces.
+
+The command line has three options:
+
+- Search by Category. _Example:_{' '} `python3 bingnews.py cat -c Business`
+- Search by Phrase. _Example:_{' '} `python3 bingnews.py phrase -p "Future of Computing"`
+- Search for Trending articles. _Example:_{' '} `python3 bingnews.py trend`
+
+#### The basic request
+
+The basic request is made up of the `search_and_output_bing`{' '} function, which is called for all of the various API queries.
+
+This queries the Bing News endpoint, and then requests that the output is printed with `print_bing_results`, which in turn formats the output for presentation in `clean_bing_article_list`, applying some tweaks for the varied result-set returned by trending articles, in{' '} `clean_trending_article_dictionary`.
+
+{' '}
+
+<script src="https://gist.github.com/Sealjay-clj/e8a708866732ccd479a9cf069cfc84a3.js"></script>
+
+{' '}
+
+#### Composing functions with Click
+
+In order to make functions available on the command-line, `click` allows us to use decorators to automatically generate help information for the command line, pass arguments to the function, and provide prompts if information is not provided by the user. Some defaults are also provided which can be overridden on the command-line, such as defaulting to the `en-GB` locale.
+
+<script src="https://gist.github.com/Sealjay-clj/a96bc2ddfd16fbbc3173f22f603c0e15.js"></script>
+
+### Other Components
+
+##### Requests Caching
+
+Requests are cached for five minutes, in case the user runs the same search, or in case the shortener is provided similar news article URLs, to prevent requesting the same URL twice for shortening from an endpoint.
+
+##### Tabulate
+
+Tabulate is used to render the dictionary output from the API, and make it easily readable in the terminal.
+
+##### PyShorteners
+
+URLs provided by Bing News are shortened with the `pyshorteners` package,and the qpsru service, to ensure they don't wrap off the terminal, and break the link.
+
+### What packages does this use
+
+The key packages are as follows:
+
+<table>
+  <thead>
+    <tr>
+      <th>Package Name</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>click</td>
+      <td>Handles the CLI functionality</td>
+    </tr>
+    <tr>
+      <td>tabulate</td>
+      <td>Formats the results as a table</td>
+    </tr>
+    <tr>
+      <td>python-dotenv</td>
+      <td>Retrieves the configuration values from the .env file</td>
+    </tr>
+    <tr>
+      <td>requests</td>
+      <td>Handles the API request</td>
+    </tr>
+    <tr>
+      <td>requests-cache</td>
+      <td>
+        Caches the requests if we make the same query, or shorten the same URL
+        (pyshorteners is [based on the requests
+        package](https://github.com/ellisonleao/pyshorteners/blob/master/pyshorteners/base.py)
+        as well, and the qspru shortener uses GET requests)
+      </td>
+    </tr>
+    <tr>
+      <td>pyshorteners</td>
+      <td>
+        Shortens the URls - I use psru, as this shortener doesn't require an API
+        key
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+### What next?
+
+If you were to use this frequently in production, you'd want to add tests, and install this locally with a `setup.py` file. But for now, it's a good start for a CLI that can be re-used - and I'll be extending the functionality in a future post.
+
+Thanks for reading, and I hope you found this interesting!
+
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/02/image-13.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="913"
+    height="289"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/02/image-13.png 600w, __GHOST_URL__/content/images/2021/02/image-13.png 913w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>Time to go and catch up on Science and Technology!</figcaption>
+</figure>
+<figure class="kg-card kg-bookmark-card kg-card-hascaption">
+  <a
+    class="kg-bookmark-container"
+    href="https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        Bing Search API documentation - Azure Cognitive Services
+      </div>
+      <div class="kg-bookmark-description">
+        The Bing Search APIs let you build web-connected apps and services that
+        find webpages, images, news, locations, and more without advertisements.
+      </div>
+      <div class="kg-bookmark-metadata">
+        <span class="kg-bookmark-author">Microsoft Docs</span>
+        <span class="kg-bookmark-publisher">aahill</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img src="https://docs.microsoft.com/en-us/media/logos/logo-ms-social.png" />
+    </div>
+  </a>
+  <figcaption>Find out more about the Bing Search API</figcaption>
+</figure>

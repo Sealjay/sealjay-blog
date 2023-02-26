@@ -1,0 +1,499 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const meta = {
+  author: 'Chris Lloyd-Jones',
+  date: '2021-03-06T02:26:59.000Z',
+  tags: ['How To', 'Power Automate'],
+  title: 'Power Automate for individual group notifications',
+  slug: 'power-automate-for-individual-group-notifications',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+If you're like me, you probably wish you got less email! But, equally, you don't want to tag a whole group of people in Teams either - starting a whole discussion.
+
+Sometimes I find myself needing to send an urgent message to a group of people, but I want to make sure each individual gets it as a message.
+
+So, I thought I'd share a handy approach to this using Power Automate, in case this comes in handy for you!
+
+**Caveat:** make sure you don't overuse this, or send notifications to an overly broad set of users. Over communication can switch your users off from your messages!
+
+## Context
+
+At my organisation, we're currently having an internal competition - right now, we're competing for the most steps! This has really brought out that team spirit, but some people are pretty busy.
+
+Sending a notification to people that haven't had the time to log their steps is the perfect type of notification to send via Teams - short, sharp, targeted, and actionable.
+
+## What does this use?
+
+I'll be using the [Microsoft Teams](https://docs.microsoft.com/en-us/connectors/teams/?WT.mc_id=AI-MVP-5004204) connector for Power Automate. I'll send an Adaptive Card to a user from the Flow Bot, with an actionable link - falling back to an email if the Flow Bot is blocked. (One reason not to spam your users!)
+
+[Adaptive Cards](https://adaptivecards.io/) allows us to write JSON snippets, which are then translated into the native UI of the platform that your message is being received in.
+
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-18.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1086"
+    height="382"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-18.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-18.png 1000w, __GHOST_URL__/content/images/2021/03/image-18.png 1086w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>
+    An example of a very basic Adaptive Card, just saying hi!
+  </figcaption>
+</figure>
+How do we do it? ----------------
+
+I'll assume you have some basic familiarity with Power Automate - and if not, Microsoft has just released a '[30 days to learn it](https://developer.microsoft.com/en-us/offers/30-days-to-learn-it)' learning path for the Power Platform, which covers just these topics!
+
+At a high level, the process is this:
+
+- Get the users in a group.
+- Set a template for the adaptive card, the email fallback, and choose the title.
+- Loop through the users, and try to send the adaptive card.
+- If the user has the bot blocked, send the email.
+
+I'll be using a recurring trigger, so I can send this on a weekly basis. In the real-life scenario, I'm also checking to see if the user has posted steps - I've omitted that here for clarity.
+
+## Setting up the automation
+
+I've gone to [flow.microsoft.com](https://flow.microsoft.com/) and logged into my account.
+
+I'll click 'Create' on the left-hand side and choose 'Scheduled cloud flow.'
+
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-19.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="542"
+    height="416"
+  />
+  <figcaption>
+    This scheduled cloud flow option lets you select a recurring frequency
+  </figcaption>
+</figure>
+Complete the form and select how often you'd like the flow to run.
+
+## Defining your messages
+
+Before we go any further, it's worth figuring out what messages you'll send.
+
+### Adaptive Card
+
+My adaptive card has a title, a short description, and a button for the user to take action.
+
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-20.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="950"
+    height="648"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-20.png 600w, __GHOST_URL__/content/images/2021/03/image-20.png 950w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+There are [tons of samples](https://adaptivecards.io/samples/Restaurant.html) to
+choose from on the adaptive cards site - and you can click 'Try it yourself' to edit
+a card in a WYSIWYG editor.
+
+You can see the code for my card here:
+
+```
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "ExtraLarge",
+      "weight": "Bolder",
+      "text": "Your steps are needed!"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "Image",
+              "style": "Person",
+              "url": "https://demeliou.files.wordpress.com/2012/11/marie-curie.jpg",
+              "size": "Large"
+            }
+          ],
+          "width": "auto"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "Logging just one step matters!",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "We have the highest average steps per day... in it to WIN it! If everyone in the team logged, we'd be top of the leaderboard.",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "Don't let the rest of House Curie down, any step logged is a step forward!",
+              "wrap": true
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Log your steps!",
+      "url": "https://www.google.com"
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.2"
+}
+```
+
+The key point here is the button - created right at the bottom, as an `Action.OpenUrl` type. You'll also notice that my adaptive card doesn't separate the data from the template, as the Flow Bot currently doesn't support this.
+
+### Email
+
+I used an [online HTML editor](https://html-online.com/editor/) to create a very basic email template, with the same call to action - as well as a short explanatory note as to why the user is receiving the email.
+
+You can see the HTML I used here:
+
+```
+<h1>Your team need you!</h1>
+<table style="border-collapse: collapse; width: 100%;" border="1">
+<tbody>
+<tr>
+<td style="width: 60.634%;">
+<p>We have the highest average steps per day... in it to WIN it! If everyone in the team logged, we'd be top of the leaderboard</p>
+<p>Don't let the rest of the team downdown, any step logged is a step forward!</p>
+<p>Logging just one step matters!</p>
+</td>
+<td style="width: 39.366%;"><img src="https://demeliou.files.wordpress.com/2012/11/marie-curie.jpg" alt="" width="180" height="200" /></td>
+</tr>
+</tbody>
+</table>
+<p><a href="dummylink">Click Here to log your Steps</a></p>
+<hr />
+<p><em>We know you're busy, and would rather not bother you. We've semt this email because you have <a href="https://flow.microsoft.com/en-us/blog/microsoft-flow-in-microsoft-teams/">the Flow Bot</a> blocked in Microsoft Teams.&nbsp;</em></p>
+```
+
+<p>Here's what the user would receive:</p>
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-21.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1276"
+    height="812"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-21.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-21.png 1000w, __GHOST_URL__/content/images/2021/03/image-21.png 1276w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>An email from the automation</figcaption>
+</figure>
+Assuming the title is pretty explanatory, I'll create three compose actions, and
+add in my adaptive card, my email, and my title.
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-22.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1250"
+    height="650"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-22.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-22.png 1000w, __GHOST_URL__/content/images/2021/03/image-22.png 1250w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>
+    You can see the recurrence trigger, the adaptive card, the email content,
+    and the title.
+  </figcaption>
+</figure>
+Looping over the users ----------------------
+
+Now we need to get all of the users in the group I want to message, and then iterate over them!
+
+I use the 'List group members' connector to get the users in the group.
+
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-23.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1248"
+    height="334"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-23.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-23.png 1000w, __GHOST_URL__/content/images/2021/03/image-23.png 1248w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+I then create an 'Apply to each' action, and add the 'value' of the 'List group members'
+action to the selected output.
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-24.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="610"
+    height="290"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-24.png 600w, __GHOST_URL__/content/images/2021/03/image-24.png 610w"
+  />
+</figure>
+<h2 id="sending-the-messages-and-the-fallback">
+  Sending the messages - and the fallback
+</h2>
+<h3 id="the-adaptive-card">The Adaptive Card</h3>
+<p>
+  To send the Adaptive card, I search for the 'Post your own adaptive card as
+  the Flow bot to a user' action, under the Teams connector.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-30.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="844"
+    height="104"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-30.png 600w, __GHOST_URL__/content/images/2021/03/image-30.png 844w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+Once this is created, I insert the Mail variable, for the users email - and I then
+insert the data I pre-prepared, with the advanced options expanded.
+
+- Recipient - Place the Mail output, with the users email
+- Message - Place the Adapative Cards output
+- Headline - I use the Title output
+- Summary - I tend to use the Title output again
+- IsAlert - I select 'Yes'
+
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-25.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1264"
+    height="660"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-25.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-25.png 1000w, __GHOST_URL__/content/images/2021/03/image-25.png 1264w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<h3 id="and-the-email-fallback">And... the email fallback</h3>
+<p>This is probably the trickiest bit, to be honest.</p>
+<p>
+  Create a 'condition' action, and in the left hand side of the condition, 'Add
+  dynamic content', select 'Expression' and then enter
+  `outputs('Post_your_own_adaptive_card_as_the_Flow_bot_to_a_user')?['statusCode']`
+  in the box. If you renamed the action after making it, you'll need to update
+  here too.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-26.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1242"
+    height="676"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-26.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-26.png 1000w, __GHOST_URL__/content/images/2021/03/image-26.png 1242w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  Once that's complete, enter 403 in the right hand side - so your condition
+  should be checking whether the status code from posting via the Flow bot, is
+  equal to 403.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-27.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1222"
+    height="408"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-27.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-27.png 1000w, __GHOST_URL__/content/images/2021/03/image-27.png 1222w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  Hit the ellipses '...' in the condition, and select 'Configure run after.'
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-28.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="578"
+    height="456"
+  />
+</figure>
+<p>Ensure the condition runs if the bot is successful, fails, or is skipped.</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-29.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1236"
+    height="456"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-29.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-29.png 1000w, __GHOST_URL__/content/images/2021/03/image-29.png 1236w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  Now, if the bot fails to send a message - because the user has blocked it - we
+  should catch that error.
+</p>
+<h3 id="sending-the-backup-email">Sending the backup email</h3>
+<p>
+  For this demo, I'll use the 'Send an email' connector - but you may prefer to
+  use the 'Send an email from a shared mailbox' connector.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-31.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="348"
+    height="114"
+  />
+</figure>
+<p>
+  Complete the connector, entering the 'Mail' output in the 'To' box, and the
+  'Title' output in the 'Subject' box.
+</p>
+<p>
+  Once complete, select the code icon, on the furthest right hand side of the
+  WYSIWYG editor, to enter HTML entry mode.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-33.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1188"
+    height="446"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-33.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-33.png 1000w, __GHOST_URL__/content/images/2021/03/image-33.png 1188w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  Once you're in the HTML editor mode, hit 'Add dynamic content', and then
+  select the HTML email we created earlier.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-36.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="324"
+    height="68"
+  />
+</figure>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-32.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1248"
+    height="578"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-32.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-32.png 1000w, __GHOST_URL__/content/images/2021/03/image-32.png 1248w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<h2 id="time-to-run-">Time to run!</h2>
+<p>
+  Now that you've pulled this all together, it's time to try it out! I recommend
+  testing this with a specially created Team just for this purpose, in case you
+  want to tweak the formatting.
+</p>
+<p>
+  Make sure your flow is enabled, and then hit the Test button. Once the flow
+  has finished running, you should see messages posted in the Run History.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-38.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1308"
+    height="136"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-38.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-38.png 1000w, __GHOST_URL__/content/images/2021/03/image-38.png 1308w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  For users that have blocked the bot, you'll see the condition evaluate as
+  true, and the fallback email will have been sent.
+</p>
+<figure class="kg-card kg-image-card">
+  <img
+    src="__GHOST_URL__/content/images/2021/03/image-37.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="1952"
+    height="1108"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/03/image-37.png 600w, __GHOST_URL__/content/images/size/w1000/2021/03/image-37.png 1000w, __GHOST_URL__/content/images/size/w1600/2021/03/image-37.png 1600w, __GHOST_URL__/content/images/2021/03/image-37.png 1952w"
+    sizes="(min-width: 720px) 720px"
+  />
+</figure>
+<p>
+  Thanks for reading - and I hope you find this useful. Remember not to spam
+  your users!
+</p>
+<p>
+  If you'd like something more involved, consider trying out Azure Cognitive
+  Search!
+</p>
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://sealjay.com/cognitive-search-law-part1-indexer/"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        Using Cognitive Search to make the law more accessible: Part 1
+      </div>
+      <div class="kg-bookmark-description">
+        Using Azure Cognitive Search to index UK Law going back to the 1800s, to
+        make it accessible and comprehensible
+      </div>
+      <div class="kg-bookmark-metadata">
+        <img class="kg-bookmark-icon" src="https://sealjay.com/favicon.png" />
+        <span class="kg-bookmark-author">Sealjay</span>
+        <span class="kg-bookmark-publisher">Chris Lloyd-Jones</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;MXwxMTc3M3wwfDF8c2VhcmNofDE3fHxsYXd8ZW58MHx8fA&amp;ixlib&#x3D;rb-1.2.1&amp;q&#x3D;80&amp;w&#x3D;2000" />
+    </div>
+  </a>
+</figure>

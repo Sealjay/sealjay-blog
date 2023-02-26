@@ -1150,3 +1150,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,node,macos,linux,jupyternotebooks,dotnetcore,csharp,azurefunctions,goland,nextjs,pycharm,rider,snyk,webstorm
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+src/public/rss/feed.json
+src/public/rss/feed.xml
+api/handler

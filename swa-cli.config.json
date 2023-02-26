@@ -1,0 +1,18 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "sealjay-blog": {
+      "appLocation": "src",
+      "apiLocation": "api",
+      "outputLocation": ".next",
+      "appBuildCommand": "npm run build",
+      "apiBuildCommand": "cargo build --release; cp target/release/handler .",
+      "swaConfigLocation": "src",
+      "run": "npm run dev",
+      "open": true,
+      "appName": "sealjay-blog",
+      "appDevserverUrl": "http://localhost:3000",
+      "resourceGroupName": "sj_blog_swa"
+    }
+  }
+}

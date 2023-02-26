@@ -1,0 +1,157 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const meta = {
+  author: 'Chris Lloyd-Jones',
+  date: '2021-05-24T23:12:17.000Z',
+  tags: [
+    'How To',
+    'Cognitive Services',
+    'CLI',
+    'Python',
+    'Digital Twins',
+    'PowerBI',
+    'Anomaly Detector',
+  ],
+  title: 'Querying Azure Digital Twins with PowerBI',
+  slug: 'querying-azure-digital-twins-with-powerbi',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+<p>
+  A Digital Twin is a digital replica of a physical object, space, or abstract
+  process. It allows us to model the state of these things virtually, and then
+  respond to events as they happen in real time.
+</p>
+<p>
+  Microsoft provide an Azure Digital Twin service, which allows us to create
+  pre-defined models (such as thermostats for example) and then create twins
+  based on these models, mapping the relationships between a whole series of
+  different things.
+</p>
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://docs.microsoft.com/en-gb/azure/digital-twins/overview?WT.mc_id&#x3D;AI-MVP-5004204"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        What is Azure Digital Twins? - Azure Digital Twins
+      </div>
+      <div class="kg-bookmark-description">
+        Overview of what can be done with Azure Digital Twins.
+      </div>
+      <div class="kg-bookmark-metadata">
+        <span class="kg-bookmark-author">Microsoft Docs</span>
+        <span class="kg-bookmark-publisher">baanders</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img
+        src="https://docs.microsoft.com/en-us/media/logos/logo-ms-social.png"
+        alt=""
+      />
+    </div>
+  </a>
+</figure>
+As well as SDKs across a variety of languages from .NET to Python, Microsoft have
+created a number of tools and code samples - [the Azure Digital Twins explorer](https://github.com/Azure-Samples/digital-twins-explorer/)
+is a web based application that allows you to visually see the connections between
+these twins.
+<figure class="kg-card kg-image-card kg-card-hascaption">
+  <img
+    src="__GHOST_URL__/content/images/2021/05/image-1.png"
+    class="kg-image"
+    alt
+    loading="lazy"
+    width="2000"
+    height="1248"
+    srcset="__GHOST_URL__/content/images/size/w600/2021/05/image-1.png 600w, __GHOST_URL__/content/images/size/w1000/2021/05/image-1.png 1000w, __GHOST_URL__/content/images/size/w1600/2021/05/image-1.png 1600w, __GHOST_URL__/content/images/size/w2400/2021/05/image-1.png 2400w"
+    sizes="(min-width: 720px) 720px"
+  />
+  <figcaption>
+    A screenshot of the graph database within the Azure Digital Twins explorer
+  </figcaption>
+</figure>
+<h3 id="sharing-data-with-end-users">Sharing data with end users</h3>
+<p>
+  Sharing these views with end users can be difficult however - you probably
+  don't want to be sharing the explorer with end users! And what if you want to
+  share an overview of the current situation with your business users? Well,
+  this sounds like a perfect use case for PowerBI and Azure Digital Twins.
+</p>
+<h3 id="powerbi-to-the-rescue">PowerBI to the rescue</h3>
+<p>
+  PowerBI is the visualisation tool from Microsoft that allows you to create and
+  share pre-built reports and data visualisations - niftily, you can use the
+  output of Python scripts as a data source, allowing us to use the Azure
+  Digital Twins SDK to create a PowerBI data source.
+</p>
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://github.com/Sealjay-clj/powerbi-adt"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">Sealjay-clj/powerbi-adt</div>
+      <div class="kg-bookmark-description">
+        Querying Azure Digital Twins with PowerBI. Contribute to
+        Sealjay-clj/powerbi-adt development by creating an account on GitHub.
+      </div>
+      <div class="kg-bookmark-metadata">
+        <img
+          class="kg-bookmark-icon"
+          src="https://github.githubassets.com/favicons/favicon.svg"
+          alt=""
+        />
+        <span class="kg-bookmark-author">GitHub</span>
+        <span class="kg-bookmark-publisher">Sealjay-clj</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img
+        src="https://opengraph.githubassets.com/9642f68c9fffaf41f7353e8263423950fa92f07d6101da79bcb0d37bb2bd9eea/Sealjay-clj/powerbi-adt"
+        alt=""
+      />
+    </div>
+  </a>
+</figure>
+### How do I pull my twins into PowerBI?
+
+Using the `azure-digitaltwins-core` python package, this can be done in eight steps!
+
+1.  Create an Azure Digital Twin, or use one you already have.
+2.  Give yourself access to the data plane - adding some example data - the{' '} [Azure Digital Twins explorer](https://github.com/Azure-Samples/digital-twins-explorer/) {' '} example data is a good start.
+3.  Create a virtual environment for your Python setup, e.g.{' '} `python3 -m venv .venv`.
+4.  Install the requirements `pip install -r requirements-dev.txt`.
+5.  Copy the path to your virtual environment.
+6.  [Enable python scripting](https://docs.microsoft.com/en-us/power-bi/connect-data/desktop-python-scripts#enable-python-scripting?WT.mc_id=AI-MVP-5004204) {' '} in PowerBI.
+7.  Log in to Azure on the CLI with `az login`.
+8.  Import the **powerbi-query.py** file in the{' '} [GitHub repository](https://github.com/Sealjay-clj/powerbi-adt){' '} as a{' '} [PowerBI datasource](https://docs.microsoft.com/en-us/power-bi/connect-data/desktop-python-scripts?WT.mc_id=AI-MVP-5004204#run-your-python-script-and-import-data) .
+
+<pre>
+  <code class="language-python">
+    query_expression = &quot;SELECT * FROM digitaltwins&quot; query_result =
+    service_client.query_twins(query_expression) twin_list =
+    pd.DataFrame(query_result)
+  </code>
+</pre>
+
+And there you have it. The example query I provide will allow you to query the twin graph - and you can use{' '} [the Azure Digital Twins query language](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-query-graph?WT.mc_id=AI-MVP-5004204) {' '} to build on this. Each individual pandas dataframe will appear as a data set.
+
+### How could you extend this?
+
+So, next time you want to share data from Azure Digital Twins - consider PowerBI! You could use the{' '} [Anomaly Detector Cognitive service](https://docs.microsoft.com/en-gb/azure/cognitive-services/anomaly-detector/?WT.mc_id=AI-MVP-5004204) {' '} for example, in combination with PowerBI, to look for buildings that are too hot, too humid, or too cold, and colour code this accordingly.
+
+For a full example,{' '} [you can see the repository on GitHub](https://github.com/Sealjay-clj/powerbi-adt) .
+<figure class="kg-card kg-image-card kg-card-hascaption">
+<img
+        src="__GHOST_URL__/content/images/2021/05/image-2.png"
+        class="kg-image"
+        alt
+        loading="lazy"
+        width="586"
+        height="296"
+      />
+<figcaption>The list of twins displayed in PowerBI</figcaption>
+</figure>

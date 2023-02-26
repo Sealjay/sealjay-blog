@@ -1,0 +1,41 @@
+{
+  "trailingSlash": "auto",
+  "platform": {
+    "apiRuntime": "node:16"
+  },
+  "routes": [
+    { "route": "/.well-known/*", "allowedRoles": ["anonymous"] },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/images/*",
+      "headers": {
+        "cache-control": "must-revalidate, max-age=15770000"
+      }
+    },
+    {
+      "route": "/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "index.html",
+    "exclude": [
+      "/images/*.{png,jpg,gif}",
+      "/css/*",
+      "/favicon.ico",
+      "/.well-known/*"
+    ]
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "index.html",
+      "statusCode": 404
+    }
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  }
+}

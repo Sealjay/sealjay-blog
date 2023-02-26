@@ -1,0 +1,136 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const meta = {
+  author: 'Chris Lloyd-Jones',
+  date: '2021-03-03T10:10:00.000Z',
+  tags: ['Impact', 'Cognitive Search', 'Futurology'],
+  title: 'Intelligent search at your fingertips: Semantic Search',
+  slug: 'intelligent-search-at-your-fingertips',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+This week at at Microsoft Ignite,{' '} [Pablo Castro and Jeremy Chapman](https://myignite.microsoft.com/sessions/cb258175-2e65-49fe-919c-23c88dca54c7?source=sessions) {' '} covered some{' '} [amazing new additions to Azure Cognitive Search](https://techcommunity.microsoft.com/t5/azure-ai/introducing-semantic-search-bringing-more-meaningful-results-to/ba-p/2175636) {' '} - including semantic search, semantic answers, and semantic questions! Everything is semantic!
+
+Semantic Search allows you to offer better answers to search queries, really blowing pure keyword based ranking out of the water. The ranking algorithm tries to rank articles, based on how well they actually answer a query.
+
+The idea behind semantic search is try to understand{' '} _what the user wants to_ achieve - this leverages investments from Bing, and Microsoft Research, to bring the best of other solutions together.{' '}
+
+I previously posted about unlocking content using Azure Cognitive Search - and Semantic Search puts these ideas on steroids!
+
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://sealjay.com/unlocking-content-with-summaries-and-insight/"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        Unlocking content using Azure Cognitive Search, and Agolo
+      </div>
+      <div class="kg-bookmark-description">
+        Using Azure Cognitive Search to index information within a document
+        store, and make it more easily comprehensible &amp; accessible
+      </div>
+      <div class="kg-bookmark-metadata">
+        <img class="kg-bookmark-icon" src="https://sealjay.com/favicon.png" />
+        <span class="kg-bookmark-author">Sealjay</span>
+        <span class="kg-bookmark-publisher">Chris Lloyd-Jones</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img src="__GHOST_URL__/content/images/2021/02/cogsearchmain-1.png" />
+    </div>
+  </a>
+</figure>
+<p>
+  The problem with a pure keyword search, is that computers don't understand the
+  context they're operating in. If you search for an orange, you'll get results
+  for the fruit, mixed in with the colour.
+</p>
+<p>
+  For a single keyword, that's fine - but semantic search really helps with
+  areas that get much more difficult.
+</p>
+<p>
+  Semantic Search makes it possible to understand links across text in a
+  document, adding Semantic Answers -  allowing you to identify answers in a
+  passage, or maybe figure out the questions that a document is posing, and
+  therefore what a person might search for.
+</p>
+<p>
+  This means we can actually show relevant passages from documents in context,
+  and hopefully answer a user right in the search results.
+</p>
+<p>
+  This is a really important extension to Azure Cognitive Search, and{' '}
+  <a href="https://docs.microsoft.com/en-gb/azure/search/semantic-search-overview">
+    now this is in public preview
+  </a>
+  , I'm looking forward to getting my hands on this, so I can show you how to use
+  this yourself!
+</p>
+<h2 id="want-to-know-more">Want to know more?</h2>
+<p>
+  I'll be demonstrating Semantic Search as part of a six-part series on rolling
+  your own Azure Cognitive Search application!
+</p>
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://sealjay.com/cognitive-search-law-part1-indexer/"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        Using Cognitive Search to make the law more accessible: Part 1
+      </div>
+      <div class="kg-bookmark-description">
+        Using Azure Cognitive Search to index UK Law going back to the 1800s, to
+        make it accessible and comprehensible
+      </div>
+      <div class="kg-bookmark-metadata">
+        <img class="kg-bookmark-icon" src="https://sealjay.com/favicon.png" />
+        <span class="kg-bookmark-author">Sealjay</span>
+        <span class="kg-bookmark-publisher">Chris Lloyd-Jones</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;MXwxMTc3M3wwfDF8c2VhcmNofDE3fHxsYXd8ZW58MHx8fA&amp;ixlib&#x3D;rb-1.2.1&amp;q&#x3D;80&amp;w&#x3D;2000" />
+    </div>
+  </a>
+</figure>
+<p>
+  The science behind this investment is pretty amazing too, and Microsoft
+  Research have published a brilliant write-up of how they actually achieved
+  these new features.
+</p>
+<figure class="kg-card kg-bookmark-card">
+  <a
+    class="kg-bookmark-container"
+    href="https://www.microsoft.com/en-us/research/blog/the-science-behind-semantic-search-how-ai-from-bing-is-powering-azure-cognitive-search/"
+  >
+    <div class="kg-bookmark-content">
+      <div class="kg-bookmark-title">
+        The science behind semantic search: How AI from Bing is powering Azure
+        Cognitive Search - Microsoft Research
+      </div>
+      <div class="kg-bookmark-description">
+        Azure Cognitive Search is a cloud search service that gives developers
+        APIs and tools to build rich search experiences over private,
+        heterogeneous content in web, mobile, and enterprise applications. It
+        has multiple components, including an API for indexing and querying,
+        seamless integration through…
+      </div>
+      <div class="kg-bookmark-metadata">
+        <img
+          class="kg-bookmark-icon"
+          src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver&#x3D;5c31"
+        />
+        <span class="kg-bookmark-author">Microsoft Research</span>
+        <span class="kg-bookmark-publisher">Rangan Majumder</span>
+      </div>
+    </div>
+    <div class="kg-bookmark-thumbnail">
+      <img src="https://www.microsoft.com/en-us/research/uploads/prod/2021/03/1400x788_semantic_search_still_no_logo-scaled.jpg" />
+    </div>
+  </a>
+</figure>
