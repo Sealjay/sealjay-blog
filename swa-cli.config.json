@@ -4,15 +4,17 @@
     "sealjay-blog": {
       "appLocation": "src",
       "apiLocation": "api",
-      "outputLocation": ".next",
+      "outputLocation": "out",
       "appBuildCommand": "npm run build",
-      "apiBuildCommand": "cargo build --release; cp target/release/handler .",
+      "apiBuildCommand": "cargo build --release; cp target/release/handler .; rm target",
       "swaConfigLocation": "src",
       "run": "npm run dev",
       "open": true,
       "appName": "sealjay-blog",
+      "env": "Production",
       "appDevserverUrl": "http://localhost:3000",
-      "resourceGroupName": "sj_blog_swa"
+      "resourceGroupName": "sj_blog_swa",
+      "resourceGroup": "sealjay-blog-rg"
     }
   }
 }

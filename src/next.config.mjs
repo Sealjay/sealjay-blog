@@ -7,16 +7,19 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx'],
   reactStrictMode: true,
   experimental: {
-    scrollRestoration: true
-  }
+    scrollRestoration: true,
+  },
+  images: {
+    unoptimized: true,
+  },
 }
 
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypePrism]
-  }
+    rehypePlugins: [rehypePrism],
+  },
 })
 
 export default withMDX(nextConfig)

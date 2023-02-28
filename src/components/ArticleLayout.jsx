@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 import { Container } from '@/components/Container'
 import { Prose } from '@/components/Prose'
