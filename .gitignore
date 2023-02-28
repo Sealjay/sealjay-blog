@@ -4,7 +4,7 @@
 
 ### AzureFunctions ###
 # Azure Functions localsettings file
-local.settings.json
+
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and
@@ -425,7 +425,8 @@ FodyWeavers.xsd
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
