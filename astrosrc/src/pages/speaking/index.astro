@@ -1,0 +1,55 @@
+---
+import Layout from "../../layouts/BlogPost.astro";
+import { getCollection } from "astro:content";
+import FormattedDate from "../../components/FormattedDate.astro";
+const posts = (await getCollection("blog")).sort(
+  (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
+);
+
+const conferenceSlots = await getCollection("speaking", ({ data }) => {
+  return data.eventType === "Conference";
+});
+
+const videos = await getCollection("speaking", ({ data }) => {
+  return data.eventType === "Video";
+});
+
+const mediaMention = await getCollection("speaking", ({ data }) => {
+  return data.eventType === "Media Mention";
+});
+
+const podcasts = await getCollection("speaking", ({ data }) => {
+  return data.eventType === "Podcast";
+});
+
+const workshops = await getCollection("speaking", ({ data }) => {
+  return data.eventType === "Workshop";
+});
+---
+
+<Layout
+  title="Speaking"
+  description="I speak at events, share my insights and learn from others."
+  pubDateTime={new Date("1 March 2023")}
+  updatedDate={new Date("1 March 2023")}
+  heroImage="/placeholder-about.jpg"
+>
+  <p>
+    I'm passionate about open-source, green software, and Microsoft AI: you can
+    find here previous conference talks, media mentions, and other speaking
+    engagements.
+  </p>
+  <section>
+    <h3>Conferences</h3>
+    <ul>
+      {
+        conferenceSlots.map((slot) => (
+          <li>
+            <FormattedDate date={slot.data.date} />
+            {slot.data.title}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>
