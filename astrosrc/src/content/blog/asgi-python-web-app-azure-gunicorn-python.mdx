@@ -1,0 +1,38 @@
+---
+title: "Running an ASGI Python Web Application in Azure with Gunicorn and Uvicorn"
+description: "Assuming you're using a Linux web application plan, and running a Python application that requires the use of Uvicorn, here are some tips.  You'll need to have a startup command set in Azure [https://docs"
+pubDateTime: "2021-02-09T09:20:00.000Z"
+heroImage: "/placeholder-hero.jpg"
+tags: ['Snippets']
+---
+
+Assuming you're using a Linux web application plan, and running a Python application that requires the use of Uvicorn, here are some tips.
+
+You'll need to [have a startup command set in Azure](https://docs.microsoft.com/en-gb/azure/app-service/configure-language-python#customize-startup-command), which either calls a Uvicorn worker directly, or calls a configuration file specifying one.
+
+![](__GHOST_URL__/content/images/2021/02/image-2.png)On the Azure Portal, open your Web App, scroll to 'Configuration' under 'Settings', click on the 'General Settings' tab, and enter the appropriate startup command.`gunicorn -c gunicorn_config.py app:app`
+
+
+Once your startup command is set, you'll also need to have a gunicorn\_config.py file in your web app deployment.
+
+
+```
+# Configuration for Gunicorn on Azure
+# Azure Startup Command should be: gunicorn -c gunicorn_config.py app:app
+# See: https://docs.gunicorn.org/en/stable/settings.html#config
+workers = 4
+worker_class = "uvicorn.workers.UvicornWorker"
+
+```
+
+Finally, in your requirements.txt file, you'll need to specify additional dependencies:
+
+
+```
+# Required for deploying to Azure
+uvicorn
+uvloop
+httptools
+
+```
+

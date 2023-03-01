@@ -1,0 +1,194 @@
+---
+title: "CLI wizardry - Bing News Search on the fly"
+description: "You've probably heard of Bing, one of the largest search engines around, love it or loathe it. But did you know it has a nifty API? Bing Search APIs have moved recently out of Cognitive Services (as of October 30, 2020 [https://docs"
+pubDateTime: "2021-02-10T01:47:31.000Z"
+heroImage: "/placeholder-hero.jpg"
+tags: ['How To', 'Bing Search', 'API', 'Python', 'CLI', 'Cognitive Services']
+---
+
+You've probably heard of Bing, one of the largest search engines around, love it or loathe it. But did you know it has a nifty API? Bing Search APIs have moved recently out of Cognitive Services ([as of October 30, 2020](https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/bing-api-comparison)).
+
+These APIs include local business search, news, and image search. Wouldn't it be cool if we could use Bing News Search to quickly and easily find out what's going on in the world? Maybe you want to quickly check up on a coffee break, remove the visuals from your pandemic doom-scrolling, or you need inspiration for a tweet! 
+
+Today, I'm going to show you how to use Python to create a Command Line Interface (CLI) to search for trending articles, phrases you're particularly interested in, or just see what's happening in the world of business.
+
+![](__GHOST_URL__/content/images/2021/02/image-3.png)An example of a search for the "future of computing" with this handy tool![Sealjay-clj/bingnews-cliA command line interface to show the potential for finding news with the Bing News Search API. - Sealjay-clj/bingnews-cli![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://avatars.githubusercontent.com/u/19361656?s=400&v=4)](https://github.com/Sealjay-clj/bingnews-cli)You can also just jump right in, and explore the GitHub repository for this example
+
+---
+
+What you'll need
+----------------
+
+* An Azure tenant ([create a free account](https://azure.microsoft.com/en/free/) if you don't have one)
+* Basic Python Proficiency
+* A local installation of Git
+* A local installation of your preferred Python distribution
+* Visual Studio Code (or similar code editor)
+
+I'll walk you through the process of setting up a Bing Search API including the News feature, and then walk you through the application.
+
+
+
+---
+
+Getting Started
+---------------
+
+### Creating your Bing News Resource
+
+[Use this link to jump directly to the Bing Search marketplace template](https://portal.azure.com/#create/microsoft.bingsearch), or search for Bing Search v7 in the marketplace.
+
+However you find this, creating the resource will need you to be familiar with the pricing tier. Not all of the tiers include Bing News Search.
+
+For the purposes of this exercise, I've used the 'Free' instance, which allows up to 1,000 free transactions per month at the time of writing - but if you intend to use the tool often, you'll want to look at [the paid tiers](https://www.microsoft.com/en-us/bing/apis/pricing).
+
+![](__GHOST_URL__/content/images/2021/02/image-8.png)Select the Free pricing tierOnce you've read the privacy statement, filled in the form, and hit create, the resource will deploy. Time to get a coffee!
+
+### Getting your Bing News Endpoint and Keys
+
+When your resource is deployed, open it in the Azure Portal, and look at the Overview screen.
+
+![](__GHOST_URL__/content/images/2021/02/image-14.png)Your deployment should look similar to this.Take a note of the Endpoint, as you'll need this URL for the application. My endpoint isn't part of a multi-service subscription, so it doesn't have the region in the URL, so it's just `https://api.bing.microsoft.com/`.
+
+
+Click on either 'Keys and Endpoint' or the 'Click here to manage keys' link to open the 'Keys and Endpoint' tab.
+
+![](__GHOST_URL__/content/images/2021/02/image-10.png)You'll see your Endpoint listed here againKeep hold of the endpoint from earlier, and click on the blue copy icon to copy the API key, and keep this safe as well.
+
+### Configuring the Application
+
+Fire up a terminal, or open up an integration terminal in your preferred code editor - I'm a fan of [Visual Studio Code](https://code.visualstudio.com/) -  and clone the Git repository for the project. 
+
+Make sure you've changed your current working directory, to wherever you want the code to go, and then run the clone command.
+
+
+
+```
+ git clone https://github.com/Sealjay-clj/bingnews-cli.git
+
+```
+
+Rename the `.env.template` file in the `bingnews-cli/` directory to `.env`, replacing the content there with the Bing Search Key, and the Bing Search Endpoint you noted down earlier.
+
+
+### Install the Python Dependencies
+
+Rather than installing all of the dependencies into the global environment, we'll create a separate environment.
+
+
+To create a separate Python environment for your installation, and activate it, there are two common options.
+
+
+I prefer to use [miniconda](https://docs.conda.io/en/latest/miniconda.html), but you can use a `venv` if you prefer.
+
+
+a. *Using a Conda distribution*
+
+
+If you are using a distribution of conda, you may want to create a new conda environment, rather than use venv:
+
+
+
+```
+  ```bash
+  $ conda create --name bingnews python=3.9 -y
+  $ conda activate bingnews
+  $ pip3 install -r requirements-dev.txt
+  ```
+
+```
+
+b. *Using a Python virtual environment*  
+
+On Debian Linux distributions, you may need to run `sudo apt-get install python3-venv` before these instructions. On other distributions, I don't have a clue!
+
+
+
+```
+$ python3 -m venv env
+$ source env/bin/activate
+$ pip3 install -r requirements-dev.txt
+
+```
+
+On Windows, you may need to use `python` and `pip` commands where there are references to the `python3` and `pip3` commands.
+
+
+At this point, you should have a configured Python environment, and we're just about ready to try this out! `cd bingnews-cli` into the same directory as `bingnews.py`, and run `python3 bingnews.py`.
+
+
+![](__GHOST_URL__/content/images/2021/02/image-5.png)Hopefully, you're seeing a screen along these lines!
+
+### How does it work?
+
+The application is surprisingly simple. Most of the intelligence takes place in Bing Search, and then Click is used to generate a CLI. [Click is a Python package](https://click.palletsprojects.com/en/7.x/) focussed on creating command line interfaces.
+
+The command line has three options:
+
+
+* Search by Category. *Example:* `python3 bingnews.py cat -c Business`
+* Search by Phrase. *Example:* `python3 bingnews.py phrase -p "Future of Computing"`
+* Search for Trending articles. *Example:* `python3 bingnews.py trend`
+
+
+#### The basic request
+
+
+The basic request is made up of the `search_and_output_bing` function, which is called for all of the various API queries.
+
+
+This queries the Bing News endpoint, and then requests that the output is printed with `print_bing_results`, which in turn formats the output for presentation in `clean_bing_article_list`, applying some tweaks for the varied result-set returned by trending articles, in `clean_trending_article_dictionary`.
+
+
+#### Composing functions with Click
+
+
+In order to make functions available on the command-line, `click` allows us to use decorators to automatically generate help information for the command line, pass arguments to the function, and provide prompts if information is not provided by the user. Some defaults are also provided which can be overridden on the command-line, such as defaulting to the `en-GB` locale.
+
+
+### Other Components
+
+
+##### Requests Caching
+
+
+Requests are cached for five minutes, in case the user runs the same search, or in case the shortener is provided similar news article URLs, to prevent requesting the same URL twice for shortening from an endpoint.
+
+
+##### Tabulate
+
+
+Tabulate is used to render the dictionary output from the API, and make it easily readable in the terminal.
+
+
+##### PyShorteners
+
+
+URLs provided by Bing News are shortened with the `pyshorteners` package,and the qpsru service, to ensure they don't wrap off the terminal, and break the link.
+
+
+### What packages does this use
+
+The key packages are as follows:
+
+
+
+| Package Name | Purpose |
+| --- | --- |
+| click | Handles the CLI functionality |
+| tabulate | Formats the results as a table |
+| python-dotenv | Retrieves the configuration values from the .env file |
+| requests | Handles the API request |
+| requests-cache | Caches the requests if we make the same query, or shorten the same URL (pyshorteners is [based on the requests package](https://github.com/ellisonleao/pyshorteners/blob/master/pyshorteners/base.py) as well, and the qspru shortener uses GET requests) |
+| pyshorteners | Shortens the URls - I use psru, as this shortener doesn't require an API key |
+
+
+### What next?
+
+If you were to use this frequently in production, you'd want to add tests, and install this locally with a `setup.py` file. But for now, it's a good start for a CLI that can be re-used - and I'll be extending the functionality in a future post.
+
+
+Thanks for reading, and I hope you found this interesting!
+
+
+![](__GHOST_URL__/content/images/2021/02/image-13.png)Time to go and catch up on Science and Technology![Bing Search API documentation - Azure Cognitive ServicesThe Bing Search APIs let you build web-connected apps and services that find webpages, images, news, locations, and more without advertisements.Microsoft Docsaahill![](https://docs.microsoft.com/en-us/media/logos/logo-ms-social.png)](https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/)Find out more about the Bing Search API
