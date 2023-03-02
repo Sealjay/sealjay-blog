@@ -1,0 +1,67 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+
+const modeScript = `
+  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  updateMode()
+  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
+  window.addEventListener('storage', updateModeWithoutTransitions)
+
+  function updateMode() {
+    let isSystemDarkMode = darkModeMediaQuery.matches
+    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+
+    if (isDarkMode === isSystemDarkMode) {
+      delete window.localStorage.isDarkMode
+    }
+  }
+
+  function disableTransitionsTemporarily() {
+    document.documentElement.classList.add('[&_*]:!transition-none')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('[&_*]:!transition-none')
+    }, 0)
+  }
+
+  function updateModeWithoutTransitions() {
+    disableTransitionsTemporarily()
+    updateMode()
+  }
+`;
+// <div class="fixed inset-0 flex justify-center sm:px-8">
+// changed to
+// <div class="inset-0 flex justify-center sm:px-8">
+// need to make top component an island
+---
+
+<html class="h-full antialiased" lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+  <body class="flex h-full flex-col bg-zinc-50 dark:bg-black">
+    <div class="inset-0 flex justify-center sm:px-8">
+      <div class="flex w-full max-w-7xl lg:px-8">
+        <div
+          class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"
+        >
+          <div class="relative">
+            <Header />
+            <slot />
+            <Footer />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

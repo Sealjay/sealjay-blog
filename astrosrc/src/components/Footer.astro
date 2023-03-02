@@ -1,13 +1,6 @@
 ---
-const today = new Date();
+import { SITE_NAV } from "../consts";
+import { Footer } from "./Footer.jsx";
 ---
 
-<footer>
-  &copy; {today.getFullYear()} Chris Lloyd-Jones, aka Sealjay&#174;. All rights reserved.
-</footer>
-<style>
-  footer {
-    padding: 25px;
-    text-align: center;
-  }
-</style>
+<Footer navigation={SITE_NAV} />

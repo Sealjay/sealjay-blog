@@ -3,3 +3,4 @@
 
 export const SITE_TITLE = 'Sealjay';
 export const SITE_DESCRIPTION = 'Software engineer, open source & sustainability enthusiast.';
+export const SITE_NAV = [{ name: 'About', path: '/about' }, { name: 'Blog', path: '/blog' }, { name: 'Speaking', path: '/speaking' }]
