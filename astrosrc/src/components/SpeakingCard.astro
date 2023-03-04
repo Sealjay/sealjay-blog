@@ -1,0 +1,40 @@
+---
+import FormattedDate from "../components/FormattedDate.astro";
+const {
+  url = "#",
+  title = "Default title",
+  event = "Your name",
+  date = new Date(),
+  cta = "Want to learn more?",
+} = Astro.props;
+---
+
+<li class="col-span-2 flex rounded-md shadow-sm">
+  <div
+    class="flex w-16 flex-shrink-0 items-center justify-center bg-slate-50 rounded-l-md text-sm font-medium text-gray-600 text-center"
+  >
+    <FormattedDate date={date} />
+  </div>
+  <div
+    class="flex flex-1 items-center justify-between rounded-r-md border-t border-r border-b border-gray-200 bg-white"
+  >
+    <div class="flex-1 text-wrap px-4 py-2 text-sm">
+      <a href="#" class="font-medium text-gray-900 hover:text-gray-600">
+        {title}
+      </a>
+      <p>
+        <slot />
+      </p>
+      <p class="text-gray-500">{event}</p>
+    </div>
+    <div class="flex-shrink-0 pr-2">
+      <a
+        href={url}
+        target="_blank"
+        class="inline-flex h-8 w-8 text-xs items-center justify-center rounded-full bg-white bg-transparent text-slate-900 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+        {cta}&rarr;
+      </a>
+    </div>
+  </div>
+</li>

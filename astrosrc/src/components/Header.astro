@@ -2,7 +2,6 @@
 import { SITE_NAV } from "../consts";
 import Container from "./Container.astro";
 import HeaderLink from "./HeaderLink.astro";
-import DarkModeToggle from "./DarkModeToggle.astro";
 const { pathname } = Astro.url;
 ---
 
@@ -34,9 +33,7 @@ const { pathname } = Astro.url;
           </ul>
         </div>
         <div class="flex justify-end md:flex-1">
-          <div class="pointer-events-auto">
-            <DarkModeToggle />
-          </div>
+          <div class="pointer-events-auto"></div>
         </div>
       </div>
     </Container>
