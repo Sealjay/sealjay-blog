@@ -2,47 +2,9 @@
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import Container from "../components/Container.astro";
 
 const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
-
-const modeScript = `
-  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-  updateMode()
-  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
-  window.addEventListener('storage', updateModeWithoutTransitions)
-
-  function updateMode() {
-    let isSystemDarkMode = darkModeMediaQuery.matches
-    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
-
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-
-    if (isDarkMode === isSystemDarkMode) {
-      delete window.localStorage.isDarkMode
-    }
-  }
-
-  function disableTransitionsTemporarily() {
-    document.documentElement.classList.add('[&_*]:!transition-none')
-    window.setTimeout(() => {
-      document.documentElement.classList.remove('[&_*]:!transition-none')
-    }, 0)
-  }
-
-  function updateModeWithoutTransitions() {
-    disableTransitionsTemporarily()
-    updateMode()
-  }
-`;
-// <div class="fixed inset-0 flex justify-center sm:px-8">
-// changed to
-// <div class="inset-0 flex justify-center sm:px-8">
-// need to make top component an island
 ---
 
 <html class="h-full antialiased" lang="en">
@@ -57,7 +19,9 @@ const modeScript = `
         >
           <div class="relative">
             <Header />
-            <slot />
+            <Container>
+              <slot />
+            </Container>
             <Footer />
           </div>
         </div>

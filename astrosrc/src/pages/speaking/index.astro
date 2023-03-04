@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/BlogPost.astro";
 import { getCollection } from "astro:content";
+import { Card } from "../../components/Card.jsx";
 import FormattedDate from "../../components/FormattedDate.astro";
 const posts = (await getCollection("blog")).sort(
   (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
@@ -34,19 +35,32 @@ const workshops = await getCollection("speaking", ({ data }) => {
   updatedDate={new Date("1 March 2023")}
   heroImage="/placeholder-about.jpg"
 >
-  <p>
+  <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">
     I'm passionate about open-source, green software, and Microsoft AI: you can
     find here previous conference talks, media mentions, and other speaking
     engagements.
   </p>
   <section>
-    <h3>Conferences</h3>
+    <h3
+      class="text-lg pb-10 pt-3 font-semibold text-zinc-800 dark:text-zinc-100"
+    >
+      Conferences
+    </h3>
     <ul>
       {
         conferenceSlots.map((slot) => (
           <li>
-            <FormattedDate date={slot.data.date} />
-            {slot.data.title}
+            <Card className="" as="article">
+              <Card.Title as="h3" href={slot.data.url}>
+                {slot.data.title}
+              </Card.Title>
+              <Card.Eyebrow className="" decorate={true}>
+                {" "}
+                <FormattedDate date={slot.data.date} />: {slot.data.event}
+              </Card.Eyebrow>
+              <Card.Description>{slot.data.description}</Card.Description>
+              <Card.Cta>{slot.data.cta}</Card.Cta>
+            </Card>
           </li>
         ))
       }

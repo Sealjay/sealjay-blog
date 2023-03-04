@@ -3,12 +3,20 @@ title: "Unlocking content with summaries and insights!"
 description: "Cognitive Search is an awesome service that allows you to take the documents and information you have, wherever it may be, index it, and apply additional transforms to make the information searchable and usable - through the use of cognitive skills [https://docs.microsoft"
 pubDateTime: "2021-02-10T16:09:57.000Z"
 heroImage: "/placeholder-hero.jpg"
-tags: ['Cognitive Services', 'API', 'How To', 'Cognitive Search', 'Text Analytics', 'Agolo']
+tags:
+  [
+    "Cognitive Services",
+    "API",
+    "How To",
+    "Cognitive Search",
+    "Text Analytics",
+    "Agolo",
+  ]
 ---
 
 Cognitive Search is an awesome service that allows you to take the documents and information you have, wherever it may be, index it, and apply additional transforms to make the information searchable and usable - through the [use of cognitive skills](https://docs.microsoft.com/en-us/azure/search/cognitive-search-concept-intro).
 
-I've been lucky enough to be working with Cognitive Search since 2018 - but although I run training sessions, and tinker with the service out of hours, a lot of this has been inextricably bound up with my day to day work. You know how it is - *am I allowed to talk about this*?
+I've been lucky enough to be working with Cognitive Search since 2018 - but although I run training sessions, and tinker with the service out of hours, a lot of this has been inextricably bound up with my day to day work. You know how it is - _am I allowed to talk about this_?
 
 Well, I have permission to share (some) of what I've been working on! This will be less code heavy, but I'll explain how a brand new solution would work in practice, and what the architecture would look like.
 
@@ -22,38 +30,30 @@ We created an Azure Web Application which allows users to type in a free text se
 
 To go beyond normal search, we integrated:
 
-* Agolo ([an automatic summarisation tool](https://www.agolo.com/)) to summarise the text of the document
-* [The Azure Text Analytics API](https://docs.microsoft.com/en-gb/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-entity-linking?tabs=version-3) to identify people, and locations mentioned
-* [The Azure Computer Vision API](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/overview#analyze-images-for-insight) to caption images
+- Agolo ([an automatic summarisation tool](https://www.agolo.com/)) to summarise the text of the document
+- [The Azure Text Analytics API](https://docs.microsoft.com/en-gb/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-entity-linking?tabs=version-3) to identify people, and locations mentioned
+- [The Azure Computer Vision API](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/overview#analyze-images-for-insight) to caption images
 
-![](__GHOST_URL__/content/images/2021/02/cogsearchdesign.png)![](__GHOST_URL__/content/images/2021/02/cogsearchmain.png)![](__GHOST_URL__/content/images/2021/02/cogsearchoverview.png)This is an anonymised set of screenshots to demonstrate the application (used with permission from Avanade Inc) ### How does it work?
+![](/images/2021/02/cogsearchdesign.png)![](/images/2021/02/cogsearchmain.png)![](/images/2021/02/cogsearchoverview.png)This is an anonymised set of screenshots to demonstrate the application (used with permission from Avanade Inc) ### How does it work?
 
-![](__GHOST_URL__/content/images/2021/02/cognitive_search_application.png)Generated with [Diagrams for Python](https://diagrams.mingrammer.com/)### Getting the documents into Blob Storage
-
+![](/images/2021/02/cognitive_search_application.png)Generated with [Diagrams for Python](https://diagrams.mingrammer.com/)### Getting the documents into Blob Storage
 
 All documents sit in SharePoint Online within Office 365. At the time of creating this solution, there was no SharePoint connector for Cognitive Search - so we copied the entirety of the library to be indexed to Blob Storage, and then created a Logic App to copy new and updated files to Blob Storage as it happened.
 
-
 ### Intelligence
-
 
 We created an Azure Function that accepted input from Cognitive Search at the Document Cracking phase, and then sent this to the Agolo [Bullet Summarizer API](https://dev.agolo.com/docs/services/570d7b4f88b6e5116cdf6a17/operations/570d7b5188b6e508dcfb1c90) to be summarised. For example - taking a whole 60 page whitepaper on AI, and summarising it in three paragraphs. This Azure Function is registered as a [Custom Web API](https://docs.microsoft.com/en-us/azure/search/cognitive-search-custom-skill-web-api).
 
-
 We then used the [built-in skills](https://docs.microsoft.com/en-us/azure/search/cognitive-search-predefined-skills#built-in-skills) for Computer Vision and Text Analytics.
-
 
 ### Indexing the files
 
-
 We created an [Index in Cognitive Search](https://docs.microsoft.com/en-us/azure/search/search-get-started-portal) which used the Blob Storage as a data source.
-
 
 As part of the indexing process, the Cognitive Skills we added earlier, and the Custom Skill we created, are applied to the documents, to produce an index.
 
+![](/images/2021/02/image-21.png)The Document Cracking Pipeline for this SolutionAnd there we have it! I hope this example showed you how easy it is to set up and use Azure Cognitive Search to create intelligent applications, and extract that is currently trapped in your documents.
 
-![](__GHOST_URL__/content/images/2021/02/image-21.png)The Document Cracking Pipeline for this SolutionAnd there we have it! I hope this example showed you how easy it is to set up and use Azure Cognitive Search to create intelligent applications, and extract that is currently trapped in your documents.
+![](/images/2021/02/cogsearchoverview-1.png)The search results for our knowledge finder exampleI showed you how Cognitive Services and Agolo could be used to summarise documents - and in a future post, I'll explain [how to use Azure Media Services Video Indexer](https://docs.microsoft.com/en-us/azure/media-services/video-indexer/video-indexer-overview) to pull insight out of video and audio files.
 
-![](__GHOST_URL__/content/images/2021/02/cogsearchoverview-1.png)The search results for our knowledge finder exampleI showed you how Cognitive Services and Agolo could be used to summarise documents - and in a future post, I'll explain [how to use Azure Media Services Video Indexer](https://docs.microsoft.com/en-us/azure/media-services/video-indexer/video-indexer-overview) to pull insight out of video and audio files.
-
-![](__GHOST_URL__/content/images/2021/02/image-23.png)The information pyramid
+![](/images/2021/02/image-23.png)The information pyramid

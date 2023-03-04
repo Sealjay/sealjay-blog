@@ -3,7 +3,16 @@ title: "Querying Azure Digital Twins with PowerBI"
 description: "A Digital Twin is a digital replica of a physical object, space, or abstract process. It allows us to model the state of these things virtually, and then respond to events as they happen in real time"
 pubDateTime: "2021-05-24T23:12:17.000Z"
 heroImage: "/placeholder-hero.jpg"
-tags: ['How To', 'Cognitive Services', 'CLI', 'Python', 'Digital Twins', 'PowerBI', 'Anomaly Detector']
+tags:
+  [
+    "How To",
+    "Cognitive Services",
+    "CLI",
+    "Python",
+    "Digital Twins",
+    "PowerBI",
+    "Anomaly Detector",
+  ]
 ---
 
 A Digital Twin is a digital replica of a physical object, space, or abstract process. It allows us to model the state of these things virtually, and then respond to events as they happen in real time.
@@ -12,7 +21,7 @@ Microsoft provide an Azure Digital Twin service, which allows us to create pre-d
 
 [What is Azure Digital Twins? - Azure Digital TwinsOverview of what can be done with Azure Digital Twins.Microsoft Docsbaanders![](https://docs.microsoft.com/en-us/media/logos/logo-ms-social.png)](https://docs.microsoft.com/en-gb/azure/digital-twins/overview?WT.mc_id=AI-MVP-5004204)As well as SDKs across a variety of languages from .NET to Python, Microsoft have created a number of tools and code samples - [the Azure Digital Twins explorer](https://github.com/Azure-Samples/digital-twins-explorer/) is a web based application that allows you to visually see the connections between these twins.
 
-![](__GHOST_URL__/content/images/2021/05/image-1.png)A screenshot of the graph database within the Azure Digital Twins explorer### Sharing data with end users
+![](/images/2021/05/image-1.png)A screenshot of the graph database within the Azure Digital Twins explorer### Sharing data with end users
 
 Sharing these views with end users can be difficult however - you probably don't want to be sharing the explorer with end users! And what if you want to share an overview of the current situation with your business users? Well, this sounds like a perfect use case for PowerBI and Azure Digital Twins.
 
@@ -24,7 +33,6 @@ PowerBI is the visualisation tool from Microsoft that allows you to create and s
 
 Using the `azure-digitaltwins-core` python package, this can be done in eight steps!
 
-
 1. Create an Azure Digital Twin, or use one you already have.
 2. Give yourself access to the data plane - adding some example data - the [Azure Digital Twins explorer](https://github.com/Azure-Samples/digital-twins-explorer/) example data is a good start.
 3. Create a virtual environment for your Python setup, e.g. `python3 -m venv .venv`.
@@ -33,8 +41,6 @@ Using the `azure-digitaltwins-core` python package, this can be done in eight st
 6. [Enable python scripting](https://docs.microsoft.com/en-us/power-bi/connect-data/desktop-python-scripts#enable-python-scripting?WT.mc_id=AI-MVP-5004204) in PowerBI.
 7. Log in to Azure on the CLI with `az login`.
 8. Import the **powerbi-query.py** file in the [GitHub repository](https://github.com/Sealjay-clj/powerbi-adt) as a [PowerBI datasource](https://docs.microsoft.com/en-us/power-bi/connect-data/desktop-python-scripts?WT.mc_id=AI-MVP-5004204#run-your-python-script-and-import-data).
-
-
 
 ```
 query_expression = "SELECT * FROM digitaltwins"
@@ -51,4 +57,4 @@ So, next time you want to share data from Azure Digital Twins - consider PowerBI
 
 For a full example, [you can see the repository on GitHub](https://github.com/Sealjay-clj/powerbi-adt).
 
-![](__GHOST_URL__/content/images/2021/05/image-2.png)The list of twins displayed in PowerBI
+![](/images/2021/05/image-2.png)The list of twins displayed in PowerBI

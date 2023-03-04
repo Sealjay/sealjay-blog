@@ -3,7 +3,7 @@ title: "Extracting transcripts and insights from videos in Python"
 description: "Compared to YouTube from Google, and Twitch from Amazon, Microsoft's experiments with media have been."
 pubDateTime: "2021-02-18T20:46:51.000Z"
 heroImage: "/placeholder-hero.jpg"
-tags: ['Cognitive Services', 'How To', 'Python']
+tags: ["Cognitive Services", "How To", "Python"]
 ---
 
 Compared to YouTube from Google, and Twitch from Amazon, Microsoft's experiments with media have been... ill-feted in the past. From the shuttering of the Zune service in 2012, and the closure of the Mixer streaming service in July 2020, the track record doesn't look great.
@@ -12,9 +12,9 @@ Compared to YouTube from Google, and Twitch from Amazon, Microsoft's experiments
 
 In the UK, we're still in lockdown due to the pandemic - so I've been trying to think of ways to help people stay connected, without burning out. This led me to work on a social video project to allow people to upload videos from their phone, automatically transcribing and posting them to teams.
 
-In the course of this project (*more detail of which will be in a forthcoming blog post series, around deploying Python Web Applications to Azure*) - I realised that the Python SDK for Video Indexer is a bit lacking. I found a great package by BK Lim, but there isn't an official SDK.
+In the course of this project (_more detail of which will be in a forthcoming blog post series, around deploying Python Web Applications to Azure_) - I realised that the Python SDK for Video Indexer is a bit lacking. I found a great package by BK Lim, but there isn't an official SDK.
 
-![](__GHOST_URL__/content/images/2021/02/Screenshot-2021-02-18-at-20.31.12.png)![](__GHOST_URL__/content/images/2021/02/Screenshot-2021-02-18-at-20.31.40.png)A social video project I've been working onFor most purposes, BK Lim's library would be great, but with the number of queries and callbacks I expected, being able to run the library asynchronously for me was a must.
+![](/images/2021/02/Screenshot-2021-02-18-at-20.31.12.png)![](/images/2021/02/Screenshot-2021-02-18-at-20.31.40.png)A social video project I've been working onFor most purposes, BK Lim's library would be great, but with the number of queries and callbacks I expected, being able to run the library asynchronously for me was a must.
 
 ### aio-videoindexer allows you to use Azure Media Services in Python
 
@@ -24,4 +24,4 @@ I thought it might be useful for others, so I've spun the library out into [a pa
 
 I've added [basic documentation to ReadTheDocs,](https://aio-videoindexer.readthedocs.io/en/latest/) and you can see this package in action in [the Teams-Vid repository](https://github.com/sealjay-clj/teams-vid). In an upcoming blog post, I'll show how Video Indexing can be used to power a social video application made with Python.
 
-![](__GHOST_URL__/content/images/2021/02/image-24.png)A list of uploaded videos[Sealjay-clj/teams-vidWeb application for mobile and desktop to quickly post videos for your team. Demonstrates Starlette, and Azure Media Services Video Indexer. Lets people record themselves on the fly, to stay in syn...![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://avatars.githubusercontent.com/u/19361656?s=400&v=4)](https://github.com/sealjay-clj/teams-vid)
+![](/images/2021/02/image-24.png)A list of uploaded videos[Sealjay-clj/teams-vidWeb application for mobile and desktop to quickly post videos for your team. Demonstrates Starlette, and Azure Media Services Video Indexer. Lets people record themselves on the fly, to stay in syn...![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://avatars.githubusercontent.com/u/19361656?s=400&v=4)](https://github.com/sealjay-clj/teams-vid)

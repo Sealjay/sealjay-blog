@@ -1,0 +1,33 @@
+---
+let imagesAndRotations = [
+  { src: "home/image-1.jpg", rotation: "rotate-2" },
+  { src: "home/image-2.jpg", rotation: "-rotate-2" },
+  { src: "home/image-3.jpg", rotation: "rotate-2" },
+  { src: "home/image-4.jpg", rotation: "rotate-2" },
+  { src: "home/image-5.jpg", rotation: "-rotate-2" },
+];
+---
+
+<div class="mt-16 sm:mt-20 z-100">
+  <div class="-my-4 flex justify-center gap-5 overflow-hidden py-4 sm:gap-8">
+    {
+      imagesAndRotations.map((image) => (
+        <>
+          <div
+            class:list={[
+              "relative aspect-[9/10] w-44 flex-none overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 sm:w-72 sm:rounded-2xl",
+              image.rotation,
+            ]}
+          >
+            <img
+              src={image.src}
+              alt=""
+              sizes="(min-width: 640px) 18rem, 11rem"
+              class="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+        </>
+      ))
+    }
+  </div>
+</div>
