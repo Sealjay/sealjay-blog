@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PageLayout from "./IndexLayout.astro";
+import FormattedDate from "../components/partials/FormattedDate.astro";
+
+type Props = CollectionEntry<"blog">["data"];
+
+const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+---
+
+<PageLayout
+    title={title}
+    description={description}
+    pubDateTime={pubDateTime}
+    updatedDate={updatedDate}
+    heroImage={heroImage}
+>
+  <article class="max-w-none my-6 text-gray-800 dark:text-gray-200 prose">
+    <h1
+        class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl mb-4"
+    >
+      {title}
+    </h1>
+    <div class="text-lg text-gray-500 dark:text-gray-400 mb-6">
+      {`Published on`}
+      <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
+     <FormattedDate date={pubDateTime} /></span>{
+          updatedDate && (
+              <>
+                {`- last updated on `}
+                <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
+          <FormattedDate date={updatedDate} />
+        </span>
+              </>
+          )
+      }
+    </div>
+    <slot />
+  </article>
+</PageLayout>

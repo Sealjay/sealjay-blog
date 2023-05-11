@@ -1,0 +1,76 @@
+---
+export function getStaticPaths() {
+  let articleUrls = [
+    "3-ways-to-turn-your-supply-chain-into-a-growth-engine",
+    "5-trends-every-cio-should-be-aware-of-in-2020",
+    "annual-manufacturing-report-2020",
+    "asgi-python-web-app-azure-gunicorn-python",
+    "azure-confidential-ledger-attestability-for-the-masses",
+    "bbc-world-service-chris-lloyd-jones-al-specialist-avanade",
+    "big-data-in-payments-cass-business-school",
+    "bing-news-search-cli",
+    "blue-prism-world-london-2017",
+    "blue-prism-world-london-2018",
+    "blue-prism-world-new-york-2017",
+    "call-to-action-on-green-software-establishing-a-centre-of-excellence",
+    "call-to-action-spreading-the-message-of-green-software",
+    "call-to-action-success-factors",
+    "chatbot-implementation-best-practice-tips-from-avanade",
+    "cognitive-search-law-part1-indexer",
+    "cognitive-search-series",
+    "creative-sector-embracing-the-use-of-ai",
+    "d365-saturday-dublin-2018-ai-and-d365",
+    "d365-saturday-london-2018-ai-and-d365",
+    "deploying-a-nextjs-application-to-azure",
+    "enabling-a-future-ready-business-with-ai-and-ia",
+    "enabling-https-on-a-uvicorn-python-application-deployed-to-azure",
+    "ethical-and-productivity-implications-of-intelligent-code-creation",
+    "extracting-transcripts-and-insights-from-videos-in-python",
+    "gartner-5-emerging-technology-trends-with-transformational-impact",
+    "github-copilot-gpt-3-powered-coding",
+    "green-software-engineering-at-microsoft-build",
+    "green-software-making-an-impact",
+    "green-software-tech-talk-kazeem",
+    "how-facial-recognition-technology-threatens-basic-privacy-rights",
+    "idg-connect-ai-creative",
+    "industry-group-aims-to-tackle-energy-efficient-software-development",
+    "intelligent-search-at-your-fingertips",
+    "intelligent-workforce-of-the-future",
+    "iot-now-focus-on-your-business-goals",
+    "microsoft-build-2020-part-1-weve-combed-through-all-the-revelations",
+    "microsoft-build-2020-part-2-and-theres-more",
+    "microsoft-inspire-2021-protecting-your-ledger-with-azure-confidential-computing",
+    "mit-future-compute-a-round-up",
+    "open-source-reduce-software-emissions-podcast",
+    "oral-culture-and-the-rise-of-literacy",
+    "oss-open-source-models",
+    "power-automate-for-individual-group-notifications",
+    "quantum-computing-coming-soon-to-an-enterprise-near-you",
+    "querying-azure-digital-twins-with-powerbi",
+    "ready-by-design-help-to-design-a-better-digital-future",
+    "tech-talent-2021",
+    "text-analytics-for-health",
+    "the-future-of-edge-demassification",
+    "the-metaverse-is-it-finally-here",
+    "the-wonderful-world-of-github-actions",
+    "thinking-machines-azure-digital-twins",
+    "unlocking-content-with-summaries-and-insight",
+    "whats-on-the-horizon-2021-mit-future-compute",
+    "why-cios-should-focus-on-trimming-their-internal-email-footprint",
+  ];
+
+  return articleUrls.map((url) => {
+    return {
+      params: {
+        redirectCanonical: url,
+      },
+    };
+  });
+}
+
+const { redirectCanonical } = Astro.params;
+---
+
+<head>
+  <meta http-equiv="refresh" content={`0; url=blog/${redirectCanonical}`} />
+</head>
