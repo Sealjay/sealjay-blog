@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Photos from "../components/partials/IndexPhotos.astro";
 import Layout from "../layouts/IndexLayout.astro";
 import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
@@ -53,4 +54,6 @@ const recentPosts = posts.slice(0, 5);
       ))
     }
   </div>
+
+  <Photos />
 </Layout>

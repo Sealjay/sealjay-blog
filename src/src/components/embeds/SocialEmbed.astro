@@ -1,0 +1,46 @@
+---
+type Props = {
+  title: string;
+  linkUrl: string;
+  imageUrl: string;
+};
+
+const { title, linkUrl, imageUrl } = Astro.props;
+---
+
+<social-embed data-url={linkUrl}>
+  <div
+    class="cursor-pointer flex items-start bg-white border border-gray-300 rounded-lg shadow-md p-6"
+  >
+    <div
+      class="w-20 h-20 flex-none bg-cover rounded-full mr-6"
+      style={`background-image: url(${imageUrl})`}
+    >
+    </div>
+    <div class="flex-1">
+      <div class="mb-4">
+        <a
+          href={linkUrl}
+          target="_blank"
+          class="text-lg leading-6 font-medium text-black">{title}</a
+        >
+      </div>
+      <div class="text-gray-600 prose"><slot /></div>
+    </div>
+  </div>
+</social-embed>
+
+<script>
+  class SocialEmbed extends HTMLElement {
+    constructor() {
+      super();
+      const url = this.dataset.url;
+      const div = this.querySelector("div");
+      div.addEventListener("click", () => {
+        window.open(url, "_blank");
+      });
+    }
+  }
+
+  customElements.define("social-embed", SocialEmbed);
+</script>

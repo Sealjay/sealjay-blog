@@ -19,6 +19,7 @@
     "test": "standard"
   },
   "dependencies": {
+    "@astro-community/astro-embed-youtube": "^0.2.2",
     "@astrojs/mdx": "^0.17.2",
     "@astrojs/prism": "^1.0.2",
     "@astrojs/react": "^2.0.2",
