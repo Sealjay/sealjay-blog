@@ -1,0 +1,144 @@
+---
+title: "Using Cognitive Search to make the law more accessible: Part 1"
+description: "In a previous blog post, I talked about the endless possibilities that Cognitive Search [https://sealjay.com/unlocking-content-with-summaries-and-insight/] gives you, making various datasets more easily accessible"
+pubDateTime: "2021-03-03T02:01:00.000Z"
+heroImage: "/placeholder-hero.png"
+tags: ["How To", "Cognitive Search", "Python", "Cognitive Services"]
+---
+
+In a previous blog post, [I talked about the endless possibilities that Cognitive Search](https://sealjay.com/unlocking-content-with-summaries-and-insight/) gives you, making various datasets more easily accessible.
+
+Now, I'm going to show you how you can do this yourself, in a six-part blog series, covering Azure Cognitive Search, through to implementing a web application to display your results.
+
+This is following the awesome work [Microsoft has done to launch semantic search... and semantic answers](https://techcommunity.microsoft.com/t5/azure-ai/introducing-semantic-search-bringing-more-meaningful-results-to/ba-p/2175636)!
+
+I'll be covering:
+
+1. _(this blog post)_ Search - Creating an indexer for Azure Cognitive Search through the Azure portal
+2. Integration - Integrating Azure Cognitive Search with a Python Web Application, using [the Azure SDK for Python](https://azuresdkdocs.blob.core.windows.net/$web/python/azure-search-documents/11.1.0/index.html)
+3. Getting a Dataset - How the UK Legislation dataset was crawled and downloaded
+4. User Interface - Creating a layout for your web application using Tailwind CSS, making the most of Azure Cognitive Search features
+5. Infrastructure as Code - Deploying the entire solution using Pulumi and GitHub Actions
+6. Answers - How can we use Azure Cognitive Search to answer questions about the law [using Semantic Search](https://docs.microsoft.com/en-gb/azure/search/semantic-search-overview)
+
+If you want to skip to the end, the accompanying code repository is already freely [available on GitHub](https://github.com/Sealjay-clj/py-cognitive-search).
+
+## Background
+
+Azure Cognitive Search takes your data, wherever it may be - from SQL Server Data, through to Blob Storage, and [SharePoint Online](__GHOST_URL__/cognitive-search-law-part1-indexer/o-index-sharepoint-online).
+
+The power behind Azure Cognitive Search is in the "Document Cracking" - applying logic and AI enrichment to make information usable.
+
+I selected [UK Legislation](https://www.legislation.gov.uk/) for this demo, because it meets a few excellent criteria:
+
+1. It's freely available for use under licence.
+2. It has a variety of document formats, including modern data (in PDF, XML, RDF, etc), through to scanned in images, embedded within PDF.
+3. It demonstrates the power of Cognitive Search - allowing us to ask questions about the law and figure out the answer.
+
+## ![](/images/2021/03/Screenshot-2021-03-03-at-01.06.02.png)![](/images/2021/03/Screenshot-2021-03-03-at-01.06.34.png)The ancient legislation from legislation.gov.uk, next to the application we'll be building in this series. Image contains public sector information licensed under the Open Government Licence v3.0.Let's get started!
+
+To follow along, I assume you have access to a Microsoft Azure subscription [or free trial](https://azure.microsoft.com/en-gb/free/); I also assume you have access to a dataset with some PDFs (in part 3, I'll show you how to download my dataset.)
+
+#### Create your Storage Account to be Indexed
+
+As I mentioned, Azure Cognitive Search supports a variety of data sources. As we have PDFs, I'll be creating an Azure Storage Account, and a Blob Storage container.
+
+Azure Storage Accounts [can be found within the Azure Marketplace](https://portal.azure.com/#create/Microsoft.StorageAccount-ARM). Choose your preferred options, then 'Review + create' your resource.
+
+![](/images/2021/03/image-8.png)I went with pretty standard defaultsIt will take a bit of time for your storage account to be provisioned - and once it is, you'll need to create a Blob Storage container, to hold all of the files you intend to crack open!
+
+I prefer to do this [using the Azure Storage Explorer](https://azure.microsoft.com/en-gb/features/storage-explorer/), a free application to manage Azure cloud storage resources, but you can also open up your new account in the portal. Click on 'Containers' under Blob service, and then click 'Container' and answer the questions which appear.
+
+![](/images/2021/03/image-9.png)![](/images/2021/03/image-11.png)**_Don't forget to upload some PDFs into the container for indexing!_**
+
+In part 3, I'll show you how to download the dataset I've used - or you can skip ahead to the GitHub repo to copy the process.
+
+#### Create your Azure Search Resource
+
+You can [find Azure Cognitive Search in the Azure Marketplace](https://portal.azure.com/#create/Microsoft.Search).
+
+For the purpose of this demo, I'll be creating a 'Basic' search resource. Be aware that your search tier limits the maximum number of indexes you can create, the size and speed of your physical storage, as well as the cost implication.  [Microsoft have a great guide on their portal.](https://docs.microsoft.com/en-us/azure/search/search-sku-tier)
+
+![](/images/2021/03/image-7.png)When we come to part six of the series, [Semantic Search](https://docs.microsoft.com/en-us/azure/search/semantic-search-overview) (which will help us answer questions about the law) is only available for search services configured on a Standard pricing tier.
+
+Pick your preferred location, tier, and choose a resource group - then 'Review + create' your resource.
+
+#### Create your Data Source
+
+Now that your search resource is up and running, we need to connect to the Blob Storage container which we created. Click on 'Data sources' and then 'New Data Source.'
+
+![](/images/2021/03/image-13.png)Click on the 'Data sources' tabA form will pop up, asking for more information about your data source.
+
+![](/images/2021/03/image-16.png)See the 'Choose an existing' connection option? Choose this option, to pick from other storage accounts you have access to. Then select the relevant container and confirm your choices.
+
+You'll need to name the data source - and then click Save.
+
+#### Create your Search Index
+
+Indexes are the main landing ground for all of the content that you'll be ingesting. This is a critical point - and once you add a field to an index, or set certain settings, you'll need to delete the whole index if you make a mistake. This isn't an issue if you have a few documents indexed but is quite painful if you have thousands or more.
+
+In a later blog post, I'll show you how to use Pulumi and API calls to set this up.
+
+To create an index, click on the 'Indexes' tab and then 'New Index.'
+
+![](/images/2021/03/image-4.png)Click on 'New Index'This will take you to a screen where you can add the various fields - that is, the column names, data types, and settings for your searchable content. This is the physical structure of your index.
+
+![](/images/2021/03/image-5.png)Your Add Index pageSome of [these field attributes have important implications](https://docs.microsoft.com/en-us/azure/search/search-what-is-an-index#attributes) - the most interesting one that I'll point out, is the "suggester." This allows you to easily add auto-complete, and auto-suggested terms to your application.
+
+For now, in my indexer, I've added fields to store the content, the legislation title, and the original file name.
+
+![](/images/2021/03/image-6.png)The indexer I've usedIn future, I can imagine wanting to store a summary of the file, maybe even index individual legislation paragraphs, or allow users to search legislation over time.
+
+**All of these scenarios are supported!**
+
+#### Create your AI Enrichment Skillset
+
+The PDFs I've used are very image-heavy up until the start of the late 20th century laws. This is likely because legal texts pre-digitisation were scanned in from paper copies.
+
+Because of this, we need to handle older PDF documents - pulling out the images - whilst indexing the text in new documents.
+
+Cognitive Skills allow us to achieve this. We can use built-in skills from Microsoft, including Cognitive Services like Computer Vision, or key phrase extraction; as well as _custom skills_ - like the use of Agolo for text summaries [that I demonstrated previously](https://sealjay.com/unlocking-content-with-summaries-and-insight/).
+
+The skillset I've created has two parts - part one will extract text (plain and structured) from images, and part two will merge all text into one field.
+
+The skillset can be found in full below.
+
+#### Start Indexing
+
+There are a few different elements [to creating an indexer.](https://docs.microsoft.com/en-gb/azure/search/search-howto-create-indexers) Microsoft's guide is great for this, so I've listed the indexer JSON definition I used in full below, and explained some key sections.
+
+To create your indexer, click on 'Indexers' and then 'New Indexer'.
+
+This will take you to a screen where you can fill in a form, or you can paste in the definition for an existing definition from JSON.
+
+![](/images/2021/03/image-3.png)I assume you'll open up the JSON tab too!By default, the existing definition is pretty plain, and it won't use the AI skill we've already defined.
+
+The most important parts that you might need to add, are:
+
+- `skillsetName` - this references the AI Enrichment Skillset we created before
+- `imageAction` - by default, this is set to None. In our case, it's `generateNormalizedImages`, which ensures we get back images for any PDFs that require this.
+- `outputFieldMappings` - we need to make sure that the `merged_content` from our AI Skillset is stored in index field I made earlier.
+
+And here's my definition in full.
+
+When your indexer is set up in the way you'd like it, you'll need to hit 'Run' - unless you've chosen to regularly schedule it, and this will populate your index.
+
+![](/images/2021/03/image-17.png)The magic button!This will take a bit of time, influenced by the amount of data you have - and the user interface is pretty intuitive.
+
+**_Make sure that you have uploaded some PDFs into the container for indexing!_**
+
+#### Try it out!
+
+![](/images/2021/03/image-2.png)Click on your index, whatever you named itAfter you leave your index to run, you should be able to return to the pane for your Search resource, and click on the 'Index' tab, and then the name of your index.
+
+This will open a search explorer - feel free to search for terms and see what you get back! I got back some information about one of the finance bills I'd uploaded.
+
+![](/images/2021/03/image-1.png)A result for 'Weights' returning a (slightly uninteresting) result on a finance act from the UKFeel proud of yourself! You've set up and indexed some content, and you're well on the way to making your information usable and accessible.
+
+## Next time
+
+And there we have it! We have an index with some (hopefully useful) content, ready to be integrated into an application!
+
+In the next post, I'll be covering how to integrate Azure Cognitive Search with the screenshot of the Python Web Application you see above.
+
+[Sealjay-clj/py-cognitive-searchA demonstrator of the latest and greatest in Cognitive Search, deployed in Azure with Python. - Sealjay-clj/py-cognitive-search![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://avatars.githubusercontent.com/u/19361656?s=400&v=4)](https://github.com/Sealjay-clj/py-cognitive-search/)

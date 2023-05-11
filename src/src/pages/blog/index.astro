@@ -1,0 +1,53 @@
+---
+import Layout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import FormattedDate from "../../components/partials/FormattedDate.astro";
+import { getMonth, getYear, format } from 'date-fns';
+
+const posts = (await getCollection("blog")).sort(
+    (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
+);
+const groupedPosts = posts.reduce((acc, post) => {
+  const date = new Date(post.data.pubDateTime);
+  const monthYearKey = format(date, 'yyyy-MM');
+  acc[monthYearKey] = [...(acc[monthYearKey] || []), post];
+  return acc;
+}, {});
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+// get the date of the last blog post
+const lastPostDate = new Date(posts[0].data.pubDateTime);
+---
+
+<Layout
+    title="Writing on topics from software to society"
+    description="Writing on topics from software to society"
+    pubDateTime={new Date("1 March 2023")}
+    updatedDate={lastPostDate}
+    heroImage="/placeholder-hero.png"
+>
+        I'm passionate about open-source, green software, and Microsoft AI: you can find blog posts I've written on these topics below - along with other random topics mixed in. You can also find some of my presentations, YouTube videos, and podcasts on the <a href="/speaking" class="text-blue-600 hover:underline">speaking page</a>.
+    <div class="mt-5 not-prose">
+      {Object.entries(groupedPosts).map(([monthYear, posts]) => (
+          <div key={monthYear} class="mt-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">{monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}</h2>
+            <ul class="divide-y divide-gray-200">
+              {posts.map((post) => (
+                  <li class="pt-6 pb-8 space-y-2 md:space-y-5" key={post.slug}>
+                    <div class="space-y-1 text-center">
+                      <div class="text-base text-gray-500">
+                        <FormattedDate date={post.data.pubDateTime} />
+                      </div>
+                      <h2 class="text-xl leading-8 font-bold tracking-tight">
+                        <a href={`/blog/${post.slug}/`} class="text-gray-900 hover:text-gray-700">
+                          {post.data.title}
+                        </a>
+                      </h2>
+                    </div>
+                  </li>
+              ))}
+            </ul>
+          </div>
+      ))}
+    </div>
+
+</Layout>
