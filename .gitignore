@@ -855,3 +855,4 @@ $RECYCLE.BIN/
 src/public/rss/feed.json
 src/public/rss/feed.xml
 api/handler
+deploy.sh

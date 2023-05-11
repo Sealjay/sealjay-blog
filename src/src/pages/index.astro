@@ -1,28 +1,25 @@
 ---
-import {getCollection} from "astro:content";
+import { getCollection } from "astro:content";
 import Layout from "../layouts/IndexLayout.astro";
-import Container from "../components/containers/Container.astro";
-import Photos from "../components/partials/IndexPhotos.astro";
 import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 const posts = (await getCollection("blog")).sort(
-    (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
+  (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
 );
 // get the most recent five blog posts only
 const recentPosts = posts.slice(0, 5);
-
 ---
 
 <Layout
-    title="About Me"
-    description="I'm Chris Lloyd-Jones, Sealjay. I live in London"
-    pubDateTime={new Date("1 March 2023")}
-    updatedDate={new Date("1 March 2023")}
-    heroImage="/chris/portrait.jpg"
+  title="About Me"
+  description="I'm Chris Lloyd-Jones, Sealjay. I live in London"
+  pubDateTime={new Date("1 March 2023")}
+  updatedDate={new Date("1 March 2023")}
+  heroImage="/chris/portrait.jpg"
 >
   <div class="max-w-2xl pt-10">
     <h1
-        class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
+      class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
     >
       Software engineer, open source & sustainability enthusiast.
     </h1>
@@ -41,7 +38,8 @@ const recentPosts = posts.slice(0, 5);
   <SocialLinks />
   <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">Recent blogs:</p>
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {recentPosts.map((post) => (
+    {
+      recentPosts.map((post) => (
         <div class="border rounded-md p-4 bg-white shadow-md" key={post.slug}>
           <h2 class="text-lg leading-6 font-medium text-gray-900">
             <a href={`/blog/${post.slug}/`} class="hover:text-indigo-600">
@@ -52,8 +50,7 @@ const recentPosts = posts.slice(0, 5);
             <FormattedDate date={post.data.pubDateTime} />
           </div>
         </div>
-    ))}
+      ))
+    }
   </div>
-
-  <Photos />
 </Layout>

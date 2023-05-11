@@ -1,7 +1,6 @@
-import { defineConfig } from 'astro/config';
-import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
-
+import { defineConfig } from "astro/config";
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 import tailwind from "@astrojs/tailwind";
@@ -14,6 +13,12 @@ import purgecss from "astro-purgecss";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
-  integrations: [mdx(), sitemap(), tailwind(), react(), purgecss()]
+  site: "https://sealjay.com",
+  integrations: [
+    mdx(),
+    sitemap(),
+    tailwind(),
+    react(),
+    purgecss({ safelist: ["aspect-[9/10]"] }),
+  ],
 });

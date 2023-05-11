@@ -10,20 +10,16 @@ const { pathname } = Astro.url;
     <Container>
       <div class="relative flex gap-4">
         <div class="flex flex-1">
-          <div
-            class="h-10 w-10 rounded-full bg-white bg-white/90 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 90 p-0.5 ring-zinc-900 5 backdrop-blur dark:bg-zinc-800 dark:ring-white"
-          >
-            <a href="/src/public" aria-label="Home" class="pointer-events-auto">
-              <img
-                src="/chris/avatar.jpg"
-                alt=""
-                id="avatarImg"
-                sizes="2.25rem"
-                class="rounded-full bg-zinc-100 object-cover dark:bg-zinc-800 h-9 w-9"
-                )}
-              />
-            </a>
-          </div>
+          <a href="/" aria-label="Home" class="pointer-events-auto">
+            <img
+              src="/chris/avatar.jpg"
+              alt=""
+              id="avatarImg"
+              sizes="2.25rem"
+              class="rounded-full bg-zinc-100 object-cover dark:bg-zinc-800 h-9 w-9"
+              )}
+            />
+          </a>
         </div>
         <div class="flex flex-1 justify-end md:justify-center">
           <ul
