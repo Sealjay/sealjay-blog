@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import FormattedDate from "../components/partials/FormattedDate.astro";
+
+const acknowledgements = await getCollection("acknowledgement");
+---
+
+<Layout
+  title="Like all sites, this one was built using many open-source projects."
+  description="Acknowledgements of all the projects this site is built with"
+  pubDateTime={new Date("11 May 2023")}
+  updatedDate={new Date("11 May 2023")}
+  heroImage="/placeholder-hero.png"
+>
+  This site was built using a collection of open source projects, tools,
+  knowledge, and articles. I've tried to cite and reference all of them here. If
+  I'm missing you, please let me know!
+  <div
+      class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+  >
+    {
+      acknowledgements.map((acknowledgement) => (
+          <div class="flex flex-col bg-white rounded-lg shadow-md p-4 space-y-3">
+            <div class="flex items-center justify-center">
+              <img
+                  class="w-16 h-16"
+                  src={"images/acknowledgements/" + acknowledgement.data.image}
+                  alt={acknowledgement.data.title}
+              />
+            </div>
+            <a
+                href={acknowledgement.data.url}
+                class="text-blue-600 font-semibold text-lg hover:underline"
+            >
+              {acknowledgement.data.title}
+            </a>
+            <p class="text-gray-700 text-sm">{acknowledgement.data.description}</p>
+            <p class="text-gray-500 text-xs">{acknowledgement.data.notes}</p>
+            <div class="flex items-center text-sm text-gray-500">
+              <span>Licence: </span>
+              <a href={acknowledgement.data.licenceUrl} class="text-blue-600 ml-1 hover:underline">
+                {acknowledgement.data.licence}
+              </a>
+            </div>
+          </div>
+      ))
+      }
+      </div>
+
+</Layout>

@@ -1,0 +1,31 @@
+---
+import BaseHead from "../components/partials/BaseHead.astro";
+import Header from "../components/partials/Header.astro";
+import Footer from "../components/partials/Footer.astro";
+import Container from "../components/containers/Container.astro";
+
+const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+---
+
+<html class="h-full antialiased" lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+  <body class="flex h-full flex-col bg-zinc-50 dark:bg-black">
+    <div class="inset-0 flex justify-center sm:px-8">
+      <div class="flex w-full max-w-7xl lg:px-8">
+        <div
+          class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"
+        >
+          <div class="relative">
+            <Header />
+            <Container>
+              <slot />
+            </Container>
+            <Footer />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

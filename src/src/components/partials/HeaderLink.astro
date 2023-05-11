@@ -1,0 +1,21 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"a">;
+
+const { href } = Astro.props;
+
+const { pathname } = Astro.url;
+const isActive = href === pathname || href === pathname.replace(/\/$/, "");
+---
+
+<a
+  href={href}
+  class:list={[
+    "relative block px-3 py-2 transition",
+    { "text-teal-500 dark:text-teal-400 hover:text-teal-800": isActive },
+    { "hover:text-teal-500 dark:hover:text-teal-400": !isActive },
+  ]}
+>
+  <slot />
+</a>

@@ -1,0 +1,25 @@
+---
+import { CollectionEntry, getCollection } from 'astro:content';
+import BlogPost from '../../layouts/BaseLayout.astro';
+import BlogPostOld from '../../components/partials/BlogPostOld.astro';
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: post,
+	}));
+}
+type Props = CollectionEntry<'blog'>;
+
+const post = Astro.props;
+const { Content } = await post.render();
+// was this post more than a year ago, and updated more than a year ago
+
+const isOld = post.data.pubDateTime < new Date(Date.now() - 31536000000) && (post.data.updatedDate === undefined || post.data.updatedDate < new Date(Date.now() - 31536000000));
+
+---
+
+<BlogPost {...post.data}>
+	{isOld ? <BlogPostOld /> : null}
+	<Content />
+</BlogPost>
