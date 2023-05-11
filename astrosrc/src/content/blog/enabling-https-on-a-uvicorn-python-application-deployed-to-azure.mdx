@@ -2,24 +2,19 @@
 title: "Enabling https on a Uvicorn Python Application deployed to Azure"
 description: "Like many services, Azure terminates SSL at the network load balancer [https://docs.microsoft"
 pubDateTime: "2021-02-09T10:10:00.000Z"
-heroImage: "/placeholder-hero.jpg"
-tags: ['Snippets']
+heroImage: "/placeholder-hero.png"
+tags: ["Snippets"]
 ---
 
 Like many services, [Azure terminates SSL at the network load balancer](https://docs.microsoft.com/en-us/azure/app-service/configure-language-python#detect-https-session). In plain English, your application needs to check the headers provided to it, to figure out if your user has connected via https.
 
 If you're using Uvicorn or another ASGI provider, you'll need to include middleware, to check the `X-Forwarded-Proto` and `X-Forwarded-For` headers.
 
-
 Thankfully, Uvicorn already provides a package you can import for this: `uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware`.
-
 
 Import the full `uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware` package, specifying a specific trusted host to check for headers, or use a wildcard for all hosts.
 
-
 For example, in a [Starlette deployment](https://www.starlette.io/middleware/) you could include the library like so:
-
-
 
 ```
 import uvicorn
@@ -30,4 +25,3 @@ import uvicorn
 # ...
 
 ```
-
