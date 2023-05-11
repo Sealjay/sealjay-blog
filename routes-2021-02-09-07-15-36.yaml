@@ -1,0 +1,16 @@
+routes:
+
+collections:
+  /mediamentions/:
+    permalink: /mediamentions/{slug}/
+    filter: "tags: mediamention"
+  /events/:
+    permalink: /events/{slug}/
+    filter: "tags: event"
+  /:
+    permalink: /{slug}/
+    template: index
+
+taxonomies:
+  tag: /tag/{slug}/
+  author: /author/{slug}/
