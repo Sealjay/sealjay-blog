@@ -6,6 +6,9 @@ heroImage: "/placeholder-hero.png"
 tags: ["How To", "Python", "Snippets", "Open Source", "Machine Learning"]
 ---
 
+import SocialEmbed from "../../components/embeds/SocialEmbed.astro";
+import GitHubGistEmbed from "../../components/embeds/GitHubGistEmbed.astro";
+
 I've been open sourcing projects at Avanade for some time. I've recently needed a ton of automation - from code scans for security vulnerabilities and licensing compliance to automatically merging pull requests after a certain amount of time.
 
 I've just started a new role as Head of Open Technologies for Avanade - bringing together Open Innovation, Open Source, and supporting a broader community. I'll share some of the information I've learnt whilst using GitHub Actions to help my work.
@@ -24,13 +27,34 @@ Each _workflow_ defines a series of _jobs_. A _job_ is made up of multiple _step
 
 Finally, you define which _event_ triggers which _workflows_. Got that?! This diagram might show better how everything fits together.
 
-![A diagram showing an event triggering a workflow. The next step shows a workflow running on a runner, a machine. This ends with outputs emitting from the runner. There is a box under the runner, showing a multiple steps in a job - the job example is a called a compliance scan. There are multiple steps, each step has an action. The first step is download a code repo, with the actions/checkout@v2 action. The second step is save cache, with the actions/cache@v2 repo. The final step is run licence scan, with any action you choose.](/images/2021/09/GHA-Blog.png)An example of the process running end to endI'll talk about some of the Actions I used on my last project (working with Brain Control Devices, a robotics platform, and a robot) and some I'm trying out now. I will assume some familiarity with [the GitHub flow](https://guides.github.com/introduction/flow/), mainly pull requests, pushes, and branching. [If not, I recommend a read](https://guides.github.com/introduction/flow/)!
+![A diagram showing an event triggering a workflow. The next step shows a workflow running on a runner, a machine. This ends with outputs emitting from the runner. There is a box under the runner, showing a multiple steps in a job - the job example is a called a compliance scan. There are multiple steps, each step has an action. The first step is download a code repo, with the actions/checkout@v2 action. The second step is save cache, with the actions/cache@v2 repo. The final step is run licence scan, with any action you choose.](/images/2021/09/GHA-Blog.png)
 
-## [Avanade/emtech-stretch-labsRepositories related to Avanade’s exploration with Rocos, NextMind and Hello Robot. - Avanade/emtech-stretch-labs![](https://github.githubassets.com/favicons/favicon.svg)GitHubAvanade![](https://opengraph.githubassets.com/8edec2b56f7ea704dba22d06272ce6b8aebda6d1603e9bf8f081ddddbd5bce14/Avanade/emtech-stretch-labs)](https://github.com/Avanade/emtech-stretch-labs)Finding a GitHub Action
+<figcaption>An example of the process running end to end</figcaption>
+
+I'll talk about some of the Actions I used on my last project (working with Brain Control Devices, a robotics platform, and a robot) and some I'm trying out now. I will assume some familiarity with [the GitHub flow](https://guides.github.com/introduction/flow/), mainly pull requests, pushes, and branching. [If not, I recommend a read](https://guides.github.com/introduction/flow/)!
+
+<SocialEmbed
+  title="GitHub - Avanade/emtech-stretch-labs"
+  linkUrl="https://github.com/Avanade/emtech-stretch-lab"
+  imageUrl="https://opengraph.githubassets.com/8edec2b56f7ea704dba22d06272ce6b8aebda6d1603e9bf8f081ddddbd5bce14/Avanade/emtech-stretch-labs"
+>
+  Repositories related to Avanade’s exploration with Rocos, NextMind and Hello
+  Robot. - Avanade/emtech-stretch-labs
+</SocialEmbed>
+
+## Finding a GitHub Action
 
 There are many different GitHub Actions available on the GitHub Marketplace.
 
-[GitHub Marketplace: actions to improve your workflowFind the actions that help your team build better, together.![](https://github.com/fluidicon.png)GitHub![](https://github.githubassets.com/images/modules/site/social-cards/marketplace.png)](https://github.com/marketplace?type=actions)### GitHub Actions for Azure - great for ML
+<SocialEmbed
+  title="GitHub Marketplace: actions to improve your workflow"
+  linkUrl="https://github.com/marketplace?type=actions"
+  imageUrl="https://github.githubassets.com/images/modules/site/social-cards/marketplace.png"
+>
+  Find the actions that help your team build better, together.
+</SocialEmbed>
+
+### GitHub Actions for Azure - great for ML
 
 Microsoft also maintains a [specific list of GitHub Actions for Azure](https://docs.microsoft.com/en-us/azure/developer/github/github-actions?WT.mc_id=AI-MVP-5004204#where-can-i-see-all-the-available-actions) - and some of these are particularly useful for integrating MLOps, or [the practices you need to deploy Machine Learning models in production alongside your code](https://docs.microsoft.com/en-us/azure/machine-learning/concept-model-management-and-deployment?WT.mc_id=AI-MVP-5004204). GitHub Actions are helpful to improve collaboration between developers and data scientists to increase reproducibility and your machine learning development consistency.
 
@@ -44,14 +68,25 @@ For Python repositories, I particularly like [`andersy005/gh-action-py-liccheck`
 
 Here's an example of these actions in use:
 
+<GitHubGistEmbed id="Sealjay/cb59f8aaf25de08a830b59358d560571" />
+
 ### Issues and Work Tracking
 
 I like to use two actions for my issues and my work - [one to create issues for Todos in code](https://github.com/ribtoks/tdg-github-action) called `ribtoks/tdg-github-action` and another to [make sure new pull requests are assigned to a GitHub project board related to the project](https://github.com/AdityaGovardhan/ga-pull-requests-projects) called `AdityaGovardhan/ga-pull-requests-projects`.
 
 Here's an example of these actions in use:
 
+<GitHubGistEmbed id="Sealjay/a3b3848342fef7d279bb85d63e033927" />
+
 ## Where to learn more?
 
 GitHub Actions make your life so much easier.  [I recommend the Microsoft Learn path](https://docs.microsoft.com/en-us/learn/paths/automate-workflow-github-actions/?WT.mc_id=AI-MVP-5004204) to get hands-on and try out some examples.
 
-[Automate your workflow with GitHub Actions - LearnLearn how GitHub Actions enables you to automate your software development cycle and deploy applications to Azure.Microsoft Docstpetchel![](https://docs.microsoft.com/learn/achievements/github/automate-workflow-github-actions-social.png)](https://docs.microsoft.com/en-us/learn/paths/automate-workflow-github-actions/?WT.mc_id=AI-MVP-5004204)
+<SocialEmbed
+  title="Automate your workflow with GitHub Actions - Learn"
+  linkUrl="https://docs.microsoft.com/en-us/learn/paths/automate-workflow-github-actions/?WT.mc_id=AI-MVP-5004204"
+  imageUrl="https://docs.microsoft.com/learn/achievements/github/automate-workflow-github-actions-social.png"
+>
+  Learn how GitHub Actions enables you to automate your software development
+  cycle and deploy applications to Azure.
+</SocialEmbed>
