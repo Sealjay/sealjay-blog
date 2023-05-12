@@ -20,9 +20,10 @@ A Digital Twin is a digital replica of a physical object, space, or abstract pro
 Microsoft provide an Azure Digital Twin service, which allows us to create pre-defined models (such as thermostats for example) and then create twins based on these models, mapping the relationships between a whole series of different things.
 
 [What is Azure Digital Twins? - Azure Digital TwinsOverview of what can be done with Azure Digital Twins.Microsoft Docsbaanders![](https://docs.microsoft.com/en-us/media/logos/logo-ms-social.png)](https://docs.microsoft.com/en-gb/azure/digital-twins/overview?WT.mc_id=AI-MVP-5004204)As well as SDKs across a variety of languages from .NET to Python, Microsoft have created a number of tools and code samples - [the Azure Digital Twins explorer](https://github.com/Azure-Samples/digital-twins-explorer/) is a web based application that allows you to visually see the connections between these twins.
+TODO: Update social tile.
 
 ![](/images/2021/05/image-1.png)A screenshot of the graph database within the Azure Digital Twins explorer### Sharing data with end users
-
+TODO: Update caption.
 Sharing these views with end users can be difficult however - you probably don't want to be sharing the explorer with end users! And what if you want to share an overview of the current situation with your business users? Well, this sounds like a perfect use case for PowerBI and Azure Digital Twins.
 
 ### PowerBI to the rescue
@@ -30,7 +31,7 @@ Sharing these views with end users can be difficult however - you probably don't
 PowerBI is the visualisation tool from Microsoft that allows you to create and share pre-built reports and data visualisations - niftily, you can use the output of Python scripts as a data source, allowing us to use the Azure Digital Twins SDK to create a PowerBI data source.
 
 [Sealjay-clj/powerbi-adtQuerying Azure Digital Twins with PowerBI. Contribute to Sealjay-clj/powerbi-adt development by creating an account on GitHub.![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://opengraph.githubassets.com/9642f68c9fffaf41f7353e8263423950fa92f07d6101da79bcb0d37bb2bd9eea/Sealjay-clj/powerbi-adt)](https://github.com/Sealjay-clj/powerbi-adt)### How do I pull my twins into PowerBI?
-
+TODO: Update social tile.
 Using the `azure-digitaltwins-core` python package, this can be done in eight steps!
 
 1. Create an Azure Digital Twin, or use one you already have.
@@ -42,7 +43,7 @@ Using the `azure-digitaltwins-core` python package, this can be done in eight st
 7. Log in to Azure on the CLI with `az login`.
 8. Import the **powerbi-query.py** file in the [GitHub repository](https://github.com/Sealjay-clj/powerbi-adt) as a [PowerBI datasource](https://docs.microsoft.com/en-us/power-bi/connect-data/desktop-python-scripts?WT.mc_id=AI-MVP-5004204#run-your-python-script-and-import-data).
 
-```
+```sql
 query_expression = "SELECT * FROM digitaltwins"
 query_result = service_client.query_twins(query_expression)
 twin_list = pd.DataFrame(query_result)
@@ -58,3 +59,4 @@ So, next time you want to share data from Azure Digital Twins - consider PowerBI
 For a full example, [you can see the repository on GitHub](https://github.com/Sealjay-clj/powerbi-adt).
 
 ![](/images/2021/05/image-2.png)The list of twins displayed in PowerBI
+TODO: Add caption.
