@@ -23,7 +23,7 @@ The source code in this project is licensed under the the [MIT Licence](./LICENC
 ### Underlying site content
 The underlying site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license). Changes and additions are licenced under the MIT licence, as an End Product released open source and freely available to End Users.
 ### Blog content itself
-**Importantly** except where I'm using other peoples work with permission, all content within the blog is copyright &copy; 2018-2022 Chris Lloyd-Jones, under the name Sealjay(R).
+**Importantly** except where I'm using other peoples work with permission, all content within the blog is copyright &copy; 2018-2023 Chris Lloyd-Jones, under the name Sealjay(R).
 
 Whilst all the content is copyright, it is licenced under the [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/). This means you are free to share and adapt the content for any purpose, as long as you give appropriate credit, provide a link to the licence, and indicate if changes were made. If you remix, transform, or build upon the material, you must distribute your contributions under the same licence as the original.
 
