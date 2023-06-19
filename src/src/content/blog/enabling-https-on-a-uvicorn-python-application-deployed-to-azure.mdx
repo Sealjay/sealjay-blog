@@ -1,12 +1,12 @@
 ---
 title: "Enabling https on a Uvicorn Python Application deployed to Azure"
-description: "Like many services, Azure terminates SSL at the network load balancer [https://docs.microsoft"
+description: "Including the X-Forwarded-Proto and X-Forwarded-For headers in your Uvicorn application"
 pubDateTime: "2021-02-09T10:10:00.000Z"
 heroImage: "/placeholder-hero.png"
 tags: ["Snippets"]
 ---
 
-Like many services, [Azure terminates SSL at the network load balancer](https://docs.microsoft.com/en-us/azure/app-service/configure-language-python#detect-https-session). In plain English, your application needs to check the headers provided to it, to figure out if your user has connected via https.
+Like many services, [Azure terminates SSL at the network load balancer](https://docs.microsoft.com/en-us/azure/app-service/configure-language-python?WT.mc_id=AI-MVP-5004204#detect-https-session). In plain English, your application needs to check the headers provided to it, to figure out if your user has connected via https.
 
 If you're using Uvicorn or another ASGI provider, you'll need to include middleware, to check the `X-Forwarded-Proto` and `X-Forwarded-For` headers.
 
