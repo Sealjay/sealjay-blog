@@ -8,7 +8,7 @@ tags: ["Snippets"]
 
 Assuming you're using a Linux web application plan, and running a Python application that requires the use of Uvicorn, here are some tips.
 
-You'll need to [have a startup command set in Azure](https://docs.microsoft.com/en-gb/azure/app-service/configure-language-python#customize-startup-command), which either calls a Uvicorn worker directly, or calls a configuration file specifying one.
+You'll need to [have a startup command set in Azure](https://docs.microsoft.com/en-gb/azure/app-service/configure-language-python?WT.mc_id=AI-MVP-5004204#customize-startup-command), which either calls a Uvicorn worker directly, or calls a configuration file specifying one.
 
 ![](/images/2021/02/image-2.png)On the Azure Portal, open your Web App, scroll to 'Configuration' under 'Settings', click on the 'General Settings' tab, and enter the appropriate startup command.`gunicorn -c gunicorn_config.py app:app`
 TODO: Add caption
