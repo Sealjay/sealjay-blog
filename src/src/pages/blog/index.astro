@@ -2,7 +2,6 @@
 import Layout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import FormattedDate from "../../components/partials/FormattedDate.astro";
-import Card from "../../components/partials/Card.astro";
 import { format } from 'date-fns';
 
 const posts = (await getCollection("blog")).sort(
@@ -23,43 +22,85 @@ const lastPostDate = new Date(posts[0].data.pubDateTime);
     description="Writing on topics from software to society"
     pubDateTime={new Date("1 March 2023")}
     updatedDate={lastPostDate}
-    heroImage="/placeholder-hero.png"
 >
-    <div class="mx-auto max-w-4xl">
-        <p class="mb-6 text-lg text-zinc-600 dark:text-zinc-400">
-            I'm passionate about open-source, green software, and Microsoft AI: you can find blog posts I've written on these topics below - along with other random topics mixed in. You can also find some of my presentations, YouTube videos, and podcasts on the <a href="/speaking" class="text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300">speaking page</a>.
-        </p>
+    <div class="mx-auto max-w-5xl">
+        <!-- Page Header -->
+        <div class="mb-10 md:mb-16">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+                <span class="text-gradient">Blog</span>
+            </h1>
+            <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
+                I'm passionate about open-source, green software, and Microsoft AI: you can find blog posts I've written on these topics below, along with other random topics mixed in. You can also find some of my presentations, YouTube videos, and podcasts on the <a href="/speaking" class="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline decoration-accent-300/30 hover:decoration-accent-300 transition-colors">speaking page</a>.
+            </p>
+        </div>
         
         {Object.entries(groupedPosts).map(([monthYear, posts]) => (
-            <div class="mb-8">
-                <h2 class="mb-4 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
+            <div class="mb-12 md:mb-16">
+                <h2 class="mb-6 text-xl sm:text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 flex items-center">
+                    <span class="inline-block w-1 h-6 bg-accent-500 dark:bg-accent-400 mr-3 rounded-full"></span>
                     {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
                 </h2>
-                <div class="grid gap-3 sm:grid-cols-2">
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
-                        <Card 
-                            url={`/blog/${post.slug}/`} 
-                            cta="Read post" 
-                            hasHeaderBg={true}
-                            contentGap="gap-2"
-                        >
-                            <FormattedDate date={post.data.pubDateTime} slot="title" />
-                            <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-zinc-800 dark:text-zinc-100">
-                                    {post.data.title}
-                                </h3>
-                                <p class="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
-                                    {post.data.description}
-                                </p>
+                        <a href={`/blog/${post.slug}/`} class="group">
+                            <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                {post.data.heroImage && (
+                                    <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                        <img 
+                                            src={post.data.heroImage} 
+                                            alt="" 
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </div>
+                                )}
+                                
+                                <div class="flex flex-col flex-grow p-5">
+                                    <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                                        <FormattedDate date={post.data.pubDateTime} />
+                                        {post.data.readingTime && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{post.data.readingTime} min read</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    
+                                    <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+                                        {post.data.title}
+                                    </h3>
+                                    
+                                    {post.data.description && (
+                                        <p class="mt-2 text-zinc-600 dark:text-zinc-400 text-sm line-clamp-2">
+                                            {post.data.description}
+                                        </p>
+                                    )}
+                                    
+                                    {post.data.tags && post.data.tags.length > 0 && (
+                                        <div class="flex flex-wrap gap-2 mt-4">
+                                            {post.data.tags.slice(0, 3).map((tag: string) => (
+                                                <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                            {post.data.tags.length > 3 && (
+                                                <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                                                    +{post.data.tags.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div class="px-5 py-3 border-t border-zinc-100 dark:border-zinc-700/40">
+                                    <div class="flex items-center text-accent-600 dark:text-accent-400 text-sm font-medium">
+                                        <span>Read post</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
-                            <div slot="bottom-left" class="flex items-center space-x-1">
-                                {post.data.tags?.map((tag: string) => (
-                                    <span class="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </Card>
+                        </a>
                     ))}
                 </div>
             </div>

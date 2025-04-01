@@ -5,62 +5,87 @@ import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 ---
 
 <Layout
-  title="About Me"
-  description="I'm Chris Lloyd-Jones, Sealjay. I live in London"
+  title="About Me | Chris Lloyd-Jones"
+  description="I'm Chris Lloyd-Jones (Sealjay), a software engineer and open source enthusiast based in Seattle"
   pubDateTime={new Date("1 March 2023")}
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
 >
   <Container>
-    <div
-      class="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12"
-    >
-      <div class="lg:pl-20">
-        <div class="max-w-xs px-2.5 lg:max-w-none">
-          <img
-            src="/chris/portrait.jpg"
-            alt=""
-            sizes="(min-width: 1024px) 32rem, 20rem"
-            class="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-          />
-        </div>
-      </div>
-      <div class="lg:order-first lg:row-span-2">
-        <h1
-          class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
-        >
-          I&apos;m Chris Lloyd-Jones, Sealjay. I live in London
+    <div class="max-w-5xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-10 text-center">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+          About <span class="text-gradient">Chris</span>
         </h1>
-        <div class="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
-          <p>
-            I work at Avanade - I&apos;m the Head of Open Innovation, which
-            means focussing on an ecossytem of academia, foundations, and
-            start-ups; it also encompasses Avanade’s Open-Source projects office
-            and developer relations team.
-          </p>
-          <p>
-            I started my career working in local government, with a brief stint
-            at the Financial Ombudsman Service. I transitioned careers, and
-            since then I&apos;ve focussed on data, analytics, and emerging
-            technologies.
-          </p>
-          <p>
-            These days, I focus on scaling capabilities, or working with open
-            source organisations like the TODO Group, the Green Software
-            Foundation, and LF Europe.
-          </p>
-          <p>
-            I&apos;m a Microsoft MVP in AI, the Chief Blueprints Officer for
-            OpenUK, as well as supporting various roles at the Green Software
-            Foundation: the Vice-Chair of the Oversight Committee, Co-Chair of
-            the Open Source Working Group, and a Steering Committee member.
-          </p>
-        </div>
       </div>
-      <div class="lg:pl-20">
-        <ul role="list">
-          <SocialLinks />
-        </ul>
+      
+      <div class="grid grid-cols-1 gap-y-12 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0">
+        <!-- Image (Mobile: top, Desktop: right) -->
+        <div class="lg:order-last lg:col-span-2">
+          <div class="relative max-w-xs mx-auto lg:max-w-none">
+            <div class="aspect-square overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 shadow-xl ring-1 ring-zinc-100 dark:ring-zinc-700/30">
+              <img
+                src="/chris/portrait.jpg"
+                alt="Chris Lloyd-Jones"
+                class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
+            <div class="absolute -bottom-6 -right-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100 dark:bg-accent-900/30"></div>
+            <div class="absolute -top-6 -left-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100/70 dark:bg-accent-900/20"></div>
+          </div>
+          
+          <!-- Mobile Social Links -->
+          <div class="mt-12 lg:hidden">
+            <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
+            <SocialLinks />
+          </div>
+        </div>
+        
+        <!-- Content (Mobile: bottom, Desktop: left) -->
+        <div class="lg:col-span-3">
+          <div class="prose prose-lg dark:prose-invert">
+            <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
+              <span class="font-medium">Head of Open Innovation at Avanade</span>
+            </div>
+            
+            <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
+              I'm Chris Lloyd-Jones, Sealjay. I live in <s>London</s> Seattle.
+            </h2>
+            
+            <div class="mt-6 space-y-6 text-base md:text-lg text-zinc-600 dark:text-zinc-400">
+              <p>
+                I work at Avanade - I'm the Head of Open Innovation, which
+                means focussing on an ecosystem of academia, foundations, and
+                start-ups; it also encompasses Avanade's Open-Source projects office
+                and developer relations team.
+              </p>
+              <p>
+                I started my career working in local government, with a brief stint
+                at the Financial Ombudsman Service. I transitioned careers, and
+                since then I've focussed on data, analytics, and emerging
+                technologies.
+              </p>
+              <p>
+                These days, I focus on scaling capabilities, or working with open
+                source organisations like the TODO Group, the Green Software
+                Foundation, and LF Europe.
+              </p>
+            </div>
+            
+            <div class="mt-8 flex flex-wrap gap-2">
+              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">Microsoft MVP in AI</span>
+              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">OpenUK Chief Blueprints Officer</span>
+              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">Green Software Foundation</span>
+            </div>
+            
+            <!-- Desktop Social Links -->
+            <div class="mt-12 hidden lg:block">
+              <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
+              <SocialLinks />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </Container>

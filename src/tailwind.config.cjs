@@ -4,6 +4,51 @@ module.exports = {
   darkMode: 'class',
   plugins: [require('@tailwindcss/typography')],
   theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter var', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'Inter var', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        // New accent color
+        accent: {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.5s ease-out',
+        'fade-up': 'fade-up 0.5s ease-out',
+        'scale-up': 'scale-up 0.2s ease-out',
+      },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'scale-up': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
+      },
+    },
     fontSize: {
       xs: ['0.8125rem', { lineHeight: '1.5rem' }],
       sm: ['0.875rem', { lineHeight: '1.5rem' }],
@@ -14,10 +59,10 @@ module.exports = {
       '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
       '4xl': ['2rem', { lineHeight: '2.5rem' }],
       '5xl': ['3rem', { lineHeight: '3.5rem' }],
-      '6xl': ['3.75rem', { lineHeight: '1' }],
-      '7xl': ['4.5rem', { lineHeight: '1' }],
-      '8xl': ['6rem', { lineHeight: '1' }],
-      '9xl': ['8rem', { lineHeight: '1' }]
+      '6xl': ['3.75rem', { lineHeight: '1.2' }],
+      '7xl': ['4.5rem', { lineHeight: '1.1' }],
+      '8xl': ['6rem', { lineHeight: '1.1' }],
+      '9xl': ['8rem', { lineHeight: '1.1' }]
     },
     typography: (theme) => ({
       invert: {
@@ -48,10 +93,10 @@ module.exports = {
         css: {
           '--tw-prose-body': theme('colors.zinc.600'),
           '--tw-prose-headings': theme('colors.zinc.900'),
-          '--tw-prose-links': theme('colors.teal.500'),
-          '--tw-prose-links-hover': theme('colors.teal.600'),
-          '--tw-prose-underline': theme('colors.teal.500 / 0.2'),
-          '--tw-prose-underline-hover': theme('colors.teal.500'),
+          '--tw-prose-links': theme('colors.accent.600'),
+          '--tw-prose-links-hover': theme('colors.accent.700'),
+          '--tw-prose-underline': theme('colors.accent.500 / 0.2'),
+          '--tw-prose-underline-hover': theme('colors.accent.500'),
           '--tw-prose-bold': theme('colors.zinc.900'),
           '--tw-prose-counters': theme('colors.zinc.900'),
           '--tw-prose-bullets': theme('colors.zinc.900'),
@@ -68,10 +113,10 @@ module.exports = {
 
           '--tw-prose-invert-body': theme('colors.zinc.400'),
           '--tw-prose-invert-headings': theme('colors.zinc.200'),
-          '--tw-prose-invert-links': theme('colors.teal.400'),
-          '--tw-prose-invert-links-hover': theme('colors.teal.400'),
-          '--tw-prose-invert-underline': theme('colors.teal.400 / 0.3'),
-          '--tw-prose-invert-underline-hover': theme('colors.teal.400'),
+          '--tw-prose-invert-links': theme('colors.accent.400'),
+          '--tw-prose-invert-links-hover': theme('colors.accent.500'),
+          '--tw-prose-invert-underline': theme('colors.accent.400 / 0.3'),
+          '--tw-prose-invert-underline-hover': theme('colors.accent.400'),
           '--tw-prose-invert-bold': theme('colors.zinc.200'),
           '--tw-prose-invert-counters': theme('colors.zinc.200'),
           '--tw-prose-invert-bullets': theme('colors.zinc.200'),
@@ -94,8 +139,8 @@ module.exports = {
             marginBottom: theme('spacing.10')
           },
           p: {
-            marginTop: theme('spacing.7'),
-            marginBottom: theme('spacing.7')
+            marginTop: theme('spacing.8'),
+            marginBottom: theme('spacing.8')
           },
 
           // Headings
@@ -104,13 +149,13 @@ module.exports = {
             fontWeight: theme('fontWeight.semibold')
           },
           h2: {
-            fontSize: theme('fontSize.xl')[0],
+            fontSize: theme('fontSize.2xl')[0],
             lineHeight: theme('lineHeight.7'),
             marginTop: theme('spacing.20'),
-            marginBottom: theme('spacing.4')
+            marginBottom: theme('spacing.6')
           },
           h3: {
-            fontSize: theme('fontSize.base')[0],
+            fontSize: theme('fontSize.lg')[0],
             lineHeight: theme('lineHeight.7'),
             marginTop: theme('spacing.16'),
             marginBottom: theme('spacing.4')
@@ -121,7 +166,7 @@ module.exports = {
 
           // Images
           img: {
-            borderRadius: theme('borderRadius.3xl')
+            borderRadius: theme('borderRadius.lg')
           },
 
           // Inline elements

@@ -3,19 +3,19 @@ import { SITE_NAV } from "../../consts";
 import Container from "../containers/Container.astro";
 ---
 
-<footer class="mt-12 sm:mt-16">
+<footer class="mt-16 sm:mt-24">
   <Container>
-    <div class="border-t border-zinc-100 pt-6 pb-8 dark:border-zinc-700/40">
-      <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
+    <div class="border-t border-zinc-100 pt-8 pb-10 dark:border-zinc-700/40">
+      <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
         <div
-          class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium text-zinc-800 dark:text-zinc-200"
+          class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-zinc-800 dark:text-zinc-200"
         >
           {
             SITE_NAV.map((navitem) => (
               <>
                 <a
                   href={navitem.path}
-                  class="transition hover:text-teal-500 dark:hover:text-teal-400 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                  class="transition hover:text-accent-600 dark:hover:text-accent-400 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
                 >
                   {navitem.name}
                 </a>
@@ -23,9 +23,9 @@ import Container from "../containers/Container.astro";
             ))
           }
         </div>
-        <p class="text-xs text-center sm:text-right text-zinc-400 dark:text-zinc-500 mt-3 sm:mt-0 px-2 sm:px-0">
+        <p class="text-sm text-center sm:text-right text-zinc-500 dark:text-zinc-400 mt-3 sm:mt-0 px-2 sm:px-0">
           &copy; 2018-{new Date().getFullYear()} Chris Lloyd-Jones, aka Sealjay&#174;.
-          All rights reserved.
+          <span class="block sm:inline mt-1 sm:mt-0">All rights reserved.</span>
         </p>
       </div>
     </div>

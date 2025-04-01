@@ -11,48 +11,119 @@ const recentPosts = posts.slice(0, 5);
 ---
 
 <Layout
-  title="About Me"
-  description="I'm Chris Lloyd-Jones, Sealjay. I live in London"
+  title="Chris Lloyd-Jones | Sealjay"
+  description="Software engineer, open source & sustainability advocate based in London"
   pubDateTime={new Date("1 March 2023")}
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
 >
-  <div class="w-full max-w-2xl mx-auto pt-6 sm:pt-10">
-    <h1
-      class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl"
-    >
-      Software engineer, open source & sustainability enthusiast.
-    </h1>
-    <p class="mt-4 sm:mt-6 text-base text-zinc-600 dark:text-zinc-400">
-      I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and
-      &lsquo;open&rsquo; enthusiast, living in London. I&apos;m the Head of Open
-      Innovation at Avanade, deeply embedded in the Open Source community, and a
-      passionate advocate for sustainability.
-    </p>
-    <p class="mt-2 text-sm text-zinc-400 dark:text-zinc-500">
-      Microsoft MVP in AI, Green Software Foundation Oversight Committee
-      Vice-Chair, Green Software Foundation Open Source Working Group Chair,
-      OpenUK Chief Blueprints Officer.
-    </p>
+  <!-- Hero Section -->
+  <div class="w-full max-w-5xl mx-auto pt-6 md:pt-12">
+    <div class="flex flex-col md:flex-row md:items-center md:gap-12">
+      <!-- Image on mobile (top) and desktop (right) -->
+      <div class="md:hidden mb-8 mx-auto">
+        <div class="relative w-32 h-32 overflow-hidden rounded-full ring-4 ring-accent-100 dark:ring-accent-900">
+          <img 
+            src="/chris/portrait.jpg" 
+            alt="Chris Lloyd-Jones"
+            class="w-full h-full object-cover" 
+          />
+        </div>
+      </div>
+      
+      <!-- Text Content -->
+      <div class="flex-1">
+        <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
+          <span class="font-medium">Head of Platforms &amp; Incubation at Avanade</span>
+        </div>
+        
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl">
+          Software engineer, open source & sustainability enthusiast.
+        </h1>
+        
+        <p class="mt-6 text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
+          I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in <s>London</s> Seattle. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
+        </p>
+        
+        <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
+          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">Microsoft MVP in AI</span>
+          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">Green Software Foundation</span>
+          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">OpenUK Chief Blueprints Officer</span>
+        </div>
+        
+        <div class="mt-8">
+          <SocialLinks />
+        </div>
+      </div>
+      
+      <!-- Image on desktop (right side) -->
+      <div class="hidden md:block flex-shrink-0">
+        <div class="relative w-56 h-56 overflow-hidden rounded-2xl shadow-xl ring-1 ring-zinc-100 dark:ring-zinc-700/30">
+          <img 
+            src="/chris/portrait.jpg" 
+            alt="Chris Lloyd-Jones"
+            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" 
+          />
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="w-full max-w-2xl mx-auto">
-    <SocialLinks />
+
+  <!-- Section Divider -->
+  <div class="w-full max-w-5xl mx-auto my-12 md:my-16">
+    <div class="h-px bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent"></div>
   </div>
-  <div class="w-full max-w-4xl mx-auto mt-8 sm:mt-12">
-    <p class="text-base text-zinc-600 dark:text-zinc-400 mb-4">Recent blogs:</p>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+  <!-- Recent Blog Posts Section -->
+  <div class="w-full max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100">Recent Articles</h2>
+      <a href="/blog" class="text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium text-sm flex items-center gap-1 transition-colors">
+        View all
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         recentPosts.map((post) => (
-          <div class="flex flex-col h-full border rounded-lg p-4 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-200" key={post.slug}>
-            <h2 class="text-lg leading-6 font-medium text-gray-900 flex-grow">
-              <a href={`/blog/${post.slug}/`} class="hover:text-indigo-600 transition-colors duration-200">
-                {post.data.title}
-              </a>
-            </h2>
-            <div class="text-sm text-gray-500 mt-2">
-              <FormattedDate date={post.data.pubDateTime} />
+          <a href={`/blog/${post.slug}/`} class="group">
+            <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              {post.data.heroImage && (
+                <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <img 
+                    src={post.data.heroImage} 
+                    alt="" 
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              )}
+              
+              <div class="flex flex-col flex-grow p-5">
+                <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                  <FormattedDate date={post.data.pubDateTime} />
+                  {post.data.readingTime && (
+                    <>
+                      <span>•</span>
+                      <span>{post.data.readingTime} min read</span>
+                    </>
+                  )}
+                </div>
+                
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+                  {post.data.title}
+                </h3>
+                
+                {post.data.description && (
+                  <p class="mt-2 text-zinc-600 dark:text-zinc-400 text-sm line-clamp-2">
+                    {post.data.description}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          </a>
         ))
       }
     </div>

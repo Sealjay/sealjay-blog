@@ -9,18 +9,18 @@ const {
 } = Astro.props;
 ---
 
-<div class="group relative flex h-full flex-col overflow-hidden rounded-lg bg-white/50 ring-1 ring-zinc-100 backdrop-blur transition duration-200 hover:bg-white/80 hover:shadow-md dark:bg-zinc-800/50 dark:ring-zinc-300/10 dark:hover:bg-zinc-800/80">
+<div class="group relative flex h-full flex-col overflow-hidden rounded-xl bg-white/70 ring-1 ring-zinc-100 backdrop-blur transition-all duration-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 dark:bg-zinc-800/50 dark:ring-zinc-300/10 dark:hover:bg-zinc-800/80">
     <div class:list={[
         "flex items-center text-sm font-medium text-zinc-900 dark:text-zinc-100",
-        compactHeader ? "min-h-[36px] px-3 py-1.5" : "min-h-[44px] px-3 py-2",
-        { "bg-zinc-50 dark:bg-zinc-800/50": hasHeaderBg }
+        compactHeader ? "min-h-[40px] px-4 py-2" : "min-h-[48px] px-4 py-2.5",
+        { "bg-zinc-50/80 dark:bg-zinc-800/70": hasHeaderBg }
     ]}>
         <slot name="title" />
     </div>
-    <div class={`flex flex-grow flex-col ${contentGap} px-3 py-2`}>
+    <div class={`flex flex-grow flex-col ${contentGap} px-4 py-3`}>
         <slot />
     </div>
-    <div class="mt-auto flex items-center justify-between border-t border-zinc-100 px-3 py-2 dark:border-zinc-700/40">
+    <div class="mt-auto flex items-center justify-between border-t border-zinc-100 px-4 py-3 dark:border-zinc-700/40">
         <div class={`${blTextColor} text-xs dark:text-zinc-400`}>
             <slot name="bottom-left" />
         </div>
@@ -28,9 +28,12 @@ const {
             <a 
                 href={url} 
                 target="_blank" 
-                class="inline-flex items-center text-xs font-medium text-teal-500 transition hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300 py-1 px-2 -mr-1 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                class="inline-flex items-center text-xs font-medium text-accent-600 transition-all hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 py-1.5 px-2.5 -mr-1 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
             >
-                {cta} <span class="ml-1 transition-transform group-hover:translate-x-0.5">→</span>
+                <span>{cta}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="ml-1.5 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
             </a>
         </div>
     </div>
