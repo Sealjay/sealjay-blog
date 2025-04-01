@@ -1,24 +1,38 @@
 ---
 const variantStyles = {
   primary:
-    "bg-zinc-800 font-semibold text-zinc-100 hover:bg-zinc-700 active:bg-zinc-800 active:text-zinc-100/70 dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:active:bg-zinc-700 dark:active:text-zinc-100/70",
+    "bg-accent-600 font-semibold text-white hover:bg-accent-700 active:bg-accent-800 active:text-white/90 dark:bg-accent-600 dark:hover:bg-accent-500 dark:active:bg-accent-700 dark:active:text-white/90 shadow-sm",
   secondary:
-    "bg-zinc-50 font-medium text-zinc-900 hover:bg-zinc-100 active:bg-zinc-100 active:text-zinc-900/60 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:active:bg-zinc-800/50 dark:active:text-zinc-50/70",
+    "bg-zinc-100 font-medium text-zinc-900 hover:bg-zinc-200 active:bg-zinc-100 active:text-zinc-900/70 dark:bg-zinc-800/70 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-zinc-50 dark:active:bg-zinc-800 dark:active:text-zinc-50/70 border border-zinc-200/50 dark:border-zinc-700/50",
+  outline:
+    "bg-transparent font-medium text-accent-600 hover:bg-accent-50 active:bg-accent-100 dark:text-accent-400 dark:hover:bg-accent-900/20 dark:hover:text-accent-300 dark:active:bg-accent-900/30 border border-accent-200 dark:border-accent-800/40",
+  text:
+    "bg-transparent font-medium text-zinc-700 hover:text-accent-600 hover:bg-zinc-50 active:bg-zinc-100 dark:text-zinc-300 dark:hover:text-accent-400 dark:hover:bg-zinc-800/70",
 };
 
-interface Props {
-  variant?: "primary" | "secondary";
-  href: string;
+const sizeStyles = {
+  sm: "text-xs py-1.5 px-2.5 rounded",
+  md: "text-sm py-2 px-3.5 rounded-md",
+  lg: "text-base py-2.5 px-5 rounded-lg",
 }
 
-const { variant = "primary", href } = Astro.props;
+interface Props {
+  variant?: "primary" | "secondary" | "outline" | "text";
+  size?: "sm" | "md" | "lg";
+  href: string;
+  class?: string;
+}
+
+const { variant = "primary", size = "md", href, class: className } = Astro.props;
 ---
 
 <a
   href={href}
   class:list={[
-    "inline-flex items-center gap-2 justify-center rounded-md py-2.5 px-4 text-sm outline-offset-2 transition active:transition-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2",
+    "inline-flex items-center gap-2 justify-center font-medium transition-all duration-200 outline-offset-2 focus:outline-none focus:ring-2 focus:ring-accent-500/50",
     variantStyles[variant],
+    sizeStyles[size],
+    className,
   ]}
 >
   <slot />

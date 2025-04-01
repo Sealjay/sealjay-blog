@@ -16,30 +16,50 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
   updatedDate={updatedDate}
   heroImage={heroImage}
 >
-  <article class="max-w-none my-4 text-gray-800 dark:text-gray-200 prose prose-sm sm:prose">
+  <article class="max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
     <h1
-      class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 mb-3"
+      class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
     >
       {title}
     </h1>
-    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-      {`Published on`}
-      <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
-        <FormattedDate date={pubDateTime} /></span
-      >{
-        updatedDate && (
-          <>
-            {` - last updated on `}
-            <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
-              <FormattedDate date={updatedDate} />
-            </span>
-          </>
-        )
-      }
+    <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-6">
+      <span class="flex items-center gap-1.5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Published <FormattedDate date={pubDateTime} /></span>
+      </span>
+      
+      {updatedDate && (
+        <>
+          <span class="text-zinc-400 dark:text-zinc-600">•</span>
+          <span class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Updated <FormattedDate date={updatedDate} /></span>
+          </span>
+        </>
+      )}
     </div>
-    <div class="prose-img:rounded-lg prose-img:mx-auto prose-img:w-full">
+    
+    {heroImage && (
+      <div class="relative w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
+        <img 
+          src={heroImage} 
+          alt={title} 
+          class="w-full h-full object-cover"
+        />
+      </div>
+    )}
+    
+    <div class="prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
       <slot />
     </div>
   </article>
-  <Giscus />
+  
+  <div class="max-w-3xl mx-auto mt-16 mb-8">
+    <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8"></div>
+    <Giscus />
+  </div>
 </PageLayout>
