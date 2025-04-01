@@ -1,17 +1,19 @@
 ---
-const { href, text } = Astro.props;
+const { href, text, class: className } = Astro.props;
 ---
 
-<li class"flex mt-4">
+<li class={`flex mt-4 ${className || ''}`}>
   <a
     href={href}
-    class="group flex text-sm font-medium text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"
+    class="group flex items-center text-sm font-medium text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <div
-      class="h-6 w-6 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300"
+      class="h-6 w-6 flex-shrink-0 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300"
     >
       <slot />
     </div>
-    <span class="ml-4">{text}</span>
+    <span class="ml-3 sm:ml-4">{text}</span>
   </a>
 </li>

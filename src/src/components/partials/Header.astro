@@ -5,36 +5,113 @@ import HeaderLink from "./HeaderLink.astro";
 const { pathname } = Astro.url;
 ---
 
-<header class="relative flex flex-col mt-3 sm:mt-2">
-  <div class="top-0">
-    <Container>
-      <div class="relative flex gap-4">
-        <div class="flex flex-1">
-          <a href="/" aria-label="Home" class="pointer-events-auto">
-            <img
-              src="/chris/avatar.jpg"
-              alt=""
-              id="avatarImg"
-              sizes="2.25rem"
-              class="rounded-full bg-zinc-100 object-cover dark:bg-zinc-800 h-9 w-9"
-              )}
-            />
-          </a>
-        </div>
-        <div class="flex flex-1 justify-end md:justify-center">
+<header class="relative py-2 sm:py-3">
+  <Container>
+    <nav class="relative flex items-center justify-between">
+      <div class="flex items-center">
+        <a href="/" aria-label="Home" class="block">
+          <img
+            src="/chris/avatar.jpg"
+            alt=""
+            sizes="(min-width: 640px) 2.25rem, 2rem"
+            class="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-zinc-100 object-cover dark:bg-zinc-800 ring-2 ring-zinc-100 dark:ring-zinc-300/20"
+            loading="eager"
+          />
+        </a>
+      </div>
+
+      <div class="flex items-center justify-end">
+        <div class="hidden md:block">
           <ul
-            class="flex rounded-full bg-white/90 px-3 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10 gap-4"
+            class="flex items-center rounded-full bg-white/90 px-2 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10"
           >
-            <li><HeaderLink href="/">Home</HeaderLink></li>
-            <li><HeaderLink href="/about">About</HeaderLink></li>
-            <li><HeaderLink href="/blog">Blog</HeaderLink></li>
-            <li><HeaderLink href="/speaking">Speaking</HeaderLink></li>
+            {
+              SITE_NAV.map((navitem) => (
+                <li class="px-3 py-2">
+                  <HeaderLink href={navitem.path}>{navitem.name}</HeaderLink>
+                </li>
+              ))
+            }
           </ul>
         </div>
-        <div class="flex justify-end md:flex-1">
-          <div class="pointer-events-auto"></div>
-        </div>
+
+        <button
+          type="button"
+          class="ml-3 md:hidden flex items-center justify-center rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500 dark:text-zinc-400 dark:hover:bg-zinc-700"
+          aria-label="Toggle menu"
+          id="mobile-menu-button"
+          aria-expanded="false"
+        >
+          <svg class="block h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
-    </Container>
-  </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="hidden md:hidden absolute inset-x-0 top-full mt-2 z-50 origin-top transform transition" id="mobile-menu">
+      <div class="rounded-lg bg-white/95 px-2 py-1.5 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/95 dark:text-zinc-200 dark:ring-zinc-800">
+        <ul class="flex flex-col space-y-1">
+          {
+            SITE_NAV.map((navitem) => (
+              <li>
+                <a
+                  href={navitem.path}
+                  class:list={[
+                    "block px-3 py-2 rounded-md text-base font-medium transition-colors",
+                    pathname === navitem.path || pathname === navitem.path.replace(/\/$/, "") 
+                      ? "text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-900/20" 
+                      : "text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-700/70"
+                  ]}
+                >
+                  {navitem.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </Container>
 </header>
+
+<script>
+  // Enhanced mobile menu functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuOpenIcon = document.getElementById('menu-open-icon');
+    const menuCloseIcon = document.getElementById('menu-close-icon');
+
+    if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+      mobileMenuButton.addEventListener('click', () => {
+        const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+        mobileMenuButton.setAttribute('aria-expanded', !expanded ? 'true' : 'false');
+        
+        mobileMenu.classList.toggle('hidden');
+        menuOpenIcon.classList.toggle('hidden');
+        menuCloseIcon.classList.toggle('hidden');
+        
+        if (!expanded) {
+          // Add animation classes when opening
+          mobileMenu.classList.add('animate-in', 'fade-in', 'duration-200');
+        }
+      });
+      
+      // Close menu when clicking outside
+      document.addEventListener('click', (event) => {
+        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+        if (isExpanded && !mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+          mobileMenuButton.setAttribute('aria-expanded', 'false');
+          mobileMenu.classList.add('hidden');
+          menuOpenIcon.classList.remove('hidden');
+          menuCloseIcon.classList.add('hidden');
+        }
+      });
+    }
+  });
+</script>

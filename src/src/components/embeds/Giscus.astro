@@ -1,21 +1,78 @@
 ---
 ---
 
-<script
-  is:inline
-  src="https://giscus.app/client.js"
-  data-repo="Sealjay/sealjay-blog"
-  data-repo-id="R_kgDOIFGusQ"
-  data-category="Comments"
-  data-category-id="DIC_kwDOIFGusc4CWbkg"
-  data-mapping="pathname"
-  data-strict="0"
-  data-reactions-enabled="1"
-  data-emit-metadata="0"
-  data-input-position="bottom"
-  data-theme="light"
-  data-lang="en"
-  data-loading="lazy"
-  crossorigin="anonymous"
-  async
-></script>
+<div class="giscus-wrapper mt-8 sm:mt-12">
+  <h2 class="text-lg sm:text-xl font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Comments</h2>
+  <div class="giscus-container overflow-hidden">
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo="Sealjay/sealjay-blog"
+      data-repo-id="R_kgDOIFGusQ"
+      data-category="Comments"
+      data-category-id="DIC_kwDOIFGusc4CWbkg"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-theme-dark="dark"
+      data-lang="en"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async
+    ></script>
+  </div>
+</div>
+
+<style>
+  /* Ensure the giscus container adapts to mobile screens properly */
+  .giscus-container {
+    width: 100%;
+  }
+  
+  /* Ensure giscus iframe is responsive */
+  :global(.giscus-frame) {
+    width: 100%;
+  }
+  
+  /* Add dark mode theme toggle support */
+  :global(html.dark) .giscus-wrapper :global(.giscus-frame) {
+    border: 0;
+  }
+</style>
+
+<script>
+  // Handle theme changes for giscus
+  document.addEventListener('DOMContentLoaded', () => {
+    const updateGiscusTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      const theme = isDarkMode ? 'dark' : 'light';
+      
+      const iframe = document.querySelector('.giscus-frame');
+      if (iframe) {
+        iframe.contentWindow.postMessage({
+          giscus: {
+            setConfig: {
+              theme
+            }
+          }
+        }, 'https://giscus.app');
+      }
+    };
+    
+    // Set initial theme after giscus loads
+    const observer = new MutationObserver((mutations) => {
+      if (document.querySelector('.giscus-frame')) {
+        updateGiscusTheme();
+        observer.disconnect();
+      }
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Update theme when it changes
+    document.addEventListener('themeChanged', updateGiscusTheme);
+  });
+</script>

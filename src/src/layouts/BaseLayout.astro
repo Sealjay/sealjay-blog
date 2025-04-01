@@ -16,20 +16,20 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
   updatedDate={updatedDate}
   heroImage={heroImage}
 >
-  <article class="max-w-none my-6 text-gray-800 dark:text-gray-200 prose">
+  <article class="max-w-none my-4 text-gray-800 dark:text-gray-200 prose prose-sm sm:prose">
     <h1
-      class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl mb-4"
+      class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 mb-3"
     >
       {title}
     </h1>
-    <div class="text-lg text-gray-500 dark:text-gray-400 mb-6">
+    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
       {`Published on`}
       <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
         <FormattedDate date={pubDateTime} /></span
       >{
         updatedDate && (
           <>
-            {`- last updated on `}
+            {` - last updated on `}
             <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">
               <FormattedDate date={updatedDate} />
             </span>
@@ -37,7 +37,9 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
         )
       }
     </div>
-    <slot />
+    <div class="prose-img:rounded-lg prose-img:mx-auto prose-img:w-full">
+      <slot />
+    </div>
   </article>
   <Giscus />
 </PageLayout>

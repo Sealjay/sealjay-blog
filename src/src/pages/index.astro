@@ -1,6 +1,5 @@
 ---
 import { getCollection } from "astro:content";
-import Photos from "../components/partials/IndexPhotos.astro";
 import Layout from "../layouts/IndexLayout.astro";
 import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
@@ -18,13 +17,13 @@ const recentPosts = posts.slice(0, 5);
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
 >
-  <div class="max-w-2xl pt-10">
+  <div class="w-full max-w-2xl mx-auto pt-6 sm:pt-10">
     <h1
-      class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
+      class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl"
     >
       Software engineer, open source & sustainability enthusiast.
     </h1>
-    <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">
+    <p class="mt-4 sm:mt-6 text-base text-zinc-600 dark:text-zinc-400">
       I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and
       &lsquo;open&rsquo; enthusiast, living in London. I&apos;m the Head of Open
       Innovation at Avanade, deeply embedded in the Open Source community, and a
@@ -36,24 +35,26 @@ const recentPosts = posts.slice(0, 5);
       OpenUK Chief Blueprints Officer.
     </p>
   </div>
-  <SocialLinks />
-  <p class="mt-6 text-base text-zinc-600 dark:text-zinc-400">Recent blogs:</p>
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {
-      recentPosts.map((post) => (
-        <div class="border rounded-md p-4 bg-white shadow-md" key={post.slug}>
-          <h2 class="text-lg leading-6 font-medium text-gray-900">
-            <a href={`/blog/${post.slug}/`} class="hover:text-indigo-600">
-              {post.data.title}
-            </a>
-          </h2>
-          <div class="text-sm text-gray-500">
-            <FormattedDate date={post.data.pubDateTime} />
-          </div>
-        </div>
-      ))
-    }
+  <div class="w-full max-w-2xl mx-auto">
+    <SocialLinks />
   </div>
-
-  <Photos />
+  <div class="w-full max-w-4xl mx-auto mt-8 sm:mt-12">
+    <p class="text-base text-zinc-600 dark:text-zinc-400 mb-4">Recent blogs:</p>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        recentPosts.map((post) => (
+          <div class="flex flex-col h-full border rounded-lg p-4 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-200" key={post.slug}>
+            <h2 class="text-lg leading-6 font-medium text-gray-900 flex-grow">
+              <a href={`/blog/${post.slug}/`} class="hover:text-indigo-600 transition-colors duration-200">
+                {post.data.title}
+              </a>
+            </h2>
+            <div class="text-sm text-gray-500 mt-2">
+              <FormattedDate date={post.data.pubDateTime} />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
 </Layout>

@@ -1,14 +1,11 @@
 ---
 import Layout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
-import Section from "../../components/containers/Section.astro";
-import SpeakerUl from "../../components/partials/SpeakerUl.astro";
 import FormattedDate from "../../components/partials/FormattedDate.astro";
 import Card from "../../components/partials/Card.astro";
 
 const speakingSlots = await getCollection("speaking");
 const lastConferenceSlot = speakingSlots.reduce((prev, current) => (prev.data.date > current.data.date) ? prev : current);
-
 ---
 
 <Layout
@@ -18,26 +15,44 @@ const lastConferenceSlot = speakingSlots.reduce((prev, current) => (prev.data.da
     updatedDate={lastConferenceSlot.data.date}
     heroImage="/placeholder-hero.png"
 >
-  I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements.
-  <div class="not-prose">
-  <Section title="Recent events and activities" class="mt-10">
-    <SpeakerUl>
-      {speakingSlots.map((slot) => (
-          <li key={slot.data.title} class="mb-4">
-            <Card url={slot.data.url} cta={slot.data.cta}>
-              <FormattedDate date={slot.data.date} slot="title"/>
-              <a href={slot.data.url} class="text-base font-semibold text-gray-900 hover:text-gray-600 hover:underline">
-                {slot.data.title}
-              </a>
+    <div class="mx-auto max-w-4xl">
+        <p class="mb-6 text-lg text-zinc-600 dark:text-zinc-400">
+            I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements.
+        </p>
 
-              {slot.data.blogPostSlug && (
-                    <a href={'blog/' + slot.data.blogPostSlug}>Related blog post here.</a>)}
-              <span slot="bottom-left">{slot.data.eventType}</span>
-              <p class="mt-2 text-sm text-gray-500">{slot.data.event}</p>
-            </Card>
-          </li>
-      ))}
-    </SpeakerUl>
-  </Section>
-</div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {speakingSlots.map((slot) => (
+                <Card 
+                    url={slot.data.url} 
+                    cta="View event"
+                    hasHeaderBg={true}
+                    compactHeader={true}
+                    contentGap="gap-2"
+                >
+                    <FormattedDate date={slot.data.date} slot="title" />
+                    <div class="space-y-1">
+                        <h3 class="text-base font-semibold text-zinc-800 dark:text-zinc-100">
+                            {slot.data.title}
+                        </h3>
+                        <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                            {slot.data.event}
+                        </p>
+                        {slot.data.blogPostSlug && (
+                            <a 
+                                href={`/blog/${slot.data.blogPostSlug}`}
+                                class="mt-1 block text-sm text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
+                            >
+                                Read related blog post →
+                            </a>
+                        )}
+                    </div>
+                    <div slot="bottom-left">
+                        <span class="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">
+                            {slot.data.eventType}
+                        </span>
+                    </div>
+                </Card>
+            ))}
+        </div>
+    </div>
 </Layout>
