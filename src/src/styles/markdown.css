@@ -7,24 +7,29 @@ h4,
 h5,
 h6 {
 	color: var(--text-heading);
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	-ms-word-break: break-word;
+	word-break: break-word;
+	hyphens: auto;
 }
 
 h1 {
 	margin-top: 0;
 	margin-bottom: 0.8333333em;
-	font-size: 2.5em;
+	font-size: 1.75em; /* Smaller on mobile */
 	line-height: 1.2 !important;
 }
 
 h2 {
-	font-size: 1.6666667em;
+	font-size: 1.4em; /* Smaller on mobile */
 	margin-top: 1.8666667em;
-	margin-bottom: 1.0666667em;
+	margin-bottom: 0.8em;
 	line-height: 1.3333333;
 }
 
 h3 {
-	font-size: 1.3333333em;
+	font-size: 1.2em; /* Smaller on mobile */
 	margin-top: 1.6666667em;
 	margin-bottom: 0.6666667em;
 	line-height: 1.5;
@@ -45,6 +50,57 @@ h4+*,
 h5+*,
 h6+* {
 	margin-top: 0;
+}
+
+/* Responsive typography for larger screens */
+@media (min-width: 640px) {
+	h1 {
+		font-size: 2.5em;
+	}
+	
+	h2 {
+		font-size: 1.6666667em;
+	}
+	
+	h3 {
+		font-size: 1.3333333em;
+	}
+}
+
+/* Improve code blocks on mobile */
+pre, code {
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	max-width: 100%;
+}
+
+/* Improve table display on small screens */
+table {
+	display: block;
+	overflow-x: auto;
+	max-width: 100%;
+}
+
+/* Responsive images */
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 0.375rem;
+}
+
+/* Better blockquotes on mobile */
+blockquote {
+	padding-left: 1rem;
+	border-left-width: 4px;
+	font-style: italic;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* Better lists on mobile */
+ul, ol {
+	padding-left: 1.25rem;
 }
 
 /* ------ MARKDOWN STYLES - END ------ */

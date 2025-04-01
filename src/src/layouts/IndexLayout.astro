@@ -3,6 +3,7 @@ import BaseHead from "../components/partials/BaseHead.astro";
 import Header from "../components/partials/Header.astro";
 import Footer from "../components/partials/Footer.astro";
 import Container from "../components/containers/Container.astro";
+import Waves from "../components/partials/IndexWaves.astro";
 
 const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
 ---
@@ -10,22 +11,38 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
 <html class="h-full antialiased" lang="en">
   <head>
     <BaseHead title={title} description={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   </head>
-  <body class="flex h-full flex-col bg-zinc-50 dark:bg-black">
-    <div class="inset-0 flex justify-center sm:px-8">
-      <div class="flex w-full max-w-7xl lg:px-8">
-        <div
-          class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"
-        >
-          <div class="relative">
-            <Header />
-            <Container>
-              <slot />
-            </Container>
-            <Footer />
+  <body class="flex min-h-full flex-col bg-zinc-50 dark:bg-black">
+    <Waves />
+    <div class="relative flex min-h-full w-full flex-col justify-between">
+      <div class="w-full px-2 sm:px-4 md:px-8">
+        <div class="mx-auto max-w-7xl">
+          <div
+            class="w-full bg-white/80 backdrop-blur ring-1 ring-zinc-100 dark:bg-zinc-900/80 dark:ring-zinc-300/20 rounded-lg sm:rounded-xl shadow-sm"
+          >
+            <div class="relative overflow-hidden">
+              <Header />
+              <main class="min-h-[50vh]">
+                <Container>
+                  <slot />
+                </Container>
+              </main>
+              <Footer />
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      // Fix for mobile viewport height issues with iOS Safari
+      function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
+      setVH();
+    </script>
   </body>
 </html>

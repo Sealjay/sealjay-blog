@@ -2,25 +2,52 @@
 type Props = {
   url: string;
   title: string;
+  height?: string;
 };
 
-const { url, title } = Astro.props;
+const { url, title, height = "300" } = Astro.props;
+
+// Extract hash and user from URL if available
+const urlObj = new URL(url);
+const pathParts = urlObj.pathname.split('/').filter(Boolean);
+const user = pathParts[0];
+const hash = pathParts[pathParts.length - 1];
 ---
 
-<!-- 
-    Even though minimal theme is built with zero javascript,
-    if your blog post uses embed elements, the iframe will need to 
-    be setup with javascript. It can't be done without javascript.
--->
-<p
-  class="codepen"
-  data-height="300"
-  data-default-tab="html,result"
-  data-slug-hash="eYJqjgq"
-  data-user="ruphaa"
-  style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;"
->
-  <span><a href={url}>{title}</a></span>
-</p>
-<script async defer src="https://cpwebassets.codepen.io/assets/embed/ei.js"
-></script>
+<div class="codepen-container">
+  <p
+    class="codepen"
+    data-height={height}
+    data-theme-id="light"
+    data-default-tab="html,result"
+    data-slug-hash={hash}
+    data-user={user}
+    style={`height: ${height}px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.1); margin: 1em 0; padding: 1em; border-radius: 0.5rem;`}
+    data-pen-title={title}
+  >
+    <span><a href={url} target="_blank" rel="noopener">{title}</a></span>
+  </p>
+  <script async defer src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+</div>
+
+<style>
+  .codepen-container {
+    position: relative;
+    width: 100%;
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+  
+  /* Make CodePen responsive on small screens */
+  @media (max-width: 640px) {
+    .codepen-container {
+      margin: 1rem 0;
+    }
+    
+    .codepen {
+      transform-origin: 0 0;
+      transform: scale(0.95);
+      width: 105.25%;
+    }
+  }
+</style>

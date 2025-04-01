@@ -2,3 +2,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Mobile-friendly base styles */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  
+  /* Improve mobile scrolling performance */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+  
+  /* Better touch targets for interactive elements */
+  button, 
+  a, 
+  [role="button"], 
+  input, 
+  label, 
+  select, 
+  textarea {
+    @apply focus:outline-none focus:ring-2 focus:ring-teal-500/50;
+    touch-action: manipulation;
+  }
+  
+  /* Fix iOS input zooming */
+  input, 
+  select, 
+  textarea {
+    @apply text-base;
+    font-size: 16px;
+  }
+  
+  /* Fix image display on mobile */
+  img {
+    @apply max-w-full;
+  }
+}
+
+/* Responsive typography utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Fix for 100vh issues on mobile */
+  .h-screen-safe {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+}
