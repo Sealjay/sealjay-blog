@@ -1,10 +1,16 @@
 ---
 import Layout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/containers/Container.astro";
+import ContentContainer from "../../components/containers/ContentContainer.astro";
+import PageHeader from "../../components/partials/PageHeader.astro";
+import Badge from "../../components/partials/Badge.astro";
 import { getCollection } from "astro:content";
 import FormattedDate from "../../components/partials/FormattedDate.astro";
 import Card from "../../components/partials/Card.astro";
 
 const speakingSlots = await getCollection("speaking");
+// Sort speaking events from newest to oldest
+const sortedSpeakingSlots = [...speakingSlots].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const lastConferenceSlot = speakingSlots.reduce((prev, current) => (prev.data.date > current.data.date) ? prev : current);
 ---
 
@@ -14,57 +20,52 @@ const lastConferenceSlot = speakingSlots.reduce((prev, current) => (prev.data.da
     pubDateTime={new Date("1 March 2023")}
     updatedDate={lastConferenceSlot.data.date}
 >
-    <div class="mx-auto max-w-5xl">
-        <!-- Page Header -->
-        <div class="mb-10 md:mb-16">
-            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
-                <span class="text-gradient">Speaking</span>
-            </h1>
-            <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
-                I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements.
-            </p>
-        </div>
+  <Container>
+    <ContentContainer maxWidth="max-w-5xl">
+      <PageHeader 
+        title="Speaking" 
+        subtitle="I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements."
+      />
 
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {speakingSlots.map((slot) => (
-                <Card
-                    url={slot.data.url}
-                    cta="View event"
-                    hasHeaderBg={true}
-                    compactHeader={true}
-                >
-                    <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400" slot="title">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <FormattedDate date={slot.data.date} />
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors mb-2">
-                            {slot.data.title}
-                        </h3>
-                        <p class="text-zinc-600 dark:text-zinc-400">
-                            {slot.data.event}
-                        </p>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-2.5 py-0.5 text-xs font-medium text-accent-700 dark:text-accent-300">
-                            {slot.data.eventType}
-                        </span>
-                        
-                        {slot.data.blogPostSlug && (
-                            <a 
-                                href={`/blog/${slot.data.blogPostSlug}`}
-                                class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                View related blog post
-                            </a>
-                        )}
-                    </div>
-                </Card>
-            ))}
-        </div>
-    </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {sortedSpeakingSlots.map((slot) => (
+              <Card
+                  url={slot.data.url}
+                  cta="View event"
+                  hasHeaderBg={true}
+                  compactHeader={true}
+              >
+                  <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400" slot="title">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <FormattedDate date={slot.data.date} />
+                  </div>
+                  
+                  <div class="mb-4">
+                      <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors mb-2">
+                          {slot.data.title}
+                      </h3>
+                      <p class="text-zinc-600 dark:text-zinc-400">
+                          {slot.data.event}
+                      </p>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-2">
+                      <Badge text={slot.data.eventType} />
+                      
+                      {slot.data.blogPostSlug && (
+                          <a 
+                              href={`/blog/${slot.data.blogPostSlug}`}
+                              class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                          >
+                              View related blog post
+                          </a>
+                      )}
+                  </div>
+              </Card>
+          ))}
+      </div>
+    </ContentContainer>
+  </Container>
 </Layout>

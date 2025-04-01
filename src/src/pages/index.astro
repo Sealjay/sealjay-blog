@@ -3,6 +3,9 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/IndexLayout.astro";
 import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
+import Badge from "../components/partials/Badge.astro";
+import { professionalBadges, formerRoles } from "../config/personal";
+
 const posts = (await getCollection("blog")).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
 );
@@ -46,9 +49,13 @@ const recentPosts = posts.slice(0, 5);
         </p>
         
         <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
-          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">Microsoft MVP in AI</span>
-          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">Green Software Foundation</span>
-          <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1">OpenUK Chief Blueprints Officer</span>
+          {professionalBadges.map(badge => (
+            <Badge 
+              text={badge.text}
+              url={badge.url}
+              isFormerRole={badge.isFormerRole}
+            />
+          ))}
         </div>
         
         <div class="mt-8">

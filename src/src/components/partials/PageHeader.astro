@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  center?: boolean;
+  titleClasses?: string;
+}
+
+const { 
+  title, 
+  subtitle, 
+  center = true, 
+  titleClasses = "text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4"
+} = Astro.props;
+---
+
+<div class={`mb-10 ${center ? 'text-center' : ''}`}>
+  <h1 class={titleClasses}>
+    <slot name="title-prefix" />{title}<slot name="title-suffix" />
+  </h1>
+  {subtitle && 
+    <p class="text-lg text-zinc-600 dark:text-zinc-400">
+      {subtitle}
+    </p>
+  }
+  <slot />
+</div>
