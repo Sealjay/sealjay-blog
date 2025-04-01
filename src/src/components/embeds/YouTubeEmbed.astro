@@ -1,20 +1,20 @@
 ---
 type Props = {
-  url: string;
-  label: string;
+  id: string;
+  title?: string;
 };
 
-const { url, label } = Astro.props;
+const { id, title = "YouTube video" } = Astro.props;
 
-// Add lazy loading parameter to YouTube URL if not already present
-const enhancedUrl = url.includes('loading=') ? url : `${url}${url.includes('?') ? '&' : '?'}loading=lazy`;
+// Construct the YouTube embed URL with lazy loading
+const embedUrl = `https://www.youtube.com/embed/${id}?loading=lazy`;
 ---
 
 <div class="youtube-container">
   <iframe
     class="youtube-iframe"
-    src={enhancedUrl}
-    title={label}
+    src={embedUrl}
+    title={title}
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
@@ -33,7 +33,7 @@ const enhancedUrl = url.includes('loading=') ? url : `${url}${url.includes('?') 
     max-width: 100%;
     margin: 1.5rem 0;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
   
   .youtube-iframe {
@@ -43,5 +43,11 @@ const enhancedUrl = url.includes('loading=') ? url : `${url}${url.includes('?') 
     width: 100%;
     height: 100%;
     border: 0;
+    border-radius: 0.5rem;
+  }
+  
+  /* Dark mode adjustments */
+  :global(html.dark) .youtube-container {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   }
 </style>
