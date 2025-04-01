@@ -1,7 +1,10 @@
 ---
 import Layout from "../layouts/IndexLayout.astro";
 import Container from "../components/containers/Container.astro";
-import SocialLinks from "../components/partials/IndexSocialLinks.astro";
+import ContentContainer from "../components/containers/ContentContainer.astro";
+import PageHeader from "../components/partials/PageHeader.astro";
+import ProfileSection from "../components/partials/ProfileSection.astro";
+import { currentRole } from "../config/personal";
 ---
 
 <Layout
@@ -12,81 +15,32 @@ import SocialLinks from "../components/partials/IndexSocialLinks.astro";
   heroImage="/chris/portrait.jpg"
 >
   <Container>
-    <div class="max-w-5xl mx-auto">
-      <!-- Page Header -->
-      <div class="mb-10 text-center">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
-          About <span class="text-gradient">Chris</span>
-        </h1>
+    <ContentContainer maxWidth="max-w-5xl">
+      <PageHeader title="About Chris" />
+      
+      <ProfileSection 
+        imageSrc="/chris/portrait.jpg" 
+        imageAlt="Chris Lloyd-Jones"
+        showBadges={true}
+        showFormerRoles={true}
+      >
+      <div slot="bio">
+        <p>
+          I work at Avanade as the Head of Platforms &amp; Incubation, where I lead our platform strategy— designing, building, and scaling cloud-native solutions that integrate seamlessly across different services.</p>
+          <p>I also oversee Avanade's incubations team, and our open source office, helping align our platform capabilities with both technical and business needs.
+        </p>
+        <p>
+          The incubation side of my role involves nurturing early-stage ideas, products, and technologies— whether internal or via partnerships with start-ups and academia. I help bring these innovations to life by providing a structure, mentorship, and support to turn promising concepts into scalable business offerings.
+        </p>
+        <p>
+          I started my career in local government, including a stint at the Financial Ombudsman Service. I later transitioned to tech, where I’ve focused on data, analytics, and emerging technologies.
+        </p>
+        <p>
+          My academic research explores how software can reduce carbon impact, using signals and evidence-based design to drive sustainability at scale.
+        </p>
       </div>
       
-      <div class="grid grid-cols-1 gap-y-12 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0">
-        <!-- Image (Mobile: top, Desktop: right) -->
-        <div class="lg:order-last lg:col-span-2">
-          <div class="relative max-w-xs mx-auto lg:max-w-none">
-            <div class="aspect-square overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 shadow-xl ring-1 ring-zinc-100 dark:ring-zinc-700/30">
-              <img
-                src="/chris/portrait.jpg"
-                alt="Chris Lloyd-Jones"
-                class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            <div class="absolute -bottom-6 -right-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100 dark:bg-accent-900/30"></div>
-            <div class="absolute -top-6 -left-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100/70 dark:bg-accent-900/20"></div>
-          </div>
-          
-          <!-- Mobile Social Links -->
-          <div class="mt-12 lg:hidden">
-            <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
-            <SocialLinks />
-          </div>
-        </div>
-        
-        <!-- Content (Mobile: bottom, Desktop: left) -->
-        <div class="lg:col-span-3">
-          <div class="prose prose-lg dark:prose-invert">
-            <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
-              <span class="font-medium">Head of Open Innovation at Avanade</span>
-            </div>
-            
-            <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
-              I'm Chris Lloyd-Jones, Sealjay. I live in <s>London</s> Seattle.
-            </h2>
-            
-            <div class="mt-6 space-y-6 text-base md:text-lg text-zinc-600 dark:text-zinc-400">
-              <p>
-                I work at Avanade - I'm the Head of Open Innovation, which
-                means focussing on an ecosystem of academia, foundations, and
-                start-ups; it also encompasses Avanade's Open-Source projects office
-                and developer relations team.
-              </p>
-              <p>
-                I started my career working in local government, with a brief stint
-                at the Financial Ombudsman Service. I transitioned careers, and
-                since then I've focussed on data, analytics, and emerging
-                technologies.
-              </p>
-              <p>
-                These days, I focus on scaling capabilities, or working with open
-                source organisations like the TODO Group, the Green Software
-                Foundation, and LF Europe.
-              </p>
-            </div>
-            
-            <div class="mt-8 flex flex-wrap gap-2">
-              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">Microsoft MVP in AI</span>
-              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">OpenUK Chief Blueprints Officer</span>
-              <span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium">Green Software Foundation</span>
-            </div>
-            
-            <!-- Desktop Social Links -->
-            <div class="mt-12 hidden lg:block">
-              <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
-              <SocialLinks />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </ProfileSection>
+    </ContentContainer>
   </Container>
 </Layout>

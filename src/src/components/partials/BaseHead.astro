@@ -48,14 +48,14 @@ const { title, description, image = "/placeholder-hero.png" } = Astro.props;
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image, Astro.url)} />
 
-<!-- Twitter/X -->
+<!-- X (formerly Twitter) -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
-<!-- Mastodon, because of Twitter/X -->
+<!-- Mastodon, because of X (formerly Twitter) -->
 <link href="https://fosstodon.org/@sealjay" rel="me" />
 
 <!-- Plausible -->

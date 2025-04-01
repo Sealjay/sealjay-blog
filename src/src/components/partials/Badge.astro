@@ -1,0 +1,29 @@
+---
+interface Props {
+  text: string;
+  url?: string;
+  isFormerRole?: boolean;
+}
+
+const { text, url, isFormerRole = false } = Astro.props;
+
+// Style classes based on badge type
+const badgeClasses = isFormerRole 
+  ? "inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800/70 px-3 py-1 text-sm text-zinc-700 dark:text-zinc-400 font-medium"
+  : "inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 font-medium";
+
+// Link classes for hover effect
+const linkClasses = "hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors";
+---
+
+{url ? (
+  <a href={url} class={`${badgeClasses} ${linkClasses}`}>
+    {isFormerRole && <span class="mr-1 opacity-80">formerly</span>}
+    {text}
+  </a>
+) : (
+  <span class={badgeClasses}>
+    {isFormerRole && <span class="mr-1 opacity-80">formerly</span>}
+    {text}
+  </span>
+)}

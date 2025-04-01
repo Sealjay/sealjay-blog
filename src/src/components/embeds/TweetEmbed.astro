@@ -15,12 +15,25 @@ const { url } = Astro.props;
     data-dnt="true"
     data-align="center"
   >
-    <a class="tweet-embed-link" href={url}>Loading embedded tweet...</a>
+    <a class="tweet-embed-link" href={url}>Loading embedded X post...</a>
   </blockquote>
 </div>
 
 <script>
-  // Create theme-aware Twitter embeds
+  // Type declaration for Twitter/X widget API
+  interface TwitterWidgets {
+    load: () => void;
+  }
+  
+  interface TwitterApi {
+    widgets: TwitterWidgets;
+  }
+  
+  interface WindowWithTwitter extends Window {
+    twttr?: TwitterApi;
+  }
+  
+  // Create theme-aware X embeds (formerly Twitter)
   const setTwitterTheme = () => {
     const isDarkMode = document.documentElement.classList.contains('dark');
     const theme = isDarkMode ? 'dark' : 'light';
@@ -35,7 +48,9 @@ const { url } = Astro.props;
     // Set initial theme
     setTwitterTheme();
     
-    // Add Twitter script dynamically
+    const win = window as WindowWithTwitter;
+    
+    // Add X script dynamically (uses Twitter's platform)
     const script = document.createElement('script');
     script.src = "https://platform.twitter.com/widgets.js";
     script.async = true;
@@ -45,10 +60,10 @@ const { url } = Astro.props;
     // Listen for theme changes
     document.addEventListener('themeChanged', setTwitterTheme);
     
-    // Re-render tweets when theme changes
+    // Re-render posts when theme changes
     document.addEventListener('themeChanged', () => {
-      if (window.twttr && window.twttr.widgets) {
-        window.twttr.widgets.load();
+      if (win.twttr && win.twttr.widgets) {
+        win.twttr.widgets.load();
       }
     });
   });
@@ -66,7 +81,7 @@ const { url } = Astro.props;
   }
   
   .tweet-embed-link {
-    color: #1da1f2;
+    color: #000000; /* Updated from Twitter blue to X black */
     text-decoration: none;
     font-size: 0.875rem;
   }

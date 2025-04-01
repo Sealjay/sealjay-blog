@@ -1,9 +1,14 @@
+---
 import Layout from "../layouts/BaseLayout.astro";
+import Container from "../components/containers/Container.astro";
+import ContentContainer from "../components/containers/ContentContainer.astro";
+import PageHeader from "../components/partials/PageHeader.astro";
 import { getCollection } from "astro:content";
 import Card from "../components/partials/Card.astro";
 
 const uses = await getCollection("uses");
 const categories = [...new Set(uses.map(item => item.data.category))];
+---
 
 <Layout
   title="Uses"
@@ -12,47 +17,49 @@ const categories = [...new Set(uses.map(item => item.data.category))];
   updatedDate={new Date("11 May 2023")}
   heroImage="/placeholder-hero.png"
 >
-  <div class="mx-auto max-w-4xl">
-    <p class="mb-8 text-lg text-zinc-600 dark:text-zinc-400">
-      Here's a list of software, hardware, and tools that I use regularly. This
-      list is updated periodically as my setup changes.
-    </p>
+  <Container>
+    <ContentContainer>
+      <PageHeader 
+        title="Uses" 
+        subtitle="Here's a list of software, hardware, and tools that I use regularly. This list is updated periodically as my setup changes." 
+      />
 
-    {categories.map((category) => (
-      <div class="mb-12">
-        <h2 class="mb-6 text-2xl font-bold text-zinc-800 dark:text-zinc-100">
-          {category}
-        </h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {uses
-            .filter((item) => item.data.category === category)
-            .map((item) => (
-              <Card 
-                url={item.data.url}
-                cta="Learn more"
-                hasHeaderBg={true}
-                compactHeader={true}
-                contentGap="gap-2"
-              >
-                <div class="flex items-center space-x-3" slot="title">
-                  <span class="font-medium text-zinc-800 dark:text-zinc-100">
-                    {item.data.title}
-                  </span>
-                </div>
-                <div class="space-y-1.5">
-                  <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                    {item.data.description}
-                  </p>
-                  {item.data.notes && (
-                    <p class="text-xs text-zinc-500 dark:text-zinc-500">
-                      {item.data.notes}
+      {categories.map((category) => (
+        <div class="mb-12">
+          <h2 class="mb-6 text-2xl font-bold text-zinc-800 dark:text-zinc-100">
+            {category}
+          </h2>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {uses
+              .filter((item) => item.data.category === category)
+              .map((item) => (
+                <Card 
+                  url={item.data.url}
+                  cta="Learn more"
+                  hasHeaderBg={true}
+                  compactHeader={true}
+                  contentGap="gap-2"
+                >
+                  <div class="flex items-center space-x-3" slot="title">
+                    <span class="font-medium text-zinc-800 dark:text-zinc-100">
+                      {item.data.title}
+                    </span>
+                  </div>
+                  <div class="space-y-1.5">
+                    <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                      {item.data.description}
                     </p>
-                  )}
-                </div>
-              </Card>
-            ))}
+                    {item.data.notes && (
+                      <p class="text-xs text-zinc-500 dark:text-zinc-500">
+                        {item.data.notes}
+                      </p>
+                    )}
+                  </div>
+                </Card>
+              ))}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-</Layout> 
+      ))}
+    </ContentContainer>
+  </Container>
+</Layout>
