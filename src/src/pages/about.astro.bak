@@ -1,0 +1,46 @@
+---
+import Layout from "../layouts/IndexLayout.astro";
+import Container from "../components/containers/Container.astro";
+import ContentContainer from "../components/containers/ContentContainer.astro";
+import PageHeader from "../components/partials/PageHeader.astro";
+import ProfileSection from "../components/partials/ProfileSection.astro";
+import { currentRole } from "../config/personal";
+---
+
+<Layout
+  title="About Me | Chris Lloyd-Jones"
+  description="I'm Chris Lloyd-Jones (Sealjay), a software engineer and open source enthusiast based in Seattle"
+  pubDateTime={new Date("1 March 2023")}
+  updatedDate={new Date("1 March 2023")}
+  heroImage="/chris/portrait.jpg"
+>
+  <Container>
+    <ContentContainer maxWidth="max-w-5xl">
+      <PageHeader title="About Chris" />
+      
+      <ProfileSection 
+        imageSrc="/chris/portrait.jpg" 
+        imageAlt="Chris Lloyd-Jones"
+        showBadges={true}
+        showFormerRoles={true}
+      >
+      <div slot="bio">
+        <p>
+          I work at Avanade as the Head of Platforms &amp; Incubation, where I lead our platform strategy— designing, building, and scaling cloud-native solutions that integrate seamlessly across different services.</p>
+          <p>I also oversee Avanade's incubations team, and our open source office, helping align our platform capabilities with both technical and business needs.
+        </p>
+        <p>
+          The incubation side of my role involves nurturing early-stage ideas, products, and technologies— whether internal or via partnerships with start-ups and academia. I help bring these innovations to life by providing a structure, mentorship, and support to turn promising concepts into scalable business offerings.
+        </p>
+        <p>
+          I started my career in local government, including a stint at the Financial Ombudsman Service. I later transitioned to tech, where I’ve focused on data, analytics, and emerging technologies.
+        </p>
+        <p>
+          My academic research explores how software can reduce carbon impact, using signals and evidence-based design to drive sustainability at scale.
+        </p>
+      </div>
+      
+      </ProfileSection>
+    </ContentContainer>
+  </Container>
+</Layout>

@@ -5,6 +5,13 @@ export interface Badge {
   isFormerRole?: boolean;
 }
 
+// Current role information
+export const currentRole = {
+  title: "Principal Architect",
+  company: "Kyndryl",
+  displayText: "Principal Architect at Kyndryl"
+};
+
 export const professionalBadges: Badge[] = [
   {
     text: "Microsoft MVP in AI",
@@ -23,11 +30,20 @@ export const professionalBadges: Badge[] = [
   {
     text: "OpenUK Ambassador",
     url: "https://greensoftware.foundation/"
+  },
+  {
+    text: "Securing the Realm",
+    url: "https://securing.quest"
   }
 ];
 
 // Former roles to display (if any)
 export const formerRoles: Badge[] = [
+    {
+        text: "Head of Platforms & Incubation at Avanade",
+        url: "https://www.avanade.com/",
+        isFormerRole: true
+      },
     {
         text: "OpenUK Chief Blueprints Officer & Leadership",
         url: "https://openuk.uk/",
