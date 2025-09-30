@@ -16,6 +16,24 @@
       }
     },
     {
+      "route": "/_astro/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/chris/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.{css,js,woff,woff2,ttf,otf,eot}",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
       "route": "/*",
       "allowedRoles": ["anonymous"]
     }
