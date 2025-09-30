@@ -7,9 +7,9 @@ export interface Badge {
 
 // Current role information
 export const currentRole = {
-  title: "Principal Architect",
+  title: "VP, AI Consulting Transformation",
   company: "Kyndryl",
-  displayText: "Principal Architect at Kyndryl"
+  displayText: "VP, AI Consulting Transformation at Kyndryl"
 };
 
 export const professionalBadges: Badge[] = [
@@ -39,6 +39,11 @@ export const professionalBadges: Badge[] = [
 
 // Former roles to display (if any)
 export const formerRoles: Badge[] = [
+    {
+        text: "Head of Avanade.ai",
+        url: "https://www.avanade.com/",
+        isFormerRole: true
+      },
     {
         text: "Head of Platforms & Incubation at Avanade",
         url: "https://www.avanade.com/",
