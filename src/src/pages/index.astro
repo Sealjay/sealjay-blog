@@ -102,7 +102,8 @@ const recentPosts = posts.slice(0, 5);
                 <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                   <img 
                     src={post.data.heroImage} 
-                    alt="" 
+                    alt=""
+                    loading="lazy"
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
