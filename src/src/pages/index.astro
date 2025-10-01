@@ -4,7 +4,7 @@ import Layout from "../layouts/IndexLayout.astro";
 import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 import Badge from "../components/partials/Badge.astro";
-import { professionalBadges, formerRoles } from "../config/personal";
+import { professionalBadges, formerRoles, currentRole } from "../config/personal";
 
 const posts = (await getCollection("blog")).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
@@ -15,7 +15,7 @@ const recentPosts = posts.slice(0, 5);
 
 <Layout
   title="Chris Lloyd-Jones | Sealjay"
-  description="Software engineer, open source & sustainability advocate based in London"
+  description="Software engineer, open source & sustainability advocate based in Seattle"
   pubDateTime={new Date("1 March 2023")}
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
@@ -37,7 +37,7 @@ const recentPosts = posts.slice(0, 5);
       <!-- Text Content -->
       <div class="flex-1">
         <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
-          <span class="font-medium">Head of Platforms &amp; Incubation at Avanade</span>
+          <span class="font-medium">{currentRole.displayText}</span>
         </div>
         
         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl">
@@ -102,7 +102,8 @@ const recentPosts = posts.slice(0, 5);
                 <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                   <img 
                     src={post.data.heroImage} 
-                    alt="" 
+                    alt=""
+                    loading="lazy"
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
