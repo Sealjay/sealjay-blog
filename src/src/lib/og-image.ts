@@ -83,6 +83,10 @@ const TAG_TO_CATEGORY: Record<string, string> = {
 	Sustainability: "green-software",
 
 	Security: "security",
+	"Securing the Realm": "security",
+	"ai-security": "security",
+	appsec: "security",
+	devsecops: "security",
 
 	Event: "events-media",
 	"External Media": "events-media",
