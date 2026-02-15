@@ -13,8 +13,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // Compute slug from the URL pathname for OG image path
 const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
 const ogImagePath = getOGImagePath(slug);
-// Use custom heroImage if set (and not the old placeholder), otherwise use generated OG
-const displayHeroImage = heroImage && heroImage !== "/placeholder-hero.png" ? heroImage : ogImagePath;
+// Only show custom hero images on the page — auto-generated OG images repeat the title/date and are redundant
+const hasCustomHero = heroImage && heroImage !== "/placeholder-hero.png";
+const displayHeroImage = hasCustomHero ? heroImage : null;
 const articleJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Article",
@@ -79,7 +80,7 @@ const articleJsonLd = JSON.stringify({
     </div>
     
     {displayHeroImage && (
-      <div class="relative w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-xl">
+      <div class="relative w-full max-h-72 mb-8 overflow-hidden rounded-xl">
         <img
           src={displayHeroImage}
           alt=""

@@ -18,6 +18,11 @@ for (const note of notes) {
   notesByDate.get(dateKey)!.push(note);
 }
 
+// Sort notes within each day oldest-first (earliest at top)
+for (const dayNotes of notesByDate.values()) {
+  dayNotes.sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf());
+}
+
 // Find day summary for each date group (from any note that has one)
 function getDaySummary(dayNotes: typeof notes): string | undefined {
   for (const n of dayNotes) {
