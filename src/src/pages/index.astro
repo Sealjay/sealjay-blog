@@ -5,6 +5,7 @@ import SocialLinks from "../components/partials/IndexSocialLinks.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 import Badge from "../components/partials/Badge.astro";
 import { professionalBadges, formerRoles, currentRole } from "../config/personal";
+import { getOGImagePath } from "../lib/og-image";
 
 const posts = (await getCollection("blog")).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
@@ -98,16 +99,14 @@ const recentPosts = posts.slice(0, 5);
         recentPosts.map((post) => (
           <a href={`/blog/${post.slug}/`} class="group">
             <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              {post.data.heroImage && (
-                <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                  <img
-                    src={post.data.heroImage}
-                    alt={post.data.title}
-                    loading="lazy"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-              )}
+              <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                <img
+                  src={post.data.heroImage && post.data.heroImage !== "/placeholder-hero.png" ? post.data.heroImage : getOGImagePath(post.slug)}
+                  alt={post.data.title}
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               
               <div class="flex flex-col flex-grow p-5">
                 <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
