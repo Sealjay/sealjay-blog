@@ -7,6 +7,30 @@ import Giscus from "../components/embeds/Giscus.astro";
 type Props = CollectionEntry<"blog">["data"];
 
 const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const articleJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": heroImage ? new URL(heroImage, Astro.site).href : undefined,
+  "datePublished": pubDateTime?.toISOString(),
+  "dateModified": updatedDate?.toISOString() || pubDateTime?.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL.href
+  }
+});
 ---
 
 <PageLayout
@@ -16,6 +40,7 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
   updatedDate={updatedDate}
   heroImage={heroImage}
 >
+  <script type="application/ld+json" set:html={articleJsonLd} />
   <article class="max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
     <h1
       class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
