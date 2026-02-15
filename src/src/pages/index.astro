@@ -66,15 +66,17 @@ const allActivity: ActivityItem[] = [
       notesByDay.get(key)!.push(n)
     }
     return [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
-      const daySummary = dayNotes.find((n) => n.data.daySummary)?.data.daySummary
+      // Sort notes within each day oldest-first (earliest at top)
+      const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
+      const daySummary = sorted.find((n) => n.data.daySummary)?.data.daySummary
       const dayUrl = `/notes/${dateKey}/`
       return {
         type: 'note' as const,
-        title: dayNotes.length === 1 ? (dayNotes[0].data.title ?? 'Note') : `${dayNotes.length} Notes`,
-        description: daySummary ?? dayNotes.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
-        date: new Date(dayNotes[0].data.pubDateTime),
+        title: sorted.length === 1 ? (sorted[0].data.title ?? 'Note') : `${sorted.length} Notes`,
+        description: daySummary ?? sorted.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
+        date: new Date(sorted[0].data.pubDateTime),
         url: dayUrl,
-        noteItems: dayNotes.map((n) => ({
+        noteItems: sorted.map((n) => ({
           description: n.data.description,
           title: n.data.title,
           time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
@@ -207,7 +209,7 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
                 {/* Header: Note badge + date + link */}
                 <div class="flex items-center gap-3 mb-2">
                   <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
-                    {badgeLabels.note}
+                    {item.noteItems && item.noteItems.length > 1 ? 'Notes' : 'Note'}
                   </span>
                   <span class="text-xs text-zinc-500 dark:text-zinc-400">
                     <FormattedDate date={item.date} />
