@@ -3,17 +3,24 @@ import type { CollectionEntry } from "astro:content";
 import PageLayout from "./IndexLayout.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 import Giscus from "../components/embeds/Giscus.astro";
+import { getOGImagePath } from "../lib/og-image";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Compute slug from the URL pathname for OG image path
+const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
+const ogImagePath = getOGImagePath(slug);
+// Use custom heroImage if set (and not the old placeholder), otherwise use generated OG
+const displayHeroImage = heroImage && heroImage !== "/placeholder-hero.png" ? heroImage : ogImagePath;
 const articleJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": title,
   "description": description,
-  "image": heroImage ? new URL(heroImage, Astro.site).href : undefined,
+  "image": new URL(ogImagePath, Astro.site).href,
   "datePublished": pubDateTime?.toISOString(),
   "dateModified": updatedDate?.toISOString() || pubDateTime?.toISOString(),
   "author": {
@@ -38,7 +45,10 @@ const articleJsonLd = JSON.stringify({
   description={description}
   pubDateTime={pubDateTime}
   updatedDate={updatedDate}
-  heroImage={heroImage}
+  heroImage={displayHeroImage}
+  image={ogImagePath}
+  ogType="article"
+  tags={tags}
 >
   <script type="application/ld+json" set:html={articleJsonLd} />
   <article class="max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
@@ -68,11 +78,15 @@ const articleJsonLd = JSON.stringify({
       )}
     </div>
     
-    {heroImage && (
+    {displayHeroImage && (
       <div class="relative w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
-        <img 
-          src={heroImage} 
-          alt={title} 
+        <img
+          src={displayHeroImage}
+          alt=""
+          width="1200"
+          height="630"
+          fetchpriority="high"
+          decoding="async"
           class="w-full h-full object-cover"
         />
       </div>

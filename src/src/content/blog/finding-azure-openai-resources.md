@@ -2,7 +2,6 @@
 title: "Finding deployed Azure OpenAI resources"
 description: "Finding deployed Azure OpenAI resources in your tenant"
 pubDateTime: "2023-06-19T11:44:00.000Z"
-heroImage: "/placeholder-hero.png"
 tags: ["Snippets", "AI", "Azure", "OpenAI", "Governance"]
 ---
 
