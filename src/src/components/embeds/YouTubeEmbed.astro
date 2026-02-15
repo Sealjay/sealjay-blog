@@ -6,8 +6,8 @@ type Props = {
 
 const { id, title = "YouTube video" } = Astro.props;
 
-// Construct the YouTube embed URL with lazy loading
-const embedUrl = `https://www.youtube.com/embed/${id}?loading=lazy`;
+// Construct the YouTube embed URL
+const embedUrl = `https://www.youtube.com/embed/${id}`;
 ---
 
 <div class="youtube-container">
