@@ -1,0 +1,264 @@
+---
+import Layout from '../../layouts/IndexLayout.astro'
+import { getCollection } from 'astro:content'
+import { format } from 'date-fns'
+import FormattedDate from '../../components/partials/FormattedDate.astro'
+
+interface StreamItem {
+  type: 'article' | 'talk' | 'note' | 'project'
+  title: string
+  description: string
+  date: Date
+  url: string
+  tags: string[]
+}
+
+const blogEntries = await getCollection('blog')
+const speakingEntries = await getCollection('speaking')
+const noteEntries = await getCollection('note')
+const projectEntries = await getCollection('project')
+
+const blogItems: StreamItem[] = blogEntries.map((entry) => ({
+  type: 'article',
+  title: entry.data.title,
+  description: entry.data.description ?? '',
+  date: new Date(entry.data.pubDateTime),
+  url: `/blog/${entry.slug}/`,
+  tags: entry.data.tags ?? [],
+}))
+
+const speakingItems: StreamItem[] = speakingEntries.map((entry) => ({
+  type: 'talk',
+  title: entry.data.title,
+  description: `${entry.data.event} - ${entry.data.eventType}`,
+  date: new Date(entry.data.date),
+  url: entry.data.url,
+  tags: [],
+}))
+
+const noteItems: StreamItem[] = noteEntries.map((entry) => {
+  const dateKey = new Date(entry.data.pubDateTime).toISOString().slice(0, 10)
+  return {
+    type: 'note',
+    title: entry.data.title ?? 'Note',
+    description: entry.data.description ?? '',
+    date: new Date(entry.data.pubDateTime),
+    url: `/notes/${dateKey}/#${entry.slug}`,
+    tags: entry.data.tags ?? [],
+  }
+})
+
+const projectItems: StreamItem[] = projectEntries.map((entry) => ({
+  type: 'project',
+  title: entry.data.title,
+  description: entry.data.description ?? '',
+  date: new Date(entry.data.date),
+  url: entry.data.repoUrl,
+  tags: entry.data.tags ?? [],
+}))
+
+const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteItems, ...projectItems].sort(
+  (a, b) => b.date.valueOf() - a.date.valueOf()
+)
+
+const groupedItems = allItems.reduce<Record<string, StreamItem[]>>((acc, item) => {
+  const key = format(item.date, 'yyyy-MM')
+  acc[key] = [...(acc[key] || []), item]
+  return acc
+}, {})
+
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+const latestDate = allItems.length > 0 ? allItems[0].date : new Date()
+
+const badgeClasses: Record<StreamItem['type'], string> = {
+  article: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  project: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+}
+
+const badgeLabels: Record<StreamItem['type'], string> = {
+  article: 'Article',
+  talk: 'Talk',
+  note: 'Note',
+  project: 'Project',
+}
+---
+
+<Layout
+  title="Stream"
+  description="Everything in one place."
+  pubDateTime={new Date('1 March 2023')}
+  updatedDate={latestDate}
+>
+  <div class="mx-auto max-w-5xl">
+    <!-- Page Header -->
+    <div class="mb-10 md:mb-16">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+        <span class="text-gradient">Stream</span>
+      </h1>
+      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
+        Everything in one place.
+      </p>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="mb-8 flex flex-wrap gap-2" id="stream-filters">
+      <button
+        data-filter="all"
+        class="stream-filter-btn active inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900"
+      >
+        All
+      </button>
+      <button
+        data-filter="article"
+        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        Articles
+      </button>
+      <button
+        data-filter="talk"
+        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        Talks
+      </button>
+      <button
+        data-filter="note"
+        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        Notes
+      </button>
+      <button
+        data-filter="project"
+        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        Projects
+      </button>
+    </div>
+
+    <!-- Stream Items Grouped by Month -->
+    {Object.entries(groupedItems).map(([monthYear, items]) => (
+      <div class="mb-12 md:mb-16 stream-month-group" data-month={monthYear}>
+        <h2 class="mb-6 text-xl sm:text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 flex items-center">
+          <span class="inline-block w-1 h-6 bg-accent-500 dark:bg-accent-400 mr-3 rounded-full" />
+          {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
+        </h2>
+        <div class="flex flex-col gap-3">
+          {items.map((item) => (
+            <a
+              href={item.url}
+              target={item.type === 'talk' || item.type === 'project' ? '_blank' : undefined}
+              rel={item.type === 'talk' || item.type === 'project' ? 'noopener noreferrer' : undefined}
+              class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+              data-type={item.type}
+            >
+              <!-- Type Badge -->
+              <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
+                {badgeLabels[item.type]}
+              </span>
+
+              <!-- Date -->
+              <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
+                <FormattedDate date={item.date} />
+              </span>
+
+              <!-- Title & Description -->
+              <div class="min-w-0 flex-1">
+                <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+                  {item.title}
+                </span>
+                {item.description && (
+                  <span class="ml-2 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1 hidden md:inline">
+                    &mdash; {item.description}
+                  </span>
+                )}
+              </div>
+
+              <!-- Arrow Icon -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</Layout>
+
+<script>
+  function initStreamFilters() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.stream-filter-btn')
+    const items = document.querySelectorAll<HTMLElement>('.stream-item')
+    const monthGroups = document.querySelectorAll<HTMLElement>('.stream-month-group')
+
+    const activeClass = 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
+    const inactiveClass =
+      'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'
+
+    function setFilter(filter: string) {
+      // Update button styles
+      for (const btn of buttons) {
+        const isActive = btn.dataset.filter === filter
+        // Remove all variant classes first
+        for (const cls of [...activeClass.split(' '), ...inactiveClass.split(' ')]) {
+          btn.classList.remove(cls)
+        }
+        // Add the correct set
+        for (const cls of (isActive ? activeClass : inactiveClass).split(' ')) {
+          btn.classList.add(cls)
+        }
+      }
+
+      // Show/hide items
+      for (const item of items) {
+        if (filter === 'all' || item.dataset.type === filter) {
+          item.classList.remove('hidden')
+        } else {
+          item.classList.add('hidden')
+        }
+      }
+
+      // Hide empty month groups
+      for (const group of monthGroups) {
+        const visibleItems = group.querySelectorAll('.stream-item:not(.hidden)')
+        if (visibleItems.length === 0) {
+          group.classList.add('hidden')
+        } else {
+          group.classList.remove('hidden')
+        }
+      }
+    }
+
+    for (const btn of buttons) {
+      btn.addEventListener('click', () => {
+        setFilter(btn.dataset.filter ?? 'all')
+      })
+    }
+  }
+
+  // Run on initial load and on Astro page transitions
+  document.addEventListener('astro:page-load', initStreamFilters)
+  initStreamFilters()
+</script>

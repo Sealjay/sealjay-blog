@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/IndexLayout.astro'
+import { getCollection } from 'astro:content'
+import FormattedDate from '../../components/partials/FormattedDate.astro'
+import Badge from '../../components/partials/Badge.astro'
+import { speakerBio, topics, talkFormats, testimonials, logistics, contactCta, headshot } from '../../config/speakerKit'
+
+const featuredSpeaking = (await getCollection('speaking'))
+  .filter((entry) => entry.data.featured === true)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+---
+
+<Layout
+  title="Speaker Kit | Chris Lloyd-Jones"
+  description={speakerBio.short}
+  pubDateTime={new Date('1 March 2023')}
+  updatedDate={new Date('15 February 2026')}
+  heroImage={headshot}
+>
+  <!-- Hero -->
+  <section class="flex flex-col items-center text-center px-4 py-12 md:py-16">
+    <img
+      src={headshot}
+      alt="Chris Lloyd-Jones"
+      class="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover ring-4 ring-accent-200 dark:ring-accent-800 shadow-lg mb-6"
+    />
+    <h1 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Speaker Kit</h1>
+    <p class="max-w-2xl text-lg text-zinc-600 dark:text-zinc-400 mb-4">{speakerBio.short}</p>
+    <p class="max-w-3xl text-base text-zinc-500 dark:text-zinc-500">{speakerBio.long}</p>
+  </section>
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Topics -->
+  <section class="px-4 py-12 md:py-16">
+    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Topics</h2>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {topics.map((topic) => (
+        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6 transition-shadow hover:shadow-md">
+          <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 dark:bg-accent-900/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent-600 dark:text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={topic.icon} />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{topic.title}</h3>
+          <p class="text-sm text-zinc-600 dark:text-zinc-400">{topic.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Talk Formats -->
+  <section class="px-4 py-12 md:py-16">
+    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Talk Formats</h2>
+    <div class="mx-auto max-w-2xl space-y-4">
+      {talkFormats.map((format) => (
+        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-xs font-semibold text-accent-700 dark:text-accent-300">
+            {format.duration}
+          </span>
+          <div>
+            <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{format.name}</h3>
+            <p class="text-sm text-zinc-600 dark:text-zinc-400">{format.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Featured Appearances -->
+  {featuredSpeaking.length > 0 && (
+    <section class="px-4 py-12 md:py-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Featured Appearances</h2>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {featuredSpeaking.map((slot) => (
+          <a
+            href={slot.data.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6 transition-shadow hover:shadow-md hover:ring-accent-300 dark:hover:ring-accent-600"
+          >
+            <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <FormattedDate date={slot.data.date} />
+            </div>
+            <Badge text={slot.data.eventType} />
+            <h3 class="mt-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+              {slot.data.title}
+            </h3>
+            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{slot.data.event}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Testimonials -->
+  {testimonials.length > 0 && (
+    <section class="px-4 py-12 md:py-16">
+      <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Testimonials</h2>
+      <div class="grid gap-6 sm:grid-cols-2">
+        {testimonials.map((t) => (
+          <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6">
+            <svg class="h-8 w-8 text-accent-300 dark:text-accent-700 mb-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.69 11 13.178 11 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.69 21 13.178 21 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179z" />
+            </svg>
+            <blockquote class="text-zinc-700 dark:text-zinc-300 italic mb-4">{t.quote}</blockquote>
+            <div class="text-sm">
+              <p class="font-semibold text-zinc-900 dark:text-zinc-100">{t.author}</p>
+              <p class="text-zinc-500 dark:text-zinc-400">
+                {t.role}{t.event && <span> &mdash; {t.event}</span>}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Logistics -->
+  <section class="px-4 py-12 md:py-16">
+    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Logistics</h2>
+    <div class="mx-auto max-w-2xl grid gap-4 sm:grid-cols-2">
+      {logistics.map((item) => (
+        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-wider text-accent-600 dark:text-accent-400 mb-1">{item.label}</p>
+          <p class="text-sm text-zinc-700 dark:text-zinc-300">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+
+  <!-- Contact CTA -->
+  <section class="px-4 py-12 md:py-16">
+    <div class="mx-auto max-w-2xl rounded-xl bg-accent-50 dark:bg-accent-900/20 ring-1 ring-accent-200 dark:ring-accent-800/40 p-8 text-center">
+      <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">{contactCta.heading}</h2>
+      <p class="text-zinc-600 dark:text-zinc-400 mb-6">{contactCta.description}</p>
+      <a
+        href={`mailto:${contactCta.email}`}
+        class="inline-flex items-center rounded-lg bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:hover:bg-accent-400 px-6 py-3 text-sm font-semibold text-white dark:text-zinc-900 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
+      >
+        Get in Touch
+      </a>
+    </div>
+  </section>
+</Layout>
