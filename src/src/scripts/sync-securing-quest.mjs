@@ -178,8 +178,8 @@ function htmlToMarkdown(html) {
   // Convert horizontal rules
   md = md.replace(/<hr\s*\/?>/gi, '\n---\n\n')
 
-  // Remove images (they won't work in cross-posted content)
-  md = md.replace(/<img[^>]*>/gi, '')
+  // Self-close img tags for MDX compatibility
+  md = md.replace(/<img([^>]*[^/])>/gi, '<img$1 />')
 
   // Strip remaining HTML tags
   md = md.replace(/<[^>]+>/g, '')

@@ -1,0 +1,160 @@
+---
+import Layout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import FormattedDate from "../../../components/partials/FormattedDate.astro";
+import { format } from 'date-fns';
+import { getOGImagePath } from "../../../lib/og-image";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("blog");
+  const tagSet = new Set<string>();
+
+  for (const post of allPosts) {
+    if (post.data.tags) {
+      for (const tag of post.data.tags) {
+        tagSet.add(tag);
+      }
+    }
+  }
+
+  return [...tagSet].map((tag) => {
+    const slug = tag.toLowerCase().replace(/\s+/g, '-');
+    const filteredPosts = allPosts
+      .filter((post) => post.data.tags?.includes(tag))
+      .sort((b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf());
+
+    return {
+      params: { tag: slug },
+      props: { tag, posts: filteredPosts },
+    };
+  });
+}
+
+const { tag, posts } = Astro.props;
+
+const groupedPosts = posts.reduce((acc, post) => {
+  const date = new Date(post.data.pubDateTime);
+  const monthYearKey = format(date, 'yyyy-MM');
+  acc[monthYearKey] = [...(acc[monthYearKey] || []), post];
+  return acc;
+}, {});
+
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const lastPostDate = new Date(posts[0].data.pubDateTime);
+---
+
+<Layout
+    title={`Tagged: ${tag}`}
+    description={`Blog posts tagged with "${tag}"`}
+    pubDateTime={new Date("1 March 2023")}
+    updatedDate={lastPostDate}
+>
+    <div class="mx-auto max-w-5xl">
+        <!-- Back link -->
+        <div class="mb-6">
+            <a href="/blog" class="inline-flex items-center text-sm text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to all posts
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="mb-10 md:mb-16">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+                <span class="text-gradient">Tagged: {tag}</span>
+            </h1>
+            <p class="text-lg text-zinc-600 dark:text-zinc-400">
+                {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged with "{tag}"
+            </p>
+        </div>
+
+        {Object.entries(groupedPosts).map(([monthYear, posts]) => (
+            <div class="mb-12 md:mb-16">
+                <h2 class="mb-6 text-xl sm:text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 flex items-center">
+                    <span class="inline-block w-1 h-6 bg-accent-500 dark:bg-accent-400 mr-3 rounded-full"></span>
+                    {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
+                </h2>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {posts.map((post) => (
+                        <a href={`/blog/${post.slug}/`} class="group">
+                            <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                    <img
+                                        src={post.data.heroImage && post.data.heroImage !== "/placeholder-hero.png" ? post.data.heroImage : getOGImagePath(post.slug)}
+                                        alt=""
+                                        width="1200"
+                                        height="630"
+                                        loading="lazy"
+                                        decoding="async"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                </div>
+
+                                <div class="flex flex-col flex-grow p-5">
+                                    <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+                                        <FormattedDate date={post.data.pubDateTime} />
+                                        {post.data.readingTime && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{post.data.readingTime} min read</span>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+                                        {post.data.title}
+                                    </h3>
+
+                                    {post.data.description && (
+                                        <p class="mt-2 text-zinc-600 dark:text-zinc-400 text-sm line-clamp-2">
+                                            {post.data.description}
+                                        </p>
+                                    )}
+
+                                    {post.data.tags && post.data.tags.length > 0 && (
+                                        <div class="flex flex-wrap gap-2 mt-4">
+                                            {post.data.tags.slice(0, 3).map((t: string) => {
+                                                const tagSlug = t.toLowerCase().replace(/\s+/g, '-');
+                                                const isActive = t === tag;
+                                                return (
+                                                    <a
+                                                        href={`/blog/tag/${tagSlug}/`}
+                                                        class:list={[
+                                                            "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+                                                            isActive
+                                                                ? "bg-accent-100 dark:bg-accent-900/40 text-accent-700 dark:text-accent-300 ring-1 ring-accent-300 dark:ring-accent-600"
+                                                                : "bg-zinc-100 dark:bg-zinc-700/70 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-600/70",
+                                                        ]}
+                                                        onclick="event.stopPropagation()"
+                                                    >
+                                                        {t}
+                                                    </a>
+                                                );
+                                            })}
+                                            {post.data.tags.length > 3 && (
+                                                <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                                                    +{post.data.tags.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div class="px-5 py-3 border-t border-zinc-100 dark:border-zinc-700/40">
+                                    <div class="flex items-center text-accent-600 dark:text-accent-400 text-sm font-medium">
+                                        <span>Read post</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </div>
+        ))}
+    </div>
+</Layout>

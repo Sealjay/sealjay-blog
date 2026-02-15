@@ -3,9 +3,17 @@
 
 export const SITE_TITLE = 'Sealjay'
 export const SITE_DESCRIPTION = 'Software engineer, open source & sustainability enthusiast.'
+
 export const SITE_NAV = [
   { name: 'About', path: '/about' },
   { name: 'Blog', path: '/blog' },
   { name: 'Speaking', path: '/speaking' },
+  { name: 'Notes', path: '/notes' },
+  { name: 'Projects', path: '/projects' },
+]
+
+export const SITE_SECONDARY_NAV = [
   { name: 'Acknowledgements', path: '/acknowledgements' },
+  { name: 'Privacy', path: '/privacy' },
+  { name: 'RSS', path: '/rss.xml' },
 ]

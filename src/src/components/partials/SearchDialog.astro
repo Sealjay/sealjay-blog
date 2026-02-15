@@ -27,7 +27,7 @@
           type="search"
           id="search-input"
           class="w-full border-0 bg-transparent py-4 pl-12 pr-4 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0 text-base"
-          placeholder="Search blog posts and speaking events..."
+          placeholder="Search posts, talks, notes, and projects..."
           autocomplete="off"
           aria-label="Search query"
           aria-controls="search-results"
@@ -66,7 +66,7 @@
     description: string
     tags: string[]
     url: string
-    type: 'blog' | 'speaking'
+    type: 'blog' | 'speaking' | 'note' | 'project'
   }
 
   class SiteSearch extends HTMLElement {
@@ -198,15 +198,20 @@
         li.setAttribute('aria-selected', 'false')
         li.id = `search-result-${i}`
 
-        const isExternal = item.type === 'speaking'
+        const isExternal = item.type === 'speaking' || item.type === 'project'
         const rel = isExternal ? ' rel="noopener noreferrer" target="_blank"' : ''
         const externalIcon = isExternal
           ? '<span class="sr-only">(opens in new tab)</span>'
           : ''
 
-        const typeLabel = item.type === 'blog'
-          ? '<span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-2 py-0.5 text-xs text-accent-700 dark:text-accent-300">Blog</span>'
-          : '<span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">Speaking</span>'
+        const typeLabelMap: Record<string, { bg: string; text: string; label: string }> = {
+          blog: { bg: 'bg-accent-50 dark:bg-accent-900/20', text: 'text-accent-700 dark:text-accent-300', label: 'Blog' },
+          speaking: { bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-600 dark:text-zinc-400', label: 'Speaking' },
+          note: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-300', label: 'Note' },
+          project: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-700 dark:text-violet-300', label: 'Project' },
+        }
+        const labelInfo = typeLabelMap[item.type] ?? typeLabelMap.blog
+        const typeLabel = `<span class="inline-flex items-center rounded-full ${labelInfo.bg} px-2 py-0.5 text-xs ${labelInfo.text}">${labelInfo.label}</span>`
 
         li.innerHTML = `
           <a href="${item.url}"${rel} class="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors cursor-pointer">
