@@ -2,8 +2,11 @@
 title: "Enabling https on a Uvicorn Python Application deployed to Azure"
 description: "Including the X-Forwarded-Proto and X-Forwarded-For headers in your Uvicorn application"
 pubDateTime: "2021-02-09T10:10:00.000Z"
+updatedDate: "2026-02-15"
 tags: ["Snippets"]
 ---
+
+> **Update (February 2026):** The `ProxyHeadersMiddleware` approach below still works. If you're using Django, you can alternatively use the built-in [`SECURE_PROXY_SSL_HEADER`](https://learn.microsoft.com/en-us/azure/app-service/configure-language-python?WT.mc_id=AI-MVP-5004204#detect-https-session) setting (`SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')`) which handles this natively without extra middleware.
 
 Like many services, [Azure terminates SSL at the network load balancer](https://docs.microsoft.com/en-us/azure/app-service/configure-language-python?WT.mc_id=AI-MVP-5004204#detect-https-session). In plain English, your application needs to check the headers provided to it, to figure out if your user has connected via https.
 

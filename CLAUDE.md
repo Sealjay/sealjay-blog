@@ -76,3 +76,4 @@ Content uses Astro's content collections with frontmatter schemas defined in `sr
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`)
 - Blog content is copyright Chris Lloyd-Jones, licensed CC BY-SA 4.0
 - Source code is MIT licensed
+- **Never rename blog post files or change their URL slugs** — existing URLs are important for search indexing and inbound links

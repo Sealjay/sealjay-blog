@@ -2,8 +2,11 @@
 title: "Running an ASGI Python Web Application in Azure with Gunicorn and Uvicorn"
 description: "Assuming you're using a Linux web application plan, and running a Python application that requires the use of Uvicorn, here are some tips.  You'll need to have a startup command set in Azure [https://docs"
 pubDateTime: "2021-02-09T09:20:00.000Z"
+updatedDate: "2026-02-15"
 tags: ["Snippets"]
 ---
+
+> **Update (February 2026):** The Gunicorn + Uvicorn worker approach below is still the [recommended method for ASGI apps on Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-language-python?WT.mc_id=AI-MVP-5004204). For new projects, also consider [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview?WT.mc_id=AI-MVP-5004204) for microservices with scale-to-zero, or [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/overview?WT.mc_id=AI-MVP-5004204) with an [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview?WT.mc_id=AI-MVP-5004204) API backend as a lightweight alternative.
 
 Assuming you're using a Linux web application plan, and running a Python application that requires the use of Uvicorn, here are some tips.
 
