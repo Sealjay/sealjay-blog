@@ -25,15 +25,17 @@ const {
             <slot name="bottom-left" />
         </div>
         <div>
-            <a 
-                href={url} 
-                target="_blank" 
-                class="inline-flex items-center text-xs font-medium text-accent-600 transition-all hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 py-1.5 px-2.5 -mr-1 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
+            <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center text-xs font-medium text-accent-600 transition-all hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 py-1.5 px-2.5 -mr-1 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-1"
             >
                 <span>{cta}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="ml-1.5 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="ml-1.5 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
+                <span class="sr-only">(opens in new tab)</span>
             </a>
         </div>
     </div>
