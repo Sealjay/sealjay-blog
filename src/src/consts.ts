@@ -14,6 +14,9 @@ export const SITE_NAV = [
 
 export const SITE_SECONDARY_NAV = [
   { name: 'Acknowledgements', path: '/acknowledgements' },
+]
+
+export const SITE_FOOTER_NAV = [
   { name: 'Privacy', path: '/privacy' },
   { name: 'RSS', path: '/rss.xml' },
 ]
