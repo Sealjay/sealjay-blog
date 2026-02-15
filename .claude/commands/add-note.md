@@ -4,17 +4,17 @@ Create a new note (microblog entry) in the Astro content collection.
 
 ## Instructions
 
-Ask the user for the following information (skip any they've already provided):
+If the user has already provided the note text as an argument, **do not ask any questions** — go ahead and create the note immediately using sensible defaults:
 
-1. **Title** (optional) - A short title for the note, or leave blank for untitled
-2. **Description** - The note content / quick thought. **Use the user's exact words.** Do NOT rewrite, embellish, or expand what they wrote. This is a microblog — post their words verbatim.
-3. **Tags** (optional) - Comma-separated list of tags
-4. **External URL** (optional) - If this note links to an external post (e.g. a LinkedIn article, GitHub repo). Maximum one URL per note.
-5. **External Platform** (optional, if URL provided) - One of: LinkedIn, Twitter, GitHub, Mastodon, YouTube, Other
-6. **Is Highlight** - Whether this is a highlighted/featured note (default: false)
-7. **Time** - If the user specifies a time (e.g. "18:23"), use it. Otherwise use the current time.
+- **Description**: Use the user's exact words verbatim. Do NOT rewrite, embellish, or expand.
+- **Tags**: Auto-suggest relevant lowercase tags based on the note content (e.g. "ai", "browser-automation", "mcp"). Look at existing notes in `src/src/content/note/` for commonly used tags to stay consistent.
+- **External URL / Platform**: Only include if the user explicitly provides a URL.
+- **Is Highlight**: Default to `false` unless the user says otherwise.
+- **Time**: Use the current time unless the user specifies one.
 
-Then create the MDX file at `src/src/content/note/<slug>.mdx` where `<slug>` is derived from the title (kebab-case) or from the current date if untitled (e.g. `2026-02-15-note`).
+Only ask questions if essential information is genuinely missing or ambiguous (e.g. unclear which URL to use). Prefer acting over asking.
+
+Then create the MDX file at `src/src/content/note/<slug>.mdx` where `<slug>` is derived from the content in kebab-case (e.g. `2026-02-15-browser-automation-research`), or from the current date if the content doesn't suggest a clear slug (e.g. `2026-02-15-note`). Add a numeric suffix if the slug already exists.
 
 ## Day Summary (multi-note days)
 
@@ -34,7 +34,6 @@ The `daySummary` is AI-generated (hence the prefix) and should be a short, singl
 
 ```mdx
 ---
-title: "<title or omit if untitled>"
 description: "<description>"
 pubDateTime: "<YYYY-MM-DDThh:mm:00.000Z>"
 tags: [<tags as quoted strings, or omit if none>]
@@ -49,14 +48,15 @@ daySummary: "<summary or omit if only one note this day>"
 
 ## Conventions
 
+- Notes do **not** have titles — they are short-form microblog entries with just a description
 - Use the current date **and time** for `pubDateTime` in ISO 8601 format (e.g. `2026-02-15T18:23:00.000Z`). The time is shown on note cards.
 - Omit optional frontmatter fields entirely rather than setting them to empty strings
 - If the note is just a quick thought with a description, the body can be left empty
 - If there's an external URL, the note serves as a bookmark/highlight of that external content
 - Maximum one external URL per note
 - `isHighlight` should only be true for particularly important or featured notes
-- Tags should be lowercase (e.g. "ai", "open-source")
-- For untitled notes, use the date as the slug: `YYYY-MM-DD-note` (add a suffix if multiple notes on the same day, e.g. `2026-02-15-note-2`)
+- Tags should be lowercase (e.g. "ai", "open-source"). Auto-suggest tags based on content, keeping consistent with existing tags across notes.
+- Slug format: `YYYY-MM-DD-<descriptive-kebab>` (e.g. `2026-02-15-browser-automation-research`). Fall back to `YYYY-MM-DD-note` if content doesn't suggest a clear slug. Add a numeric suffix if the slug already exists.
 - After creating the file, show the user the path and confirm the note was added
 - Notes are grouped by day. Each day has one page at `/notes/YYYY-MM-DD/` with all that day's notes and a single Giscus discussion thread
 - Each note card has an anchor ID matching its slug, so you can link to `/notes/YYYY-MM-DD/#<slug>`
