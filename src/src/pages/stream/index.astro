@@ -202,7 +202,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
                   {/* Header: Note badge + date + link */}
                   <div class="flex items-center gap-3 mb-2">
                     <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
-                      {badgeLabels.note}
+                      {item.noteItems && item.noteItems.length > 1 ? 'Notes' : 'Note'}
                     </span>
                     <span class="text-xs text-zinc-500 dark:text-zinc-400">
                       <FormattedDate date={item.date} />
