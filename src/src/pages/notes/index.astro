@@ -59,7 +59,9 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
               <div class="relative pl-10 mb-4">
                 <div class="absolute left-0 top-1 h-[18px] w-[18px] rounded-full border-2 border-white dark:border-zinc-900 bg-accent-500 dark:bg-accent-400" />
                 <h2 class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
-                  <FormattedDate date={dateObj} />
+                  <a href={`/notes/${dateKey}/`} class="hover:text-accent-600 dark:hover:text-accent-400 transition-colors">
+                    <FormattedDate date={dateObj} />
+                  </a>
                 </h2>
                 {daySummary && dayNotes.length > 1 && (
                   <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400 italic">{daySummary}</p>
@@ -81,20 +83,26 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                     />
 
                     <div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-sm hover:shadow-md transition-all duration-300 p-5">
-                      {/* Top row: highlight badge */}
-                      {note.data.isHighlight && (
-                        <div class="mb-2">
+                      {/* Top row: time + highlight badge */}
+                      <div class="flex items-center gap-2 mb-2">
+                        <a
+                          href={`/notes/${dateKey}/#${note.slug}`}
+                          class="text-xs text-zinc-400 dark:text-zinc-500 hover:text-accent-600 dark:hover:text-accent-400 transition-colors tabular-nums"
+                        >
+                          {note.data.pubDateTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                        </a>
+                        {note.data.isHighlight && (
                           <span class="inline-flex items-center rounded-full bg-accent-100 dark:bg-accent-900/40 px-2.5 py-0.5 text-xs font-medium text-accent-700 dark:text-accent-300">
                             Highlight
                           </span>
-                        </div>
-                      )}
+                        )}
+                      </div>
 
-                      {/* Title (optional, linked) */}
+                      {/* Title (optional, linked to day page) */}
                       {note.data.title && (
                         <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">
                           <a
-                            href={`/notes/${note.slug}/`}
+                            href={`/notes/${dateKey}/#${note.slug}`}
                             class="hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
                           >
                             {note.data.title}

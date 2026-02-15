@@ -55,8 +55,9 @@ const allActivity: ActivityItem[] = [
       if (!notesByDay.has(key)) notesByDay.set(key, [])
       notesByDay.get(key)!.push(n)
     }
-    return [...notesByDay.entries()].map(([, dayNotes]) => {
+    return [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
       const daySummary = dayNotes.find((n) => n.data.daySummary)?.data.daySummary
+      const dayUrl = `/notes/${dateKey}/`
       if (dayNotes.length === 1) {
         const n = dayNotes[0]
         return {
@@ -64,7 +65,7 @@ const allActivity: ActivityItem[] = [
           title: n.data.title ?? 'Note',
           description: n.data.description,
           date: new Date(n.data.pubDateTime),
-          url: `/notes/${n.slug}/`,
+          url: dayUrl,
         }
       }
       return {
@@ -72,7 +73,7 @@ const allActivity: ActivityItem[] = [
         title: `${dayNotes.length} Notes`,
         description: daySummary ?? dayNotes.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
         date: new Date(dayNotes[0].data.pubDateTime),
-        url: '/notes/',
+        url: dayUrl,
       }
     })
   })(),

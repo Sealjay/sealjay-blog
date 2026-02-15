@@ -1,25 +1,48 @@
 ---
-import { CollectionEntry, getCollection } from 'astro:content'
+import { getCollection } from 'astro:content'
 import IndexLayout from '../../layouts/IndexLayout.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Giscus from '../../components/embeds/Giscus.astro'
 
 export async function getStaticPaths() {
-  const notes = await getCollection('note')
-  return notes.map((note) => ({
-    params: { slug: note.slug },
-    props: note,
+  const allNotes = await getCollection('note')
+
+  // Group notes by date (YYYY-MM-DD)
+  const notesByDate = new Map<string, typeof allNotes>()
+  for (const note of allNotes) {
+    const dateKey = note.data.pubDateTime.toISOString().slice(0, 10)
+    if (!notesByDate.has(dateKey)) notesByDate.set(dateKey, [])
+    notesByDate.get(dateKey)!.push(note)
+  }
+
+  return [...notesByDate.entries()].map(([dateKey, notes]) => ({
+    params: { slug: dateKey },
+    props: {
+      dateKey,
+      notes: notes.sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()),
+    },
   }))
 }
 
-type Props = CollectionEntry<'note'>
+const { dateKey, notes } = Astro.props
+const dateObj = new Date(dateKey + 'T00:00:00Z')
+const daySummary = notes.find((n: any) => n.data.daySummary)?.data.daySummary
 
-const note = Astro.props
-const { Content } = await note.render()
-const { title, pubDateTime, tags, externalUrl, externalPlatform } = note.data
+// Render all note bodies
+const rendered = await Promise.all(notes.map(async (n: any) => {
+  const { Content } = await n.render()
+  return { note: n, Content }
+}))
+
+const pageTitle = notes.length === 1 && notes[0].data.title
+  ? notes[0].data.title
+  : `Notes — ${dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+const pageDescription = daySummary
+  ?? notes.map((n: any) => n.data.description).filter(Boolean).join(' · ')
+  ?? 'Notes from Sealjay.'
 ---
 
-<IndexLayout title={title ?? 'Note'} description={note.data.description ?? 'A short note from Sealjay.'}>
+<IndexLayout title={pageTitle} description={pageDescription}>
   <div class="mx-auto max-w-3xl">
     <a
       href="/notes"
@@ -35,56 +58,70 @@ const { title, pubDateTime, tags, externalUrl, externalPlatform } = note.data
       Back to notes
     </a>
 
-    <article>
-      <header class="mb-8">
-        <div class="text-sm text-zinc-500 dark:text-zinc-400">
-          <FormattedDate date={pubDateTime} />
-        </div>
+    {/* Day header */}
+    <header class="mb-10">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
+        <FormattedDate date={dateObj} />
+      </h1>
+      {daySummary && notes.length > 1 && (
+        <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400 italic">{daySummary}</p>
+      )}
+    </header>
 
-        {title && <h1 class="mt-2 text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">{title}</h1>}
+    {/* Notes for this day */}
+    <div class="flex flex-col gap-10">
+      {rendered.map(({ note, Content }: any) => (
+        <article id={note.slug} class="scroll-mt-20">
+          {/* Note header */}
+          <div class="mb-4">
+            {note.data.title && (
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">{note.data.title}</h2>
+            )}
 
-        {
-          tags && tags.length > 0 && (
-            <div class="mt-4 flex flex-wrap gap-2">
-              {tags.map((tag) => (
+            {note.data.description && (
+              <p class="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">{note.data.description}</p>
+            )}
+          </div>
+
+          {/* Tags + external link */}
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            {note.data.tags && note.data.tags.length > 0 && (
+              note.data.tags.map((tag: string) => (
                 <span class="inline-block rounded-full bg-accent-100 px-3 py-0.5 text-sm font-medium text-accent-700 dark:bg-accent-900/30 dark:text-accent-300">
                   #{tag}
                 </span>
-              ))}
-            </div>
-          )
-        }
-      </header>
+              ))
+            )}
 
-      {
-        externalUrl && (
-          <div class="mb-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-            <p class="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-              </svg>
-              <span>
-                Originally shared on{' '}
-                <a
-                  href={externalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="font-medium text-accent-600 underline hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300"
-                >
-                  {externalPlatform ?? 'an external site'}
-                </a>
-              </span>
-            </p>
+            {note.data.externalUrl && (
+              <a
+                href={note.data.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-3 py-0.5 text-sm font-medium text-accent-600 dark:text-accent-400 hover:bg-zinc-200 dark:hover:bg-zinc-600/70 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                {note.data.externalPlatform || 'Link'}
+              </a>
+            )}
           </div>
-        )
-      }
 
-      <div class="prose prose-lg dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 dark:prose-a:text-accent-400">
-        <Content />
-      </div>
-    </article>
+          {/* Note body (if any MDX content) */}
+          <div class="prose prose-lg dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 dark:prose-a:text-accent-400">
+            <Content />
+          </div>
 
+          {/* Divider between notes */}
+          {rendered.indexOf(rendered.find((r: any) => r.note === note)!) < rendered.length - 1 && (
+            <div class="mt-10 h-px bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-700/60 to-transparent"></div>
+          )}
+        </article>
+      ))}
+    </div>
+
+    {/* Discussion — one thread per day */}
     <div class="mt-16 mb-8">
       <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8"></div>
       <Giscus />

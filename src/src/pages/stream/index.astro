@@ -36,14 +36,17 @@ const speakingItems: StreamItem[] = speakingEntries.map((entry) => ({
   tags: [],
 }))
 
-const noteItems: StreamItem[] = noteEntries.map((entry) => ({
-  type: 'note',
-  title: entry.data.title ?? 'Note',
-  description: entry.data.description ?? '',
-  date: new Date(entry.data.pubDateTime),
-  url: `/notes/${entry.slug}/`,
-  tags: entry.data.tags ?? [],
-}))
+const noteItems: StreamItem[] = noteEntries.map((entry) => {
+  const dateKey = new Date(entry.data.pubDateTime).toISOString().slice(0, 10)
+  return {
+    type: 'note',
+    title: entry.data.title ?? 'Note',
+    description: entry.data.description ?? '',
+    date: new Date(entry.data.pubDateTime),
+    url: `/notes/${dateKey}/#${entry.slug}`,
+    tags: entry.data.tags ?? [],
+  }
+})
 
 const projectItems: StreamItem[] = projectEntries.map((entry) => ({
   type: 'project',

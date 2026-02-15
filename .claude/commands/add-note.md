@@ -12,6 +12,7 @@ Ask the user for the following information (skip any they've already provided):
 4. **External URL** (optional) - If this note links to an external post (e.g. a LinkedIn article, GitHub repo). Maximum one URL per note.
 5. **External Platform** (optional, if URL provided) - One of: LinkedIn, Twitter, GitHub, Mastodon, YouTube, Other
 6. **Is Highlight** - Whether this is a highlighted/featured note (default: false)
+7. **Time** - If the user specifies a time (e.g. "18:23"), use it. Otherwise use the current time.
 
 Then create the MDX file at `src/src/content/note/<slug>.mdx` where `<slug>` is derived from the title (kebab-case) or from the current date if untitled (e.g. `2026-02-15-note`).
 
@@ -35,7 +36,7 @@ The `daySummary` is AI-generated (hence the prefix) and should be a short, singl
 ---
 title: "<title or omit if untitled>"
 description: "<description>"
-pubDateTime: "<current ISO date>"
+pubDateTime: "<YYYY-MM-DDThh:mm:00.000Z>"
 tags: [<tags as quoted strings, or omit if none>]
 externalUrl: "<url or omit if none>"
 externalPlatform: "<platform or omit if none>"
@@ -48,7 +49,7 @@ daySummary: "<summary or omit if only one note this day>"
 
 ## Conventions
 
-- Use the current date for `pubDateTime` in ISO 8601 format
+- Use the current date **and time** for `pubDateTime` in ISO 8601 format (e.g. `2026-02-15T18:23:00.000Z`). The time is shown on note cards.
 - Omit optional frontmatter fields entirely rather than setting them to empty strings
 - If the note is just a quick thought with a description, the body can be left empty
 - If there's an external URL, the note serves as a bookmark/highlight of that external content
@@ -57,5 +58,5 @@ daySummary: "<summary or omit if only one note this day>"
 - Tags should be lowercase (e.g. "ai", "open-source")
 - For untitled notes, use the date as the slug: `YYYY-MM-DD-note` (add a suffix if multiple notes on the same day, e.g. `2026-02-15-note-2`)
 - After creating the file, show the user the path and confirm the note was added
-- Notes are shown individually on the notes stream page, grouped under date headers
-- Each note card has an anchor ID matching its slug, so you can link to `/notes/#<slug>`
+- Notes are grouped by day. Each day has one page at `/notes/YYYY-MM-DD/` with all that day's notes and a single Giscus discussion thread
+- Each note card has an anchor ID matching its slug, so you can link to `/notes/YYYY-MM-DD/#<slug>`
