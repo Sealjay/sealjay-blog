@@ -19,7 +19,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "test": "biome check ."
+    "test": "biome check .",
+    "sync:str": "node src/scripts/sync-securing-quest.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
