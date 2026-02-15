@@ -1,11 +1,9 @@
 import { defineCollection, z } from 'astro:content'
 
 const blog = defineCollection({
-  // Type-check frontmatter using a schema
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    // Transform string to Date object
     pubDateTime: z
       .string()
       .or(z.date())
@@ -17,17 +15,16 @@ const blog = defineCollection({
     heroImage: z.string().optional(),
     tags: z.array(z.string()).optional(),
     sourceUrl: z.string().url().optional(),
+    featured: z.boolean().default(false),
   }),
 })
 
 const speaking = defineCollection({
-  // Type-check frontmatter using a schema
   schema: z.object({
     title: z.string(),
-    eventType: z.enum(['Conference', 'Video', 'Media Mention', 'Podcast', 'Workshop']),
+    eventType: z.enum(['Conference', 'Video', 'Media Mention', 'Podcast', 'Workshop', 'Webinar', 'Panel']),
     description: z.string(),
     event: z.string(),
-    // Transform string to Date object
     date: z
       .string()
       .or(z.date())
@@ -36,11 +33,48 @@ const speaking = defineCollection({
     url: z.string().url(),
     thumbnail: z.string().optional(),
     blogPostSlug: z.string().optional(),
+    featured: z.boolean().default(false),
+    videoEmbedUrl: z.string().url().optional(),
+  }),
+})
+
+const note = defineCollection({
+  schema: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    pubDateTime: z
+      .string()
+      .or(z.date())
+      .transform((val) => new Date(val)),
+    tags: z.array(z.string()).optional(),
+    externalUrl: z.string().url().optional(),
+    externalPlatform: z.enum(['LinkedIn', 'Twitter', 'GitHub', 'Mastodon', 'YouTube', 'Other']).optional(),
+    isHighlight: z.boolean().default(false),
+    engagementNote: z.string().optional(),
+  }),
+})
+
+const project = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    repoUrl: z.string().url(),
+    demoUrl: z.string().url().optional(),
+    heroImage: z.string().optional(),
+    techStack: z.array(z.string()),
+    status: z.enum(['Active', 'Maintained', 'Archived', 'Contribution']),
+    date: z
+      .string()
+      .or(z.date())
+      .transform((val) => new Date(val)),
+    stars: z.number().optional(),
+    blogPostSlug: z.string().optional(),
+    featured: z.boolean().default(false),
+    tags: z.array(z.string()).optional(),
   }),
 })
 
 const acknowledgement = defineCollection({
-  // Type-check frontmatter using a schema
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -52,4 +86,4 @@ const acknowledgement = defineCollection({
   }),
 })
 
-export const collections = { blog, speaking, acknowledgement }
+export const collections = { blog, speaking, note, project, acknowledgement }
