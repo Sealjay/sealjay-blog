@@ -112,7 +112,7 @@ export const contactCta = {
   heading: 'Invite Chris to Speak',
   description:
     'Interested in having Chris speak at your event? Get in touch to discuss topics, formats, and availability.',
-  email: 'contact via LinkedIn',
+  url: 'https://uk.linkedin.com/in/chrislloydjones',
 }
 
 export const headshot = '/chris/portrait.jpg'

@@ -154,10 +154,12 @@ const featuredSpeaking = (await getCollection('speaking'))
       <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">{contactCta.heading}</h2>
       <p class="text-zinc-600 dark:text-zinc-400 mb-6">{contactCta.description}</p>
       <a
-        href={`mailto:${contactCta.email}`}
+        href={contactCta.url}
+        target="_blank"
+        rel="noopener noreferrer"
         class="inline-flex items-center rounded-lg bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:hover:bg-accent-400 px-6 py-3 text-sm font-semibold text-white dark:text-zinc-900 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
       >
-        Get in Touch
+        Connect on LinkedIn
       </a>
     </div>
   </section>
