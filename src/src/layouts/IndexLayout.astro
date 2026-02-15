@@ -11,9 +11,11 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
 <html class="h-full antialiased" lang="en">
   <head>
     <BaseHead title={title} description={description} />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   </head>
   <body class="flex min-h-full flex-col bg-zinc-50 dark:bg-black">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 focus:rounded-lg focus:bg-accent-600 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg">
+      Skip to main content
+    </a>
     <Waves />
     <div class="relative flex min-h-full w-full flex-col justify-between">
       <div class="w-full px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8">
@@ -23,7 +25,7 @@ const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
           >
             <div class="relative overflow-hidden">
               <Header />
-              <main class="min-h-[60vh]">
+              <main id="main-content" class="min-h-[60vh]">
                 <Container>
                   <div class="my-6 md:my-10">
                     <slot />

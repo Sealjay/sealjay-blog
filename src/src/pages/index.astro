@@ -15,7 +15,7 @@ const recentPosts = posts.slice(0, 5);
 
 <Layout
   title="Chris Lloyd-Jones | Sealjay"
-  description="Software engineer, open source & sustainability advocate based in Seattle"
+  description="Software engineer, open source & sustainability advocate based in London"
   pubDateTime={new Date("1 March 2023")}
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
@@ -45,7 +45,7 @@ const recentPosts = posts.slice(0, 5);
         </h1>
         
         <p class="mt-6 text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in <s>London</s> Seattle. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
+          I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in London. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
         </p>
         
         <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
@@ -100,9 +100,9 @@ const recentPosts = posts.slice(0, 5);
             <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               {post.data.heroImage && (
                 <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                  <img 
-                    src={post.data.heroImage} 
-                    alt=""
+                  <img
+                    src={post.data.heroImage}
+                    alt={post.data.title}
                     loading="lazy"
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
