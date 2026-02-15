@@ -5,12 +5,12 @@ import Footer from "../components/partials/Footer.astro";
 import Container from "../components/containers/Container.astro";
 import Waves from "../components/partials/IndexWaves.astro";
 
-const { title, description, pubDateTime, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, image, ogType, tags } = Astro.props;
 ---
 
 <html class="h-full antialiased" lang="en">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title} description={description} image={image} ogType={ogType} pubDate={pubDateTime} tags={tags} />
   </head>
   <body class="flex min-h-full flex-col bg-zinc-50 dark:bg-black">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 focus:rounded-lg focus:bg-accent-600 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg">
