@@ -4,6 +4,15 @@ import { getCollection } from 'astro:content'
 import { format } from 'date-fns'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 
+interface NoteDetail {
+  description: string
+  title: string
+  time: string
+  hasExternalLink: boolean
+  externalUrl: string
+  url: string
+}
+
 interface StreamItem {
   type: 'article' | 'talk' | 'note' | 'project'
   title: string
@@ -11,6 +20,7 @@ interface StreamItem {
   date: Date
   url: string
   tags: string[]
+  noteItems?: NoteDetail[]
 }
 
 const blogEntries = await getCollection('blog')
@@ -36,15 +46,36 @@ const speakingItems: StreamItem[] = speakingEntries.map((entry) => ({
   tags: [],
 }))
 
-const noteItems: StreamItem[] = noteEntries.map((entry) => {
+// Group notes by day and emit one stream item per day
+const notesByDay = new Map<string, typeof noteEntries>()
+for (const entry of noteEntries) {
   const dateKey = new Date(entry.data.pubDateTime).toISOString().slice(0, 10)
+  if (!notesByDay.has(dateKey)) notesByDay.set(dateKey, [])
+  notesByDay.get(dateKey)!.push(entry)
+}
+
+const noteGroupItems: StreamItem[] = [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
+  const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
+  const daySummary = sorted.find((n) => n.data.daySummary)?.data.daySummary
   return {
-    type: 'note',
-    title: entry.data.title ?? 'Note',
-    description: entry.data.description ?? '',
-    date: new Date(entry.data.pubDateTime),
-    url: `/notes/${dateKey}/#${entry.slug}`,
-    tags: entry.data.tags ?? [],
+    type: 'note' as const,
+    title: sorted.length === 1 ? (sorted[0].data.title ?? 'Note') : `${sorted.length} Notes`,
+    description: daySummary ?? sorted.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
+    date: new Date(sorted[0].data.pubDateTime),
+    url: `/notes/${dateKey}/`,
+    tags: [],
+    noteItems: sorted.map((n) => ({
+      description: n.data.description ?? '',
+      title: n.data.title ?? '',
+      time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+      hasExternalLink: !!n.data.externalUrl,
+      externalUrl: n.data.externalUrl ?? '',
+      url: `/notes/${dateKey}/#${n.slug}`,
+    })),
   }
 })
 
@@ -57,8 +88,8 @@ const projectItems: StreamItem[] = projectEntries.map((entry) => ({
   tags: entry.data.tags ?? [],
 }))
 
-const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteItems, ...projectItems].sort(
-  (a, b) => b.date.valueOf() - a.date.valueOf()
+const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteGroupItems, ...projectItems].sort(
+  (a, b) => b.date.valueOf() - a.date.valueOf(),
 )
 
 const groupedItems = allItems.reduce<Record<string, StreamItem[]>>((acc, item) => {
@@ -158,49 +189,113 @@ const badgeLabels: Record<StreamItem['type'], string> = {
           {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
         </h2>
         <div class="flex flex-col gap-3">
-          {items.map((item) => (
-            <a
-              href={item.url}
-              target={item.type === 'talk' || item.type === 'project' ? '_blank' : undefined}
-              rel={item.type === 'talk' || item.type === 'project' ? 'noopener noreferrer' : undefined}
-              class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-              data-type={item.type}
-            >
-              <!-- Type Badge -->
-              <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
-                {badgeLabels[item.type]}
-              </span>
+          {items.map((item) => {
+            const isExternal = item.type === 'talk' || item.type === 'project'
 
-              <!-- Date -->
-              <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
-                <FormattedDate date={item.date} />
-              </span>
+            {/* Notes: grouped bullet format under date header */}
+            if (item.type === 'note' && item.noteItems) {
+              return (
+                <div
+                  class="stream-item rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm"
+                  data-type="note"
+                >
+                  {/* Header: Note badge + date + link */}
+                  <div class="flex items-center gap-3 mb-2">
+                    <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
+                      {badgeLabels.note}
+                    </span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                      <FormattedDate date={item.date} />
+                    </span>
+                    <a
+                      href={item.url}
+                      class="ml-auto text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium transition-colors flex items-center gap-0.5"
+                    >
+                      View all
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
+                  {/* Individual notes as bullet list */}
+                  <div class="flex flex-col gap-0.5">
+                    {item.noteItems.map((note) => (
+                      <div class="flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-1">
+                        <span class="text-zinc-400 dark:text-zinc-500 leading-5" aria-hidden="true">&#8226;</span>
+                        <a
+                          href={note.url}
+                          class="flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors truncate leading-5"
+                        >
+                          {note.description || note.title || 'Note'}
+                        </a>
+                        {note.hasExternalLink && note.externalUrl && (
+                          <a
+                            href={note.externalUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="shrink-0 text-accent-500 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
+                            title="External link"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        )}
+                        <span class="shrink-0 text-xs text-zinc-400 dark:text-zinc-500 tabular-nums leading-5">
+                          @ {note.time}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
 
-              <!-- Title & Description -->
-              <div class="min-w-0 flex-1">
-                <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
-                  {item.title}
-                </span>
-                {item.description && (
-                  <span class="ml-2 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1 hidden md:inline">
-                    &mdash; {item.description}
-                  </span>
-                )}
-              </div>
-
-              <!-- Arrow Icon -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
+            {/* Other items: article, talk, project */}
+            return (
+              <a
+                href={item.url}
+                target={isExternal ? '_blank' : undefined}
+                rel={isExternal ? 'noopener noreferrer' : undefined}
+                class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+                data-type={item.type}
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-          ))}
+                <!-- Type Badge -->
+                <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
+                  {badgeLabels[item.type]}
+                </span>
+
+                <!-- Date -->
+                <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
+                  <FormattedDate date={item.date} />
+                </span>
+
+                <!-- Title & Description -->
+                <div class="min-w-0 flex-1">
+                  <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+                    {item.title}
+                  </span>
+                  {item.description && (
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+
+                <!-- Arrow Icon -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            )
+          })}
         </div>
       </div>
     ))}
