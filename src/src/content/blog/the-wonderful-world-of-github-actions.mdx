@@ -2,6 +2,7 @@
 title: "The Wonderful World of GitHub Actions"
 description: "I've been open sourcing projects at Avanade for some time. I've recently needed a ton of automation - from code scans for security vulnerabilities and licensing compliance to automatically merging pull requests after a certain amount of time"
 pubDateTime: "2021-09-21T14:46:35.000Z"
+updatedDate: "2026-02-15"
 tags: ["How To", "Python", "Snippets", "Open Source", "Machine Learning"]
 ---
 
@@ -34,7 +35,7 @@ I'll talk about some of the Actions I used on my last project (working with Brai
 
 <SocialEmbed
   title="GitHub - Avanade/emtech-stretch-labs"
-  linkUrl="https://github.com/Avanade/emtech-stretch-lab"
+  linkUrl="https://github.com/Avanade/emtech-stretch-labs"
   imageUrl="https://opengraph.githubassets.com/8edec2b56f7ea704dba22d06272ce6b8aebda6d1603e9bf8f081ddddbd5bce14/Avanade/emtech-stretch-labs"
 >
   Repositories related to Avanade’s exploration with Rocos, NextMind and Hello
@@ -61,7 +62,9 @@ Microsoft also maintains a [specific list of GitHub Actions for Azure](https://d
 
 I've tried some of the Open Source licence compliance tools, and I'm now looking at some of the commercial options - I don't have an opinion on those yet, but I can show you some of the OSS tools in use.
 
-I'm still using [`ShiftLeftSecurity/scan-action`](https://github.com/ShiftLeftSecurity/scan-action) from http://slscan.io/ and that tool supports many different programming languages.
+I'm still using [`ShiftLeftSecurity/scan-action`](https://github.com/ShiftLeftSecurity/scan-action) and that tool supports many different programming languages.
+
+> **Update (15 February 2026):** `ShiftLeftSecurity/scan-action` was retired in 2021 and is no longer maintained. The closest replacement is [`owasp-dep-scan/dep-scan`](https://github.com/owasp-dep-scan/dep-scan) by [AppThreat](https://www.appthreat.com/) — a next-generation security and risk audit tool based on known vulnerabilities, advisories, and license limitations for project dependencies.
 
 For Python repositories, I particularly like [`andersy005/gh-action-py-liccheck`](https://github.com/andersy005/gh-action-py-liccheck) which uses a `pyproject.toml` file format.
 

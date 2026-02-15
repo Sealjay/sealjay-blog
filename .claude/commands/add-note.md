@@ -58,5 +58,6 @@ daySummary: "<summary or omit if only one note this day>"
 - Tags should be lowercase (e.g. "ai", "open-source"). Auto-suggest tags based on content, keeping consistent with existing tags across notes.
 - Slug format: `YYYY-MM-DD-<descriptive-kebab>` (e.g. `2026-02-15-browser-automation-research`). Fall back to `YYYY-MM-DD-note` if content doesn't suggest a clear slug. Add a numeric suffix if the slug already exists.
 - After creating the file, show the user the path and confirm the note was added
+- **Fosstodon**: After confirming the note, ask the user if they'd like to post it to Fosstodon. If yes, run `bun --install=auto .claude/commands/post-to-fosstodon/post.ts "<description>" [externalUrl]` from the project root. The script reads `MASTODON_TOKEN` from `.env`. If the env var isn't set, tell the user to copy `.env.example` to `.env` and add their token. Note: Mastodon has a 500 char limit — if the description + URL exceed that, ask the user to shorten it before posting.
 - Notes are grouped by day. Each day has one page at `/notes/YYYY-MM-DD/` with all that day's notes and a single Giscus discussion thread
 - Each note card has an anchor ID matching its slug, so you can link to `/notes/YYYY-MM-DD/#<slug>`

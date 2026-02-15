@@ -3,6 +3,7 @@ title: "Power Automate for individual group notifications"
 description: "If you're like me, you probably wish you got less email! But, equally, you don't want to tag a whole group of people in Teams either - starting a whole discussion.  Sometimes I find myself needing to send an urgent message to a group of people, but I want to make sure each individual gets it as a message"
 pubDateTime: "2021-03-06T02:26:59.000Z"
 tags: ["How To", "Power Automate"]
+heroImage: "/placeholder-hero.png"
 ---
 
 > Using Power Automate, and Flow Bot to send individual notifications to members of a Team - and fall back to email.
@@ -25,7 +26,6 @@ Sending a notification to people that haven't had the time to log their steps is
 I'll be using the [Microsoft Teams](https://docs.microsoft.com/en-us/connectors/teams/?WT.mc_id=AI-MVP-5004204) connector for Power Automate. I'll send an Adaptive Card to a user from the Flow Bot, with an actionable link - falling back to an email if the Flow Bot is blocked. (One reason not to spam your users!)
 
 [Adaptive Cards](https://adaptivecards.io/) allows us to write JSON snippets, which are then translated into the native UI of the platform that your message is being received in.
-TODO: Add caption.
 
 ![](/images/2021/03/image-18.png)An example of a very basic Adaptive Card, just saying hi!
 
@@ -49,7 +49,6 @@ I've gone to [flow.microsoft.com](https://flow.microsoft.com/) and logged into m
 I'll click 'Create' on the left-hand side and choose 'Scheduled cloud flow.'
 
 ![](/images/2021/03/image-19.png)This scheduled cloud flow option lets you select a recurring frequencyComplete the form and select how often you'd like the flow to run.
-TODO: Add caption.
 
 ## Defining your messages
 
@@ -157,11 +156,9 @@ You can see the HTML I used here:
 Here's what the user would receive:
 
 ![](/images/2021/03/image-21.png)An email from the automationAssuming the title is pretty explanatory, I'll create three compose actions, and add in my adaptive card, my email, and my title.
-TODO: Add caption.
 
 #![](/images/2021/03/image-22.png)
 You can see the recurrence trigger, the adaptive card, the email content, and the title.
-TODO: Add caption.
 
 ## Looping over the users
 
@@ -222,4 +219,3 @@ Make sure your flow is enabled, and then hit the Test button. Once the flow has 
 If you'd like something more involved, consider trying out Azure Cognitive Search!
 
 [Using Cognitive Search to make the law more accessible: Part 1Using Azure Cognitive Search to index UK Law going back to the 1800s, to make it accessible and comprehensible![](https://sealjay.com/favicon.png)SealjayChris Lloyd-Jones![](https://images.unsplash.com/photo-1521587760476-6c12a4b040da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwxMTc3M3wwfDF8c2VhcmNofDE3fHxsYXd8ZW58MHx8fA&ixlib=rb-1.2.1&q=80&w=2000)](https://sealjay.com/cognitive-search-law-part1-indexer/)
-TODO: Add social tile.

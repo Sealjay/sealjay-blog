@@ -3,6 +3,7 @@ title: "Using Cognitive Search to make the law more accessible: Part 1"
 description: "In a previous blog post, I talked about the endless possibilities that Cognitive Search [https://sealjay.com/unlocking-content-with-summaries-and-insight/] gives you, making various datasets more easily accessible"
 pubDateTime: "2021-03-03T02:01:00.000Z"
 tags: ["How To", "Cognitive Search", "Python", "Cognitive Services"]
+heroImage: "/placeholder-hero.png"
 ---
 
 In a previous blog post, [I talked about the endless possibilities that Cognitive Search](https://sealjay.com/unlocking-content-with-summaries-and-insight/) gives you, making various datasets more easily accessible.
@@ -36,7 +37,6 @@ I selected [UK Legislation](https://www.legislation.gov.uk/) for this demo, beca
 
 ![](/images/2021/03/Screenshot-2021-03-03-at-01.06.02.png)![](/images/2021/03/Screenshot-2021-03-03-at-01.06.34.png)
 The ancient legislation from legislation.gov.uk, next to the application we'll be building in this series. Image contains public sector information licensed under the Open Government Licence v3.0.
-TODO: Add caption
 ##Let's get started!
 
 To follow along, I assume you have access to a Microsoft Azure subscription [or free trial](https://azure.microsoft.com/en-gb/free/); I also assume you have access to a dataset with some PDFs (in part 3, I'll show you how to download my dataset.)
@@ -48,7 +48,6 @@ As I mentioned, Azure Cognitive Search supports a variety of data sources. As we
 Azure Storage Accounts [can be found within the Azure Marketplace](https://portal.azure.com/#create/Microsoft.StorageAccount-ARM). Choose your preferred options, then 'Review + create' your resource.
 
 ![](/images/2021/03/image-8.png)I went with pretty standard defaults
-TODO: Add caption
 
 It will take a bit of time for your storage account to be provisioned - and once it is, you'll need to create a Blob Storage container, to hold all of the files you intend to crack open!
 
@@ -73,7 +72,6 @@ Pick your preferred location, tier, and choose a resource group - then 'Review +
 Now that your search resource is up and running, we need to connect to the Blob Storage container which we created. Click on 'Data sources' and then 'New Data Source.'
 
 ![](/images/2021/03/image-13.png)Click on the 'Data sources' tab
-TODO: Add caption
 
 A form will pop up, asking for more information about your data source.
 
@@ -90,19 +88,16 @@ In a later blog post, I'll show you how to use Pulumi and API calls to set this 
 To create an index, click on the 'Indexes' tab and then 'New Index.'
 
 ![](/images/2021/03/image-4.png)Click on 'New Index'
-TODO: Add Caption
 
 This will take you to a screen where you can add the various fields - that is, the column names, data types, and settings for your searchable content. This is the physical structure of your index.
 
 ![](/images/2021/03/image-5.png)Your Add Index page
-TODO: Add Caption
 
 Some of [these field attributes have important implications](https://docs.microsoft.com/en-us/azure/search/search-what-is-an-index#attributes) - the most interesting one that I'll point out, is the "suggester." This allows you to easily add auto-complete, and auto-suggested terms to your application.
 
 For now, in my indexer, I've added fields to store the content, the legislation title, and the original file name.
 
 ![](/images/2021/03/image-6.png)The inde
-TODO: Add Caption
 
 In future, I can imagine wanting to store a summary of the file, maybe even index individual legislation paragraphs, or allow users to search legislation over time.
 
@@ -129,7 +124,6 @@ To create your indexer, click on 'Indexers' and then 'New Indexer'.
 This will take you to a screen where you can fill in a form, or you can paste in the definition for an existing definition from JSON.
 
 ![](/images/2021/03/image-3.png)I assume you'll open up the JSON tab too!
-TODO: Add Caption
 
 By default, the existing definition is pretty plain, and it won't use the AI skill we've already defined.
 
@@ -144,7 +138,6 @@ And here's my definition in full.
 When your indexer is set up in the way you'd like it, you'll need to hit 'Run' - unless you've chosen to regularly schedule it, and this will populate your index.
 
 ![](/images/2021/03/image-17.png)The magic button!
-TODO: Add caption
 
 This will take a bit of time, influenced by the amount of data you have - and the user interface is pretty intuitive.
 
@@ -153,14 +146,12 @@ This will take a bit of time, influenced by the amount of data you have - and th
 #### Try it out!
 
 ![](/images/2021/03/image-2.png)Click on your index, whatever you named it
-TODO: Add caption
 
 After you leave your index to run, you should be able to return to the pane for your Search resource, and click on the 'Index' tab, and then the name of your index.
 
 This will open a search explorer - feel free to search for terms and see what you get back! I got back some information about one of the finance bills I'd uploaded.
 
 ![](/images/2021/03/image-1.png)A result for 'Weights' returning a (slightly uninteresting) result on a finance act from the UK
-TODO: Add caption
 
 Feel proud of yourself! You've set up and indexed some content, and you're well on the way to making your information usable and accessible.
 
@@ -171,4 +162,3 @@ And there we have it! We have an index with some (hopefully useful) content, rea
 In the next post, I'll be covering how to integrate Azure Cognitive Search with the screenshot of the Python Web Application you see above.
 
 [Sealjay-clj/py-cognitive-searchA demonstrator of the latest and greatest in Cognitive Search, deployed in Azure with Python. - Sealjay-clj/py-cognitive-search![](https://github.githubassets.com/favicons/favicon.svg)GitHubSealjay-clj![](https://avatars.githubusercontent.com/u/19361656?s=400&v=4)](https://github.com/Sealjay-clj/py-cognitive-search/)
-TODO: Add social tile.
