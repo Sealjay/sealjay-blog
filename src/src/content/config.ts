@@ -34,7 +34,7 @@ const speaking = defineCollection({
       .transform((val) => new Date(val)),
     cta: z.string(),
     url: z.string().url(),
-    thumbnail: z.string(),
+    thumbnail: z.string().optional(),
     blogPostSlug: z.string().optional(),
   }),
 })
