@@ -21,19 +21,11 @@ export const professionalBadges: Badge[] = [
     url: 'https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4',
   },
   {
-    text: 'Co-author, ISO/IEC 21031:2024',
+    text: 'Contributor, ISO/IEC 21031:2024',
   },
   {
-    text: 'Doctoral Researcher, Green AI (UEL, 2022\u20132027)',
+    text: 'Doctoral Student, Green AI (UEL, 2022\u20132027)',
     url: 'https://orcid.org/0000-0001-7995-7865',
-  },
-  {
-    text: 'Green Software Foundation Steering Committee Vice-Chair',
-    url: 'https://greensoftware.foundation/',
-  },
-  {
-    text: 'TODO Group Member',
-    url: 'https://todogroup.org/',
   },
   {
     text: 'OpenUK Ambassador',
@@ -51,6 +43,16 @@ export const professionalBadges: Badge[] = [
 
 // Former roles to display (if any)
 export const formerRoles: Badge[] = [
+  {
+    text: 'Green Software Foundation Steering Committee Vice-Chair',
+    url: 'https://greensoftware.foundation/',
+    isFormerRole: true,
+  },
+  {
+    text: 'TODO Group Member',
+    url: 'https://todogroup.org/',
+    isFormerRole: true,
+  },
   {
     text: 'Head of Avanade.ai',
     url: 'https://www.avanade.com/',
