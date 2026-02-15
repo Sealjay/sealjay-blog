@@ -1,0 +1,270 @@
+---
+---
+
+<site-search>
+  <button
+    type="button"
+    class="flex items-center justify-center rounded-full p-2 text-zinc-500 hover:bg-zinc-100 hover:text-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-1 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+    aria-label="Search site"
+    id="search-open-button"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  </button>
+
+  <dialog
+    id="search-dialog"
+    class="fixed inset-0 z-[200] m-0 h-full w-full max-h-full max-w-full bg-black/50 backdrop-blur-sm p-0 open:flex open:items-start open:justify-center overscroll-contain"
+    aria-label="Search"
+  >
+    <div class="mt-[5vh] sm:mt-[10vh] w-full max-w-xl mx-4 rounded-xl bg-white dark:bg-zinc-900 shadow-2xl ring-1 ring-zinc-200 dark:ring-zinc-700 overflow-hidden" role="document">
+      <div class="relative">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          class="w-full border-0 bg-transparent py-4 pl-12 pr-4 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0 text-base"
+          placeholder="Search blog posts and speaking events..."
+          autocomplete="off"
+          aria-label="Search query"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          role="combobox"
+          aria-expanded="false"
+          aria-haspopup="listbox"
+        />
+        <kbd class="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center rounded border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">Esc</kbd>
+      </div>
+
+      <div class="border-t border-zinc-100 dark:border-zinc-800">
+        <ul
+          id="search-results"
+          role="listbox"
+          aria-label="Search results"
+          class="max-h-[50vh] overflow-y-auto p-2"
+        >
+          <li id="search-empty" class="hidden px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400" role="status">
+            No results found.
+          </li>
+          <li id="search-initial" class="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            Start typing to search...
+          </li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+</site-search>
+
+<script>
+  import Fuse from 'fuse.js'
+
+  interface SearchItem {
+    title: string
+    description: string
+    tags: string[]
+    url: string
+    type: 'blog' | 'speaking'
+  }
+
+  class SiteSearch extends HTMLElement {
+    private fuse: Fuse<SearchItem> | null = null
+    private dialog: HTMLDialogElement | null = null
+    private input: HTMLInputElement | null = null
+    private resultsList: HTMLElement | null = null
+    private emptyState: HTMLElement | null = null
+    private initialState: HTMLElement | null = null
+    private activeIndex = -1
+
+    constructor() {
+      super()
+
+      this.dialog = this.querySelector('#search-dialog')
+      this.input = this.querySelector('#search-input')
+      this.resultsList = this.querySelector('#search-results')
+      this.emptyState = this.querySelector('#search-empty')
+      this.initialState = this.querySelector('#search-initial')
+
+      const openButton = this.querySelector('#search-open-button')
+
+      openButton?.addEventListener('click', () => this.openDialog())
+
+      // Global keyboard shortcut: Ctrl/Cmd + K
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault()
+          this.openDialog()
+        }
+      })
+
+      this.dialog?.addEventListener('click', (e) => {
+        if (e.target === this.dialog) this.closeDialog()
+      })
+
+      this.dialog?.addEventListener('close', () => {
+        this.resetSearch()
+      })
+
+      this.input?.addEventListener('input', () => {
+        this.search(this.input!.value)
+      })
+
+      this.input?.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          this.closeDialog()
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          this.moveSelection(1)
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          this.moveSelection(-1)
+        } else if (e.key === 'Enter') {
+          e.preventDefault()
+          this.selectCurrent()
+        }
+      })
+    }
+
+    async loadIndex() {
+      if (this.fuse) return
+      const res = await fetch('/search.json')
+      const data: SearchItem[] = await res.json()
+      this.fuse = new Fuse(data, {
+        keys: [
+          { name: 'title', weight: 2 },
+          { name: 'description', weight: 1 },
+          { name: 'tags', weight: 0.5 },
+        ],
+        threshold: 0.3,
+        includeMatches: true,
+      })
+    }
+
+    openDialog() {
+      this.loadIndex()
+      this.dialog?.showModal()
+      this.input?.focus()
+    }
+
+    closeDialog() {
+      this.dialog?.close()
+    }
+
+    resetSearch() {
+      if (this.input) this.input.value = ''
+      this.activeIndex = -1
+      this.clearResults()
+      if (this.initialState) this.initialState.classList.remove('hidden')
+      if (this.emptyState) this.emptyState.classList.add('hidden')
+      this.input?.setAttribute('aria-expanded', 'false')
+    }
+
+    clearResults() {
+      if (!this.resultsList) return
+      const items = this.resultsList.querySelectorAll('[data-search-result]')
+      for (const item of items) item.remove()
+    }
+
+    search(query: string) {
+      if (!query.trim()) {
+        this.resetSearch()
+        return
+      }
+
+      if (!this.fuse) return
+
+      const results = this.fuse.search(query, { limit: 10 })
+
+      this.clearResults()
+      this.activeIndex = -1
+      if (this.initialState) this.initialState.classList.add('hidden')
+
+      if (results.length === 0) {
+        if (this.emptyState) this.emptyState.classList.remove('hidden')
+        this.input?.setAttribute('aria-expanded', 'false')
+        return
+      }
+
+      if (this.emptyState) this.emptyState.classList.add('hidden')
+      this.input?.setAttribute('aria-expanded', 'true')
+
+      for (const [i, result] of results.entries()) {
+        const item = result.item
+        const li = document.createElement('li')
+        li.setAttribute('data-search-result', '')
+        li.setAttribute('role', 'option')
+        li.setAttribute('aria-selected', 'false')
+        li.id = `search-result-${i}`
+
+        const isExternal = item.type === 'speaking'
+        const rel = isExternal ? ' rel="noopener noreferrer" target="_blank"' : ''
+        const externalIcon = isExternal
+          ? '<span class="sr-only">(opens in new tab)</span>'
+          : ''
+
+        const typeLabel = item.type === 'blog'
+          ? '<span class="inline-flex items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-2 py-0.5 text-xs text-accent-700 dark:text-accent-300">Blog</span>'
+          : '<span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">Speaking</span>'
+
+        li.innerHTML = `
+          <a href="${item.url}"${rel} class="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors cursor-pointer">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                ${typeLabel}
+                ${externalIcon}
+              </div>
+              <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">${this.escapeHtml(item.title)}</div>
+              <div class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">${this.escapeHtml(item.description)}</div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        `
+
+        this.resultsList?.insertBefore(li, this.emptyState)
+      }
+    }
+
+    moveSelection(direction: number) {
+      const items = this.resultsList?.querySelectorAll('[data-search-result]')
+      if (!items || items.length === 0) return
+
+      // Deselect current
+      if (this.activeIndex >= 0 && this.activeIndex < items.length) {
+        items[this.activeIndex].setAttribute('aria-selected', 'false')
+        items[this.activeIndex].querySelector('a')?.classList.remove('bg-zinc-50', 'dark:bg-zinc-800/70')
+      }
+
+      this.activeIndex += direction
+      if (this.activeIndex < 0) this.activeIndex = items.length - 1
+      if (this.activeIndex >= items.length) this.activeIndex = 0
+
+      const active = items[this.activeIndex]
+      active.setAttribute('aria-selected', 'true')
+      active.querySelector('a')?.classList.add('bg-zinc-50', 'dark:bg-zinc-800/70')
+      active.scrollIntoView({ block: 'nearest' })
+      this.input?.setAttribute('aria-activedescendant', active.id)
+    }
+
+    selectCurrent() {
+      const items = this.resultsList?.querySelectorAll('[data-search-result]')
+      if (!items || this.activeIndex < 0 || this.activeIndex >= items.length) return
+      const link = items[this.activeIndex].querySelector('a') as HTMLAnchorElement
+      if (link) {
+        this.closeDialog()
+        link.click()
+      }
+    }
+
+    escapeHtml(str: string) {
+      const div = document.createElement('div')
+      div.textContent = str
+      return div.innerHTML
+    }
+  }
+
+  customElements.define('site-search', SiteSearch)
+</script>
