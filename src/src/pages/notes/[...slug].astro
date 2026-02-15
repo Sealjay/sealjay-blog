@@ -2,6 +2,7 @@
 import { CollectionEntry, getCollection } from 'astro:content'
 import IndexLayout from '../../layouts/IndexLayout.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
+import Giscus from '../../components/embeds/Giscus.astro'
 
 export async function getStaticPaths() {
   const notes = await getCollection('note')
@@ -83,5 +84,10 @@ const { title, pubDateTime, tags, externalUrl, externalPlatform } = note.data
         <Content />
       </div>
     </article>
+
+    <div class="mt-16 mb-8">
+      <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8"></div>
+      <Giscus />
+    </div>
   </div>
 </IndexLayout>
