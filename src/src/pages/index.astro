@@ -20,6 +20,15 @@ const projects = (await getCollection('project')).sort(
   (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
 )
 
+interface NoteDetail {
+  description?: string
+  title?: string
+  time: string
+  hasExternalLink: boolean
+  externalUrl?: string
+  url: string
+}
+
 interface ActivityItem {
   type: 'article' | 'talk' | 'note' | 'project'
   title: string
@@ -28,6 +37,7 @@ interface ActivityItem {
   url: string
   heroImage?: string
   slug?: string
+  noteItems?: NoteDetail[]
 }
 
 const allActivity: ActivityItem[] = [
@@ -58,22 +68,24 @@ const allActivity: ActivityItem[] = [
     return [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
       const daySummary = dayNotes.find((n) => n.data.daySummary)?.data.daySummary
       const dayUrl = `/notes/${dateKey}/`
-      if (dayNotes.length === 1) {
-        const n = dayNotes[0]
-        return {
-          type: 'note' as const,
-          title: n.data.title ?? 'Note',
-          description: n.data.description,
-          date: new Date(n.data.pubDateTime),
-          url: dayUrl,
-        }
-      }
       return {
         type: 'note' as const,
-        title: `${dayNotes.length} Notes`,
+        title: dayNotes.length === 1 ? (dayNotes[0].data.title ?? 'Note') : `${dayNotes.length} Notes`,
         description: daySummary ?? dayNotes.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
         date: new Date(dayNotes[0].data.pubDateTime),
         url: dayUrl,
+        noteItems: dayNotes.map((n) => ({
+          description: n.data.description,
+          title: n.data.title,
+          time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          }),
+          hasExternalLink: !!n.data.externalUrl,
+          externalUrl: n.data.externalUrl,
+          url: `${dayUrl}#${n.slug}`,
+        })),
       }
     })
   })(),
@@ -187,6 +199,64 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
       {
         allActivity.map((item) => {
           const isExternal = item.type === 'talk' || item.type === 'project'
+
+          {/* Notes: grouped bullet format under date header */}
+          if (item.type === 'note' && item.noteItems) {
+            return (
+              <div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm">
+                {/* Header: Note badge + date + link */}
+                <div class="flex items-center gap-3 mb-2">
+                  <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
+                    {badgeLabels.note}
+                  </span>
+                  <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                    <FormattedDate date={item.date} />
+                  </span>
+                  <a
+                    href={item.url}
+                    class="ml-auto text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium transition-colors flex items-center gap-0.5"
+                  >
+                    View all
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+                {/* Individual notes as bullet list */}
+                <div class="flex flex-col gap-0.5">
+                  {item.noteItems.map((note) => (
+                    <div class="flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-1">
+                      <span class="text-zinc-400 dark:text-zinc-500 leading-5" aria-hidden="true">&#8226;</span>
+                      <a
+                        href={note.url}
+                        class="flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors truncate leading-5"
+                      >
+                        {note.description || note.title || 'Note'}
+                      </a>
+                      {note.hasExternalLink && note.externalUrl && (
+                        <a
+                          href={note.externalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="shrink-0 text-accent-500 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
+                          title="External link"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      )}
+                      <span class="shrink-0 text-xs text-zinc-400 dark:text-zinc-500 tabular-nums leading-5">
+                        @ {note.time}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          {/* Other items: article, talk, project */}
           return (
             <a
               href={item.url}
@@ -210,9 +280,9 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
                   {item.title}
                 </span>
                 {item.description && (
-                  <span class="ml-2 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1 hidden md:inline">
-                    &mdash; {item.description}
-                  </span>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                    {item.description}
+                  </p>
                 )}
               </div>
 
