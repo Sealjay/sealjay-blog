@@ -40,7 +40,6 @@ const speaking = defineCollection({
 
 const note = defineCollection({
   schema: z.object({
-    title: z.string().optional(),
     description: z.string().optional(),
     pubDateTime: z
       .string()
