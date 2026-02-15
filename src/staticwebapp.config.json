@@ -1,7 +1,7 @@
 {
   "trailingSlash": "auto",
   "platform": {
-    "apiRuntime": "node:16"
+    "apiRuntime": "node:20"
   },
   "routes": [
     { "route": "/.well-known/*", "allowedRoles": ["anonymous"] },
