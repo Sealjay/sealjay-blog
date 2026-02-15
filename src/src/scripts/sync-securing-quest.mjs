@@ -1,19 +1,23 @@
 /**
  * Sync blog posts from Securing the Realm (securing.quest) via RSS feed.
  *
- * Creates stub MDX posts in src/content/blog/ for new entries,
- * following the existing "External Media" pattern. Uses a "str-" filename
+ * Creates MDX posts in src/content/blog/ for new entries and updates
+ * existing stubs with full content when content:encoded is available.
+ * Follows the existing "External Media" pattern. Uses a "str-" filename
  * prefix and sourceUrl frontmatter field for deduplication.
  *
  * Usage: node src/scripts/sync-securing-quest.mjs
  */
 
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { readdir, readFile, writeFile, unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const RSS_URL = 'https://securing.quest/blog/rss.xml'
 const SITE_BASE = 'https://securing.quest'
+
+/** Titles to skip when syncing */
+const EXCLUDED_TITLES = ['Welcome to the Library']
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const BLOG_DIR = join(__dirname, '..', 'content', 'blog')
@@ -45,6 +49,11 @@ async function fetchRSSItems() {
       block.match(/<description>(.*?)<\/description>/)?.[1] ??
       ''
 
+    const contentEncoded =
+      block.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/)?.[1] ??
+      block.match(/<content:encoded>([\s\S]*?)<\/content:encoded>/)?.[1] ??
+      ''
+
     const pubDate = block.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? ''
 
     const categories = []
@@ -53,7 +62,7 @@ async function fetchRSSItems() {
     }
 
     if (link) {
-      items.push({ title, link, description, pubDate, categories })
+      items.push({ title, link, description, pubDate, categories, contentEncoded })
     }
   }
 
@@ -71,14 +80,14 @@ function slugFromLink(link) {
 
 /** Get the set of sourceUrls already present in existing blog posts. */
 async function getExistingSources() {
-  const sources = new Set()
+  const sources = new Map()
   const files = await readdir(BLOG_DIR)
   for (const file of files) {
     if (!file.startsWith('str-')) continue
     const content = await readFile(join(BLOG_DIR, file), 'utf-8')
     const urlMatch = content.match(/sourceUrl:\s*"([^"]+)"/)
     if (urlMatch) {
-      sources.add(urlMatch[1])
+      sources.set(urlMatch[1], { file, content })
     }
   }
   return sources
@@ -101,7 +110,101 @@ function stripHtml(str) {
   return str.replace(/<[^>]+>/g, '').trim()
 }
 
-/** Generate a stub MDX file for a securing.quest blog post. */
+/**
+ * Convert HTML content to markdown for inclusion in MDX files.
+ * Handles common HTML elements found in RSS content:encoded.
+ */
+function htmlToMarkdown(html) {
+  if (!html) return ''
+
+  let md = html
+
+  // Normalize line endings
+  md = md.replace(/\r\n/g, '\n')
+
+  // Convert headings
+  md = md.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, content) => `# ${stripHtml(content)}\n\n`)
+  md = md.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, content) => `## ${stripHtml(content)}\n\n`)
+  md = md.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_, content) => `### ${stripHtml(content)}\n\n`)
+  md = md.replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, (_, content) => `#### ${stripHtml(content)}\n\n`)
+  md = md.replace(/<h5[^>]*>([\s\S]*?)<\/h5>/gi, (_, content) => `##### ${stripHtml(content)}\n\n`)
+  md = md.replace(/<h6[^>]*>([\s\S]*?)<\/h6>/gi, (_, content) => `###### ${stripHtml(content)}\n\n`)
+
+  // Convert links
+  md = md.replace(/<a[^>]+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_, href, text) => `[${stripHtml(text)}](${href})`)
+
+  // Convert emphasis
+  md = md.replace(/<(strong|b)>([\s\S]*?)<\/\1>/gi, (_, _tag, content) => `**${content}**`)
+  md = md.replace(/<(em|i)>([\s\S]*?)<\/\1>/gi, (_, _tag, content) => `*${content}*`)
+
+  // Convert code
+  md = md.replace(/<code>([\s\S]*?)<\/code>/gi, (_, content) => `\`${content}\``)
+  md = md.replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, (_, content) => `\`\`\`\n${stripHtml(content)}\n\`\`\`\n\n`)
+
+  // Convert blockquotes
+  md = md.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, content) => {
+    const inner = stripHtml(content).trim()
+    return inner.split('\n').map((line) => `> ${line}`).join('\n') + '\n\n'
+  })
+
+  // Convert unordered lists
+  md = md.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (_, content) => {
+    const items = []
+    const liRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi
+    for (const liMatch of content.matchAll(liRegex)) {
+      items.push(`- ${liMatch[1].replace(/<[^>]+>/g, '').trim()}`)
+    }
+    return items.join('\n') + '\n\n'
+  })
+
+  // Convert ordered lists
+  md = md.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (_, content) => {
+    const items = []
+    let idx = 1
+    const liRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi
+    for (const liMatch of content.matchAll(liRegex)) {
+      items.push(`${idx}. ${liMatch[1].replace(/<[^>]+>/g, '').trim()}`)
+      idx++
+    }
+    return items.join('\n') + '\n\n'
+  })
+
+  // Convert paragraphs
+  md = md.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, (_, content) => `${content.trim()}\n\n`)
+
+  // Convert line breaks
+  md = md.replace(/<br\s*\/?>/gi, '\n')
+
+  // Convert horizontal rules
+  md = md.replace(/<hr\s*\/?>/gi, '\n---\n\n')
+
+  // Remove images (they won't work in cross-posted content)
+  md = md.replace(/<img[^>]*>/gi, '')
+
+  // Strip remaining HTML tags
+  md = md.replace(/<[^>]+>/g, '')
+
+  // Decode HTML entities
+  md = md.replace(/&amp;/g, '&')
+  md = md.replace(/&lt;/g, '<')
+  md = md.replace(/&gt;/g, '>')
+  md = md.replace(/&quot;/g, '"')
+  md = md.replace(/&#39;/g, "'")
+  md = md.replace(/&nbsp;/g, ' ')
+
+  // Clean up excessive whitespace
+  md = md.replace(/\n{3,}/g, '\n\n')
+  md = md.trim()
+
+  return md
+}
+
+/** Check if an existing post is a stub (no full content). */
+function isStub(content) {
+  return content.includes('Read the full article at [') || content.includes('<SocialEmbed')
+}
+
+/** Generate an MDX file for a securing.quest blog post. */
 function generateMDX(item) {
   const slug = slugFromLink(item.link)
   const fullUrl = item.link.startsWith('http') ? item.link : `${SITE_BASE}${item.link}`
@@ -118,24 +221,36 @@ function generateMDX(item) {
     '---',
   ].join('\n')
 
-  const body = [
-    '',
-    `This post was originally published on [Securing the Realm](${fullUrl}).`,
-    '',
-    `> ${cleanDescription}`,
-    '',
-    `Read the full article at [${item.title}](${fullUrl}).`,
-    '',
-    'import SocialEmbed from "../../components/embeds/SocialEmbed.astro";',
-    '',
-    '<SocialEmbed',
-    `  title="${escapeYaml(item.title)}"`,
-    `  linkUrl="${fullUrl}"`,
-    '  imageUrl="https://securing.quest/favicon.svg"',
-    '>',
-    `  ${cleanDescription}`,
-    '</SocialEmbed>',
-  ].join('\n')
+  const markdownContent = htmlToMarkdown(item.contentEncoded)
+
+  let body
+  if (markdownContent) {
+    body = [
+      '',
+      `*This post was originally published on [Securing the Realm](${fullUrl}).*`,
+      '',
+      markdownContent,
+    ].join('\n')
+  } else {
+    body = [
+      '',
+      `This post was originally published on [Securing the Realm](${fullUrl}).`,
+      '',
+      `> ${cleanDescription}`,
+      '',
+      `Read the full article at [${item.title}](${fullUrl}).`,
+      '',
+      'import SocialEmbed from "../../components/embeds/SocialEmbed.astro";',
+      '',
+      '<SocialEmbed',
+      `  title="${escapeYaml(item.title)}"`,
+      `  linkUrl="${fullUrl}"`,
+      '  imageUrl="https://securing.quest/favicon.svg"',
+      '>',
+      `  ${cleanDescription}`,
+      '</SocialEmbed>',
+    ].join('\n')
+  }
 
   return { slug, content: frontmatter + body }
 }
@@ -145,14 +260,49 @@ async function main() {
   const items = await fetchRSSItems()
   console.log(`Found ${items.length} items in feed.`)
 
+  // Filter excluded titles
+  const filteredItems = items.filter((item) => {
+    if (EXCLUDED_TITLES.includes(item.title)) {
+      console.log(`  Excluding by title: "${item.title}"`)
+      return false
+    }
+    return true
+  })
+  console.log(`${filteredItems.length} items after filtering.`)
+
   const existingSources = await getExistingSources()
   console.log(`Found ${existingSources.size} existing synced posts.`)
 
-  let created = 0
+  // Remove posts for excluded titles
+  for (const [url, { file }] of existingSources) {
+    const matchingExcluded = items.find(
+      (item) => EXCLUDED_TITLES.includes(item.title) && (item.link === url || `${SITE_BASE}${item.link}` === url),
+    )
+    if (matchingExcluded) {
+      const filepath = join(BLOG_DIR, file)
+      await unlink(filepath)
+      console.log(`  Deleted excluded post: ${file}`)
+    }
+  }
 
-  for (const item of items) {
+  let created = 0
+  let updated = 0
+
+  for (const item of filteredItems) {
     const fullUrl = item.link.startsWith('http') ? item.link : `${SITE_BASE}${item.link}`
-    if (existingSources.has(fullUrl)) {
+    const existing = existingSources.get(fullUrl)
+
+    if (existing && item.contentEncoded && isStub(existing.content)) {
+      // Update stub with full content
+      const { content } = generateMDX(item)
+      const filepath = join(BLOG_DIR, existing.file)
+      await writeFile(filepath, content, 'utf-8')
+      console.log(`  Updated with full content: ${existing.file}`)
+      updated++
+      continue
+    }
+
+    if (existing) {
       console.log(`  Skipping (already exists): ${item.title}`)
       continue
     }
@@ -166,8 +316,8 @@ async function main() {
     created++
   }
 
-  console.log(`\nDone. Created ${created} new post(s).`)
-  return created
+  console.log(`\nDone. Created ${created} new post(s), updated ${updated} post(s).`)
+  return created + updated
 }
 
 main().catch((err) => {
