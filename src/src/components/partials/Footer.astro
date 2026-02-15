@@ -1,5 +1,5 @@
 ---
-import { SITE_NAV, SITE_SECONDARY_NAV } from "../../consts";
+import { SITE_NAV, SITE_SECONDARY_NAV, SITE_FOOTER_NAV } from "../../consts";
 import Container from "../containers/Container.astro";
 ---
 
@@ -20,7 +20,7 @@ import Container from "../containers/Container.astro";
           }
           <span class="hidden sm:inline text-zinc-300 dark:text-zinc-600" aria-hidden="true">|</span>
           {
-            SITE_SECONDARY_NAV.map((navitem) => (
+            [...SITE_SECONDARY_NAV, ...SITE_FOOTER_NAV].map((navitem) => (
               <a
                 href={navitem.path}
                 class="transition text-zinc-500 dark:text-zinc-400 hover:text-accent-600 dark:hover:text-accent-400 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
