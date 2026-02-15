@@ -40,12 +40,7 @@
   ],
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": [
-      "/images/*.{png,jpg,gif}",
-      "/css/*",
-      "/favicon.ico",
-      "/.well-known/*"
-    ]
+    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/favicon.ico", "/.well-known/*"]
   },
   "responseOverrides": {
     "404": {
