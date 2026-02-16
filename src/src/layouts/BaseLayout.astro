@@ -52,9 +52,13 @@ const articleJsonLd = JSON.stringify({
   tags={tags}
 >
   <script type="application/ld+json" set:html={articleJsonLd} />
-  <article class="max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
+  <article class="h-entry max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
+    <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
+    <span class="p-author h-card" style="display:none">
+      <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
+    </span>
     <h1
-      class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
+      class="p-name text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
     >
       {title}
     </h1>
@@ -63,7 +67,7 @@ const articleJsonLd = JSON.stringify({
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span>Published <FormattedDate date={pubDateTime} /></span>
+        <span>Published <time class="dt-published" datetime={pubDateTime?.toISOString()}><FormattedDate date={pubDateTime} /></time></span>
       </span>
       
       {updatedDate && (
@@ -88,12 +92,12 @@ const articleJsonLd = JSON.stringify({
           height="630"
           fetchpriority="high"
           decoding="async"
-          class="w-full h-full object-cover"
+          class="u-photo w-full h-full object-cover"
         />
       </div>
     )}
     
-    <div class="prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
+    <div class="e-content prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
       <slot />
     </div>
   </article>
