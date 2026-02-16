@@ -37,7 +37,7 @@ const rendered = await Promise.all(notes.map(async (n: any) => {
 
 const pageTitle = notes.length === 1 && notes[0].data.title
   ? notes[0].data.title
-  : `Notes — ${dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+  : `Notes: ${dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
 const pageDescription = daySummary
   ?? notes.map((n: any) => n.data.description).filter(Boolean).join(' · ')
   ?? 'Notes from Sealjay.'
