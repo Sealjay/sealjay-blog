@@ -45,8 +45,16 @@ sync-mastodon-toots.mjs
 │   │   prevents re-syndication via the u-syndication microformat
 │   └── Body: empty (matching existing note convention)
 │
-└── 6. State tracking
+├── 6. daySummary generation
+│   ├── For each day that received new notes, gather ALL notes for that day
+│   ├── If 2+ notes exist: generate a concatenated summary from descriptions
+│   ├── Remove daySummary from any existing note that carries it
+│   ├── Add daySummary to the last note of the day (by pubDateTime)
+│   └── Track which file holds the daySummary in state file
+│
+└── 7. State tracking
     ├── Save last-synced toot ID to src/data/mastodon-sync-state.json
+    ├── Record daySummary holder per day (file path)
     └── On next run, use since_id to only fetch newer toots
 ```
 
@@ -64,13 +72,16 @@ sync-mastodon-toots.mjs
 - **Also extract to `tags` array**: convert to lowercase, deduplicate (e.g. `#GreenAI` → `"green-ai"`). This enables tag-based filtering on the site.
 - If a toot has no hashtags, the `tags` field is omitted (consistent with existing notes).
 
-### daySummary: don't touch
+### daySummary: generate and track
 
 - `daySummary` is currently used in 4 pages (notes index, day detail, stream, homepage) — it IS actively displayed.
-- It's AI-generated ("AI summary: ...") and requires an LLM to produce.
-- The sync script runs headless (GitHub Actions / CLI) — no LLM available.
-- **Decision**: The script does NOT generate or update `daySummary`. If it adds notes to a day that already has a summary, the existing summary will be stale but harmless. The next `add-note` Claude command session will naturally regenerate it.
-- If you want a fully automated summary, that's a separate enhancement (e.g. call Claude API from the script).
+- The sync script runs headless (GitHub Actions / CLI) — no LLM available for AI-prefixed summaries.
+- **Decision**: After creating notes for a given day, the script generates a simple concatenated summary of all that day's note descriptions (truncated to fit). This is NOT prefixed with "AI summary:" since it's mechanically generated.
+- Format: comma-separated first ~10 words of each note's description, e.g. `"Bridgy Fed for Mastodon/Bluesky, going full IndieWeb, dropping X links"`
+- The summary is placed on the **last note of the day** (by pubDateTime), matching the add-note convention.
+- If an existing note already carries a `daySummary`, it is removed from that note first (only one note per day should have it).
+- **State tracking**: `src/data/mastodon-sync-state.json` also records which note file last received the `daySummary` for each day, so subsequent runs know where to find/move it.
+- If a day has only 1 note total (including synced), `daySummary` is omitted.
 
 ### mastodonUrl: critical for preventing re-syndication
 
@@ -99,6 +110,7 @@ sync-mastodon-toots.mjs
 ### Modified files
 3. **`.env.example`** — add note about `read:statuses` scope
 4. **`CLAUDE.md`** — document the new script in "Common commands" or add a "Sync scripts" section
+5. **`.claude/commands/add-note.md`** — fix stale `mastodonUrl` description: change "not displayed yet but stored for potential future use" → explain it's rendered as a `u-syndication` link and is critical for preventing re-syndication of content that already exists on Mastodon
 
 ## Deduplication detail
 
