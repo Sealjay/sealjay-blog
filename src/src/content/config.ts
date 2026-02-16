@@ -16,6 +16,7 @@ const blog = defineCollection({
     tags: z.array(z.string()).optional(),
     sourceUrl: z.string().url().optional(),
     featured: z.boolean().default(false),
+    inReplyTo: z.string().url().optional(),
   }),
 })
 
@@ -51,6 +52,7 @@ const note = defineCollection({
     isHighlight: z.boolean().default(false),
     engagementNote: z.string().optional(),
     mastodonUrl: z.string().url().optional(),
+    inReplyTo: z.string().url().optional(),
     daySummary: z.string().optional(),
   }),
 })
