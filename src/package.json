@@ -22,6 +22,7 @@
     "test": "biome check .",
     "sync:str": "bun src/scripts/sync-securing-quest.mjs",
     "sync:webmentions": "bun src/scripts/sync-webmentions.mjs",
+    "sync:mastodon": "bun src/scripts/sync-mastodon-toots.mjs",
     "send:webmentions": "bun src/scripts/send-webmentions.mjs"
   },
   "dependencies": {

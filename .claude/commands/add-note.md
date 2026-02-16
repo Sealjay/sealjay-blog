@@ -16,6 +16,17 @@ Only ask questions if essential information is genuinely missing or ambiguous (e
 
 Then create the MDX file at `src/src/content/note/<slug>.mdx` where `<slug>` is derived from the content in kebab-case (e.g. `2026-02-15-browser-automation-research`), or from the current date if the content doesn't suggest a clear slug (e.g. `2026-02-15-note`). Add a numeric suffix if the slug already exists.
 
+## Stale daySummary check (from Mastodon sync)
+
+Before creating the note, check if `src/src/data/mastodon-sync-state.json` exists and has a `daysNeedingSummary` array. For each day listed:
+
+1. Read all notes for that day in `src/src/content/note/`
+2. Generate a single-sentence `daySummary` prefixed with "AI summary:" covering all notes that day
+3. Add it to the **last note of the day** (by `pubDateTime`)
+4. Remove the day from the `daysNeedingSummary` array and save the updated state file
+
+This handles days where the Mastodon sync script added new notes and removed stale summaries.
+
 ## Day Summary (multi-note days)
 
 After creating the note, check if there are other notes for the same day (same `YYYY-MM-DD` in `pubDateTime`) in `src/src/content/note/`.
@@ -60,6 +71,6 @@ daySummary: "<summary or omit if only one note this day>"
 - Tags should be lowercase (e.g. "ai", "open-source"). Auto-suggest tags based on content, keeping consistent with existing tags across notes.
 - Slug format: `YYYY-MM-DD-<descriptive-kebab>` (e.g. `2026-02-15-browser-automation-research`). Fall back to `YYYY-MM-DD-note` if content doesn't suggest a clear slug. Add a numeric suffix if the slug already exists.
 - After creating the file, show the user the path and confirm the note was added
-- **Fosstodon**: After confirming the note, ask the user if they'd like to post it to Fosstodon. If yes, run `bun --install=auto .claude/commands/post-to-fosstodon/post.ts "<description>" [externalUrl]` from the project root. The script reads `MASTODON_TOKEN` from `.env`. If the env var isn't set, tell the user to copy `.env.example` to `.env` and add their token. Note: Mastodon has a 500 char limit — if the description + URL exceed that, ask the user to shorten it before posting. After a successful post, the script outputs `Posted: <url>` — capture that URL and add it to the note's frontmatter as `mastodonUrl`. This field is not displayed yet but stored for potential future use.
+- **Fosstodon**: After confirming the note, ask the user if they'd like to post it to Fosstodon. If yes, run `bun --install=auto .claude/commands/post-to-fosstodon/post.ts "<description>" [externalUrl]` from the project root. The script reads `MASTODON_TOKEN` from `.env`. If the env var isn't set, tell the user to copy `.env.example` to `.env` and add their token. Note: Mastodon has a 500 char limit — if the description + URL exceed that, ask the user to shorten it before posting. After a successful post, the script outputs `Posted: <url>` — capture that URL and add it to the note's frontmatter as `mastodonUrl`. This field is rendered as a hidden `<a class="u-syndication" rel="syndication">` link in note pages — it tells IndieWeb readers and the POSSE workflow that this content already exists on Mastodon, preventing re-syndication.
 - Notes are grouped by day. Each day has one page at `/notes/YYYY-MM-DD/` with all that day's notes and a single Giscus discussion thread
 - Each note card has an anchor ID matching its slug, so you can link to `/notes/YYYY-MM-DD/#<slug>`
