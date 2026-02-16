@@ -6,7 +6,7 @@
  * Follows the existing "External Media" pattern. Uses a "str-" filename
  * prefix and sourceUrl frontmatter field for deduplication.
  *
- * Usage: node src/scripts/sync-securing-quest.mjs
+ * Usage: bun src/scripts/sync-securing-quest.mjs
  */
 
 import { readdir, readFile, unlink, writeFile } from 'node:fs/promises'

@@ -4,11 +4,12 @@
  * Scans dist/ HTML files for outgoing <a> links, discovers webmention
  * endpoints on target sites, and sends webmentions.
  *
- * Usage: node src/scripts/send-webmentions.mjs
+ * Usage: bun src/scripts/send-webmentions.mjs
  *
  * Expects the site to be built first (bun run build).
  */
 
+import { createHash } from 'node:crypto'
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -123,6 +124,8 @@ async function main() {
   const tracking = await loadTracking()
   let sent = 0
   let skipped = 0
+  let unchanged = 0
+  let noHentry = 0
   let noEndpoint = 0
 
   for (const file of htmlFiles) {
@@ -130,19 +133,34 @@ async function main() {
     const links = extractLinks(html)
     if (links.length === 0) continue
 
+    // Only send webmentions from pages with h-entry microformats
+    if (!html.includes('class="h-entry"')) {
+      noHentry += links.length
+      continue
+    }
+
     const relPath = relative(DIST_DIR, file)
     const sourceUrl = `${SITE_URL}/${relPath.replace(/index\.html$/, '')}`
+    const contentHash = createHash('sha256').update(html).digest('hex').slice(0, 16)
 
     for (const targetUrl of links) {
       const key = `${sourceUrl} -> ${targetUrl}`
+      const entry = tracking[key]
 
-      if (tracking[key] === 'no-endpoint') {
+      if (entry === 'no-endpoint') {
         skipped++
         continue
       }
 
-      let endpoint = tracking[key]
-      if (!endpoint || endpoint === 'no-endpoint') {
+      // Skip if already sent and source page content hasn't changed
+      if (entry && typeof entry === 'object' && entry.contentHash === contentHash) {
+        unchanged++
+        continue
+      }
+
+      // Migrate old string format or discover new endpoint
+      let endpoint = entry && typeof entry === 'object' ? entry.endpoint : entry
+      if (!endpoint) {
         endpoint = await discoverEndpoint(targetUrl)
         if (!endpoint) {
           tracking[key] = 'no-endpoint'
@@ -153,7 +171,7 @@ async function main() {
 
       const result = await sendWebmention(endpoint, sourceUrl, targetUrl)
       if (result.ok) {
-        tracking[key] = endpoint
+        tracking[key] = { endpoint, contentHash }
         console.log(`  Sent: ${sourceUrl} -> ${targetUrl}`)
         sent++
       } else {
@@ -163,7 +181,7 @@ async function main() {
   }
 
   await saveTracking(tracking)
-  console.log(`\nDone. Sent: ${sent}, Skipped: ${skipped}, No endpoint: ${noEndpoint}`)
+  console.log(`\nDone. Sent: ${sent}, Skipped (no endpoint): ${skipped}, Unchanged: ${unchanged}, No h-entry: ${noHentry}, No endpoint: ${noEndpoint}`)
 }
 
 main().catch((err) => {
