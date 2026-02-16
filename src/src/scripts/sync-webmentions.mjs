@@ -4,7 +4,7 @@
  * Fetches recent webmentions for sealjay.com and merges them into
  * src/data/webmentions.json, keyed by target URL. Deduplicates by wm-id.
  *
- * Usage: WEBMENTION_IO_TOKEN=xxx node src/scripts/sync-webmentions.mjs
+ * Usage: WEBMENTION_IO_TOKEN=xxx bun src/scripts/sync-webmentions.mjs
  */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
