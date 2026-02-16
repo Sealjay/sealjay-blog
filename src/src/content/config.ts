@@ -50,7 +50,7 @@ const note = defineCollection({
     externalPlatform: z.enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace']).optional(),
     isHighlight: z.boolean().default(false),
     engagementNote: z.string().optional(),
-    fosstodonUrl: z.string().url().optional(),
+    mastodonUrl: z.string().url().optional(),
     daySummary: z.string().optional(),
   }),
 })
