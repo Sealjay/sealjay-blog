@@ -147,12 +147,10 @@ function htmlToMarkdown(html) {
   // Convert blockquotes
   md = md.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, content) => {
     const inner = stripHtml(content).trim()
-    return (
-      inner
-        .split('\n')
-        .map((line) => `> ${line}`)
-        .join('\n') + '\n\n'
-    )
+    return `${inner
+      .split('\n')
+      .map((line) => `> ${line}`)
+      .join('\n')}\n\n`
   })
 
   // Convert unordered lists
@@ -162,7 +160,7 @@ function htmlToMarkdown(html) {
     for (const liMatch of content.matchAll(liRegex)) {
       items.push(`- ${liMatch[1].replace(/<[^>]+>/g, '').trim()}`)
     }
-    return items.join('\n') + '\n\n'
+    return `${items.join('\n')}\n\n`
   })
 
   // Convert ordered lists
@@ -174,7 +172,7 @@ function htmlToMarkdown(html) {
       items.push(`${idx}. ${liMatch[1].replace(/<[^>]+>/g, '').trim()}`)
       idx++
     }
-    return items.join('\n') + '\n\n'
+    return `${items.join('\n')}\n\n`
   })
 
   // Convert paragraphs

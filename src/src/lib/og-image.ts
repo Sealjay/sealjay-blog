@@ -366,7 +366,6 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
       }
       break
     }
-    case 'dots':
     default: {
       // Subtle dot grid – general/neutral
       for (let i = 0; i < 20; i++) {
