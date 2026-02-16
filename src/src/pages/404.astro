@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/IndexLayout.astro'
+import Container from '../components/containers/Container.astro'
+import ContentContainer from '../components/containers/ContentContainer.astro'
+---
+
+<Layout
+  title="Page Not Found | Chris Lloyd-Jones"
+  description="The page you're looking for doesn't exist."
+>
+  <Container>
+    <ContentContainer maxWidth="max-w-3xl">
+      <div class="text-center py-16">
+        <p class="text-7xl font-bold text-accent-600 dark:text-accent-400 mb-4">404</p>
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+          Page not found
+        </h1>
+        <p class="text-lg text-zinc-600 dark:text-zinc-400 mb-8">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-accent-500 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to home
+        </a>
+      </div>
+    </ContentContainer>
+  </Container>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof plausible !== 'undefined') {
+        plausible('404', { props: { path: document.location.pathname } })
+      }
+    })
+  </script>
+</Layout>
