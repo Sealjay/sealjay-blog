@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-16
 **Status:** Approved
-**Goal:** Bring sealjay.com to IndieWeb Level 2 (microformats + sending webmentions) and Level 3 (receiving webmentions + reply contexts), without Bridgy backfeed. Social interaction via fosstodon.org.
+**Goal:** Bring sealjay.com to IndieWeb Level 2 (microformats + sending webmentions) and Level 3 (receiving webmentions + reply contexts), with Bridgy backfeed and Bridgy Fed ActivityPub discovery. Social interaction via fosstodon.org.
 
 ## Current State
 
@@ -16,7 +16,8 @@
 - **Sending:** Post-build script in CI/CD pipeline, scans built HTML for outgoing links
 - **Display:** Build-time fetch from webmention.io API, baked into static HTML
 - **Reply contexts:** Optional `inReplyTo` frontmatter field on blog and note content types
-- **No Bridgy backfeed:** Mastodon replies stay on Mastodon; only direct IndieWeb webmentions are received
+- **Bridgy backfeed:** Mastodon replies, boosts, and favourites fed back as webmentions via brid.gy
+- **Bridgy Fed:** ActivityPub discovery so posts are searchable in the fediverse
 
 ## 1. Microformats2 Markup (h-entry)
 
@@ -125,6 +126,19 @@ Add to `BaseHead.astro`, conditionally on pages with a canonical URL (blog posts
 This tells fediverse servers that an ActivityPub version of the page exists at Bridgy Fed. When someone pastes the post URL into Mastodon search, it shows up as a federated post.
 
 No scripts, no new files. Just one `<link>` tag addition.
+
+## 6. Bridgy Backfeed
+
+Pull Mastodon interactions (replies, boosts, favourites) back to your site as webmentions.
+
+### One-time setup (manual)
+
+1. Sign up at brid.gy and connect your fosstodon.org Mastodon account
+2. Bridgy polls your Mastodon account and sends webmentions to webmention.io automatically
+
+### No code changes needed
+
+Bridgy sends standard webmentions to your webmention.io endpoint. The receiving infrastructure (section 2) handles them like any other webmention. The display component shows Mastodon replies alongside direct IndieWeb mentions.
 
 ## Files to Create
 
