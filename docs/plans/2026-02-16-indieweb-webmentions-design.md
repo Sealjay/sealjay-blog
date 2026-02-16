@@ -127,6 +127,16 @@ This tells fediverse servers that an ActivityPub version of the page exists at B
 
 No scripts, no new files. Just one `<link>` tag addition.
 
+### Bridgy Fed Bluesky verification
+
+Add a `rel="me"` link in `BaseHead.astro` for the Bridgy Fed bridged Bluesky identity:
+
+```html
+<link href="https://bsky.brid.gy/ap/did:plc:lamiqq7bkfqygjzdbdz673q3" rel="me" />
+```
+
+This enables Mastodon green-check verification on the bridged Bluesky account.
+
 ## 6. Bridgy Backfeed
 
 Pull Mastodon interactions (replies, boosts, favourites) back to your site as webmentions.
