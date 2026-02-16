@@ -7,7 +7,7 @@
  * Usage: WEBMENTION_IO_TOKEN=xxx node src/scripts/sync-webmentions.mjs
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 

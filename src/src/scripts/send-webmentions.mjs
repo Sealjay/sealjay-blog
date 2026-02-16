@@ -9,7 +9,7 @@
  * Expects the site to be built first (bun run build).
  */
 
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -67,8 +67,9 @@ async function discoverEndpoint(targetUrl) {
     }
 
     const html = await res.text()
-    const htmlMatch = html.match(/<link[^>]+rel="?webmention"?[^>]+href="([^"]+)"/)
-      || html.match(/<link[^>]+href="([^"]+)"[^>]+rel="?webmention"?/)
+    const htmlMatch =
+      html.match(/<link[^>]+rel="?webmention"?[^>]+href="([^"]+)"/) ||
+      html.match(/<link[^>]+href="([^"]+)"[^>]+rel="?webmention"?/)
     if (htmlMatch) {
       return new URL(htmlMatch[1], targetUrl).href
     }
