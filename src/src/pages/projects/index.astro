@@ -61,7 +61,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
       {sortedProjects.map((project) => {
         const colors = statusColors[project.data.status]
         return (
-          <div class="group relative h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-100 dark:ring-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+          <div class="group relative h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
             {/* Hero Image */}
             {project.data.heroImage && (
               <div class="aspect-w-16 aspect-h-9 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">

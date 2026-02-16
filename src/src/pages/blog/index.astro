@@ -27,7 +27,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime);
     <div class="mx-auto max-w-5xl">
         <!-- Page Header -->
         <div class="mb-10 md:mb-16">
-            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
                 <span class="text-gradient">Blog</span>
             </h1>
             <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
@@ -44,7 +44,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime);
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
                         <a href={`/blog/${post.slug}/`} class="group">
-                            <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="h-full flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
                                 <div class="aspect-w-16 aspect-h-9 overflow-hidden">
                                     <img
                                         src={post.data.heroImage && post.data.heroImage !== "/placeholder-hero.png" ? post.data.heroImage : getOGImagePath(post.slug)}

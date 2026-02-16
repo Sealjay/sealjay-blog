@@ -1,8 +1,5 @@
 ---
 import Layout from '../../layouts/IndexLayout.astro'
-import Container from '../../components/containers/Container.astro'
-import ContentContainer from '../../components/containers/ContentContainer.astro'
-import PageHeader from '../../components/partials/PageHeader.astro'
 import Badge from '../../components/partials/Badge.astro'
 import { getCollection } from 'astro:content'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
@@ -21,14 +18,18 @@ const eventTypes = [...new Set(speakingSlots.map((s) => s.data.eventType))].sort
   pubDateTime={new Date('1 March 2023')}
   updatedDate={lastConferenceSlot.data.date}
 >
-  <Container>
-    <ContentContainer maxWidth="max-w-5xl">
-      <PageHeader
-        title="Speaking"
-        subtitle="I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements."
-      />
+  <div class="mx-auto max-w-5xl">
+    <!-- Page Header -->
+    <div class="mb-10 md:mb-16">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+        <span class="text-gradient">Speaking</span>
+      </h1>
+      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
+        I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements.
+      </p>
+    </div>
 
-      <!-- Speaker Kit CTA -->
+    <!-- Speaker Kit CTA -->
       <div class="mb-10 rounded-xl bg-accent-50 dark:bg-accent-900/20 border border-accent-200 dark:border-accent-800/40 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Want me to speak at your event?</h3>
@@ -104,8 +105,7 @@ const eventTypes = [...new Set(speakingSlots.map((s) => s.data.eventType))].sort
           </div>
         ))}
       </div>
-    </ContentContainer>
-  </Container>
+  </div>
 </Layout>
 
 <script>
