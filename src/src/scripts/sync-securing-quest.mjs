@@ -9,7 +9,7 @@
  * Usage: node src/scripts/sync-securing-quest.mjs
  */
 
-import { readdir, readFile, writeFile, unlink } from 'node:fs/promises'
+import { readdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -139,12 +139,20 @@ function htmlToMarkdown(html) {
 
   // Convert code
   md = md.replace(/<code>([\s\S]*?)<\/code>/gi, (_, content) => `\`${content}\``)
-  md = md.replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, (_, content) => `\`\`\`\n${stripHtml(content)}\n\`\`\`\n\n`)
+  md = md.replace(
+    /<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi,
+    (_, content) => `\`\`\`\n${stripHtml(content)}\n\`\`\`\n\n`,
+  )
 
   // Convert blockquotes
   md = md.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, content) => {
     const inner = stripHtml(content).trim()
-    return inner.split('\n').map((line) => `> ${line}`).join('\n') + '\n\n'
+    return (
+      inner
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n') + '\n\n'
+    )
   })
 
   // Convert unordered lists
@@ -225,12 +233,9 @@ function generateMDX(item) {
 
   let body
   if (markdownContent) {
-    body = [
-      '',
-      `*This post was originally published on [Securing the Realm](${fullUrl}).*`,
-      '',
-      markdownContent,
-    ].join('\n')
+    body = ['', `*This post was originally published on [Securing the Realm](${fullUrl}).*`, '', markdownContent].join(
+      '\n',
+    )
   } else {
     body = [
       '',

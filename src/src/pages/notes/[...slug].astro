@@ -78,6 +78,9 @@ const pageDescription = daySummary
           <span class="p-author h-card" style="display:none">
             <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
           </span>
+          {note.data.mastodonUrl && (
+            <a class="u-syndication" href={note.data.mastodonUrl} rel="syndication" style="display:none">Mastodon</a>
+          )}
           {note.data.inReplyTo && (
             <div class="not-prose mb-4 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
               <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>

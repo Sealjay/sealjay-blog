@@ -48,7 +48,9 @@ const note = defineCollection({
       .transform((val) => new Date(val)),
     tags: z.array(z.string()).optional(),
     externalUrl: z.string().url().optional(),
-    externalPlatform: z.enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace']).optional(),
+    externalPlatform: z
+      .enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace'])
+      .optional(),
     isHighlight: z.boolean().default(false),
     engagementNote: z.string().optional(),
     mastodonUrl: z.string().url().optional(),

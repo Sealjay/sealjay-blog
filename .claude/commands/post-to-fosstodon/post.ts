@@ -15,7 +15,8 @@ if (!message) {
 }
 
 const url = process.argv[3]
-const status = url ? `${message}\n\n${url}` : message
+const alreadyContainsUrl = url && message.includes(url)
+const status = url && !alreadyContainsUrl ? `${message}\n\n${url}` : message
 
 if (status.length > 500) {
   console.error(`Status is ${status.length} chars — Mastodon limit is 500. Please shorten it.`)
