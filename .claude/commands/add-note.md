@@ -38,7 +38,7 @@ description: "<description>"
 pubDateTime: "<YYYY-MM-DDThh:mm:00.000Z>"
 tags: [<tags as quoted strings, or omit if none>]
 externalUrl: "<url or omit if none>"
-externalPlatform: "<platform or omit if none>"
+externalPlatform: "<platform or omit if none — must be one of: LinkedIn, X, GitHub, Mastodon, YouTube, Article, Web, HuggingFace>"
 isHighlight: <true or false>
 daySummary: "<summary or omit if only one note this day>"
 ---
@@ -53,6 +53,7 @@ daySummary: "<summary or omit if only one note this day>"
 - Omit optional frontmatter fields entirely rather than setting them to empty strings
 - If the note is just a quick thought with a description, the body can be left empty
 - If there's an external URL, the note serves as a bookmark/highlight of that external content
+- `externalPlatform` **must** be one of the allowed enum values: `LinkedIn`, `X`, `GitHub`, `Mastodon`, `YouTube`, `Article`, `Web`, `HuggingFace`. Choose the value that best matches the URL's domain. Use `Web` as a fallback for sites that don't match a specific platform.
 - Maximum one external URL per note
 - `isHighlight` should only be true for particularly important or featured notes
 - Tags should be lowercase (e.g. "ai", "open-source"). Auto-suggest tags based on content, keeping consistent with existing tags across notes.
