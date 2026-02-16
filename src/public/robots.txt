@@ -1,0 +1,26 @@
+User-agent: *
+Disallow: /_astro/
+Allow: /
+
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Bytespider
+User-agent: Diffbot
+User-agent: FacebookBot
+User-agent: Applebot-Extended
+User-agent: PerplexityBot
+User-agent: Cohere-ai
+User-agent: anthropic-ai
+User-agent: Amazonbot
+User-agent: OAI-SearchBot
+User-agent: Meta-ExternalAgent
+User-agent: ImagesiftBot
+User-agent: Omgilibot
+User-agent: Timpibot
+Disallow: /
+
+Sitemap: https://sealjay.com/sitemap-index.xml
