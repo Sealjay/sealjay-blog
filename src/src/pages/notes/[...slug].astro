@@ -32,7 +32,8 @@ const daySummary = notes.find((n: any) => n.data.daySummary)?.data.daySummary
 // Render all note bodies
 const rendered = await Promise.all(notes.map(async (n: any) => {
   const { Content } = await n.render()
-  return { note: n, Content }
+  const hasBody = n.body?.trim().length > 0
+  return { note: n, Content, hasBody }
 }))
 
 const pageTitle = notes.length === 1 && notes[0].data.title
@@ -71,7 +72,7 @@ const pageDescription = daySummary
 
     {/* Notes for this day */}
     <div class="flex flex-col gap-10">
-      {rendered.map(({ note, Content }: any) => (
+      {rendered.map(({ note, Content, hasBody }: any) => (
         <article id={note.slug} class="h-entry scroll-mt-20">
           <a class="u-url" href={`/notes/${dateKey}/#${note.slug}`} style="display:none">{note.data.title || 'Note'}</a>
           <time class="dt-published" datetime={note.data.pubDateTime.toISOString()} style="display:none">{note.data.pubDateTime.toISOString()}</time>
@@ -93,8 +94,11 @@ const pageDescription = daySummary
               <h2 class="p-name text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">{note.data.title}</h2>
             )}
 
-            {note.data.description && (
+            {note.data.description && !hasBody && (
               <p class="p-summary text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">{note.data.description}</p>
+            )}
+            {note.data.description && hasBody && (
+              <p class="p-summary sr-only">{note.data.description}</p>
             )}
           </div>
 

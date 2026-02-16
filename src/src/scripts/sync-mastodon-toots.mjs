@@ -99,7 +99,7 @@ function shouldInclude(toot) {
 // --- Text processing ---
 
 function processTootHtml(html) {
-  if (!html) return { description: '', tags: [] }
+  if (!html) return { description: '', bodyMarkdown: '', tags: [], urls: [] }
 
   let text = html
 
@@ -129,33 +129,54 @@ function processTootHtml(html) {
   // Convert hashtag links to plain text
   text = text.replace(hashtagRegex, (_, tag) => `#${tag}`)
 
-  // Convert remaining links to plain text with URL
-  text = text.replace(/<a[^>]*href="([^"]*)"[^>]*>[^<]*<span[^>]*>([^<]*)<\/span>[^<]*<\/a>/gi, '$2')
-  text = text.replace(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/gi, '$2')
+  // Extract non-hashtag, non-mention URLs before converting links
+  const urls = []
+  const linkHrefRegex = /<a[^>]*href="([^"]*)"[^>]*>/gi
+  const rawText = text // snapshot before link conversion
+  for (const match of rawText.matchAll(linkHrefRegex)) {
+    const href = match[0]
+    // Skip hashtag and mention links (already handled above, but guard remaining ones)
+    if (href.includes('class="') && (href.includes('hashtag') || href.includes('mention'))) continue
+    urls.push(match[1])
+  }
 
-  // Convert line breaks and paragraphs
-  text = text.replace(/<br\s*\/?>/gi, '\n')
-  text = text.replace(/<\/p>\s*<p>/gi, '\n\n')
-  text = text.replace(/<\/?p[^>]*>/gi, '')
+  // Convert remaining links — Mastodon uses multiple <span> elements inside <a>
+  // for URL truncation, so we match the full <a>...</a> and strip inner HTML
+  let bodyText = text
+  bodyText = bodyText.replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_, href, inner) => {
+    const linkText = inner.replace(/<[^>]+>/g, '').trim()
+    return `[${linkText}](${href})`
+  })
 
-  // Strip remaining HTML
-  text = text.replace(/<[^>]+>/g, '')
+  // Same for description, but plain text only
+  text = text.replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_, _href, inner) => {
+    return inner.replace(/<[^>]+>/g, '').trim()
+  })
 
-  // Decode HTML entities
-  text = text.replace(/&amp;/g, '&')
-  text = text.replace(/&lt;/g, '<')
-  text = text.replace(/&gt;/g, '>')
-  text = text.replace(/&quot;/g, '"')
-  text = text.replace(/&#39;/g, "'")
-  text = text.replace(/&nbsp;/g, ' ')
+  // Helper to clean up HTML → plain text
+  function cleanHtml(t) {
+    t = t.replace(/<br\s*\/?>/gi, '\n')
+    t = t.replace(/<\/p>\s*<p>/gi, '\n\n')
+    t = t.replace(/<\/?p[^>]*>/gi, '')
+    t = t.replace(/<[^>]+>/g, '')
+    t = t.replace(/&amp;/g, '&')
+    t = t.replace(/&lt;/g, '<')
+    t = t.replace(/&gt;/g, '>')
+    t = t.replace(/&quot;/g, '"')
+    t = t.replace(/&#39;/g, "'")
+    t = t.replace(/&nbsp;/g, ' ')
+    t = t.replace(/\n{3,}/g, '\n\n').trim()
+    t = t.replace(/@(\w+)@[\w.]+/g, '@$1')
+    return t
+  }
 
-  // Clean up whitespace
-  text = text.replace(/\n{3,}/g, '\n\n').trim()
+  text = cleanHtml(text)
+  bodyText = cleanHtml(bodyText)
 
-  // Strip instance from any remaining @user@instance patterns
-  text = text.replace(/@(\w+)@[\w.]+/g, '@$1')
+  // Only use bodyMarkdown if it differs from description (i.e. has links)
+  const bodyMarkdown = bodyText !== text ? bodyText : ''
 
-  return { description: text, tags: [...new Set(tags)] }
+  return { description: text, bodyMarkdown, tags: [...new Set(tags)], urls: [...new Set(urls)] }
 }
 
 // --- Deduplication ---
@@ -257,18 +278,47 @@ function generateSlug(description, date) {
   return `${datePrefix}-mastodon-${words || 'toot'}`
 }
 
-function generateMDX(toot, description, tags) {
+function detectPlatform(url) {
+  if (!url) return null
+  try {
+    const host = new URL(url).hostname.toLowerCase()
+    if (host.includes('github.com')) return 'GitHub'
+    if (host.includes('youtube.com') || host.includes('youtu.be')) return 'YouTube'
+    if (host.includes('huggingface.co')) return 'HuggingFace'
+    if (host.includes('linkedin.com')) return 'LinkedIn'
+    return 'Web'
+  } catch {
+    return 'Web'
+  }
+}
+
+function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [] } = {}) {
   const pubDateTime = new Date(toot.created_at).toISOString().replace(/:\d{2}\.\d{3}Z$/, ':00.000Z')
+
+  // Ensure "mastodon" tag is present for synced notes
+  const allTags = [...new Set([...tags, 'mastodon'])]
 
   const lines = ['---', `description: "${escapeYaml(description)}"`, `pubDateTime: "${pubDateTime}"`]
 
-  if (tags.length > 0) {
-    lines.push(`tags: [${tags.map((t) => `"${t}"`).join(', ')}]`)
+  lines.push(`tags: [${allTags.map((t) => `"${t}"`).join(', ')}]`)
+
+  // Set first extracted URL as externalUrl
+  const externalUrl = urls[0]
+  if (externalUrl) {
+    const platform = detectPlatform(externalUrl)
+    lines.push(`externalUrl: "${externalUrl}"`)
+    if (platform) lines.push(`externalPlatform: "${platform}"`)
   }
 
   lines.push(`mastodonUrl: "${toot.url}"`)
   lines.push('---')
   lines.push('')
+
+  // Add markdown body if it has links (differs from plain description)
+  if (bodyMarkdown) {
+    lines.push(bodyMarkdown)
+    lines.push('')
+  }
 
   return { content: lines.join('\n'), pubDateTime }
 }
@@ -334,7 +384,7 @@ async function main() {
       continue
     }
 
-    const { description, tags } = processTootHtml(toot.content)
+    const { description, bodyMarkdown, tags, urls } = processTootHtml(toot.content)
     if (!description) {
       if (dryRun) console.log(`  [SKIP:empty] ${toot.url}`)
       skipped++
@@ -360,13 +410,15 @@ async function main() {
     // Generate note
     const slug = generateSlug(description, toot.created_at)
     const uniqueSlug = await ensureUniqueSlug(slug)
-    const { content } = generateMDX(toot, description, tags)
+    const { content } = generateMDX(toot, description, tags, { bodyMarkdown, urls })
     const filename = `${uniqueSlug}.mdx`
 
     if (dryRun) {
       console.log(`  [CREATE] ${filename}`)
       console.log(`    Text: "${description.slice(0, 120)}${description.length > 120 ? '...' : ''}"`)
-      console.log(`    Tags: ${tags.length ? tags.join(', ') : '(none)'}`)
+      console.log(`    Tags: ${[...new Set([...tags, 'mastodon'])].join(', ')}`)
+      if (urls.length) console.log(`    External: ${urls[0]} (${detectPlatform(urls[0])})`)
+      if (bodyMarkdown) console.log(`    Body: has markdown links`)
       console.log(`    URL:  ${toot.url}`)
     } else {
       await mkdir(NOTE_DIR, { recursive: true })
