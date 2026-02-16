@@ -4,8 +4,10 @@
 ![GitHub issues](https://img.shields.io/github/issues/Sealjay/sealjay-blog)
 ![GitHub](https://img.shields.io/github/license/Sealjay/sealjay-blog)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Sealjay/sealjay-blog?style=social)
-[![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/)
-[![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](http://astro.build/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
+[![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](https://astro.build/)
+[![Bun](https://img.shields.io/badge/Bun-000?logo=bun&logoColor=fff)](https://bun.sh/)
+[![Biome](https://img.shields.io/badge/Biome-60A5FA?logo=biome&logoColor=fff)](https://biomejs.dev/)
 [![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/?WT.mc_id=AI-MVP-5004204)
 
 ## Overview
@@ -54,9 +56,7 @@ src/
 
 ## Getting started
 
-You can use a [dev container](https://containers.dev/) to run this in VS Code, or in [GitHub Codespaces](https://github.com/features/codespaces).
-
-To get started locally, make sure you have [Bun](https://bun.sh/) installed. All commands run from the `src/` directory:
+Make sure you have [Bun](https://bun.sh/) installed. All commands run from the `src/` directory:
 
 ```bash
 cd src
