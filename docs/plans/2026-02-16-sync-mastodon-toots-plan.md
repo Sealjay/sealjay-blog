@@ -45,16 +45,15 @@ sync-mastodon-toots.mjs
 │   │   prevents re-syndication via the u-syndication microformat
 │   └── Body: empty (matching existing note convention)
 │
-├── 6. daySummary generation
-│   ├── For each day that received new notes, gather ALL notes for that day
-│   ├── If 2+ notes exist: generate a concatenated summary from descriptions
-│   ├── Remove daySummary from any existing note that carries it
-│   ├── Add daySummary to the last note of the day (by pubDateTime)
-│   └── Track which file holds the daySummary in state file
+├── 6. daySummary: flag stale days (do NOT generate summaries)
+│   ├── For each day that received new notes, check if a daySummary exists
+│   ├── If it does, remove it (it's now stale — new notes were added)
+│   ├── Record the day as needing regeneration in state file
+│   └── Claude Code regenerates the summary next time add-note runs
 │
 └── 7. State tracking
     ├── Save last-synced toot ID to src/data/mastodon-sync-state.json
-    ├── Record daySummary holder per day (file path)
+    ├── Record days needing daySummary regeneration
     └── On next run, use since_id to only fetch newer toots
 ```
 
@@ -72,16 +71,15 @@ sync-mastodon-toots.mjs
 - **Also extract to `tags` array**: convert to lowercase, deduplicate (e.g. `#GreenAI` → `"green-ai"`). This enables tag-based filtering on the site.
 - If a toot has no hashtags, the `tags` field is omitted (consistent with existing notes).
 
-### daySummary: generate and track
+### daySummary: flag stale, let Claude regenerate
 
 - `daySummary` is currently used in 4 pages (notes index, day detail, stream, homepage) — it IS actively displayed.
-- The sync script runs headless (GitHub Actions / CLI) — no LLM available for AI-prefixed summaries.
-- **Decision**: After creating notes for a given day, the script generates a simple concatenated summary of all that day's note descriptions (truncated to fit). This is NOT prefixed with "AI summary:" since it's mechanically generated.
-- Format: comma-separated first ~10 words of each note's description, e.g. `"Bridgy Fed for Mastodon/Bluesky, going full IndieWeb, dropping X links"`
-- The summary is placed on the **last note of the day** (by pubDateTime), matching the add-note convention.
-- If an existing note already carries a `daySummary`, it is removed from that note first (only one note per day should have it).
-- **State tracking**: `src/data/mastodon-sync-state.json` also records which note file last received the `daySummary` for each day, so subsequent runs know where to find/move it.
-- If a day has only 1 note total (including synced), `daySummary` is omitted.
+- The sync script runs headless (GitHub Actions / CLI) — no LLM available.
+- **Decision**: The sync script does NOT generate summaries. Instead:
+  1. If new notes are added to a day that already has a `daySummary`, the script **removes** the existing stale summary (it no longer reflects all notes for that day).
+  2. The day is recorded in `src/data/mastodon-sync-state.json` under `daysNeedingSummary` as needing regeneration.
+  3. The **add-note Claude Code skill** checks this list on next run and regenerates "AI summary: ..." for any flagged days, then clears the flag.
+- This keeps summaries high-quality (AI-generated) rather than mechanical concatenation.
 
 ### mastodonUrl: critical for preventing re-syndication
 
@@ -110,7 +108,9 @@ sync-mastodon-toots.mjs
 ### Modified files
 3. **`.env.example`** — add note about `read:statuses` scope
 4. **`CLAUDE.md`** — document the new script in "Common commands" or add a "Sync scripts" section
-5. **`.claude/commands/add-note.md`** — fix stale `mastodonUrl` description: change "not displayed yet but stored for potential future use" → explain it's rendered as a `u-syndication` link and is critical for preventing re-syndication of content that already exists on Mastodon
+5. **`.claude/commands/add-note.md`** — two changes:
+   - Fix stale `mastodonUrl` description: change "not displayed yet but stored for potential future use" → explain it's rendered as a `u-syndication` link and is critical for preventing re-syndication of content that already exists on Mastodon
+   - Add instruction: on startup, check `src/data/mastodon-sync-state.json` for `daysNeedingSummary`. For each flagged day, read all notes, generate an "AI summary: ..." daySummary, add it to the last note of that day, and clear the flag from the state file
 
 ## Deduplication detail
 
