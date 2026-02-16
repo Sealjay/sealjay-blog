@@ -181,7 +181,9 @@ async function main() {
   }
 
   await saveTracking(tracking)
-  console.log(`\nDone. Sent: ${sent}, Skipped (no endpoint): ${skipped}, Unchanged: ${unchanged}, No h-entry: ${noHentry}, No endpoint: ${noEndpoint}`)
+  console.log(
+    `\nDone. Sent: ${sent}, Skipped (no endpoint): ${skipped}, Unchanged: ${unchanged}, No h-entry: ${noHentry}, No endpoint: ${noEndpoint}`,
+  )
 }
 
 main().catch((err) => {
