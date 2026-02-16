@@ -8,7 +8,7 @@ import Waves from "../components/partials/IndexWaves.astro";
 const { title, description, pubDateTime, updatedDate, heroImage, image, ogType, tags } = Astro.props;
 ---
 
-<html class="h-full antialiased" lang="en">
+<html class="[height:100%] antialiased" lang="en">
   <head>
     <BaseHead title={title} description={description} image={image} ogType={ogType} pubDate={pubDateTime} tags={tags} />
   </head>
