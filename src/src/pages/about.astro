@@ -1,8 +1,5 @@
 ---
 import Layout from "../layouts/IndexLayout.astro";
-import Container from "../components/containers/Container.astro";
-import ContentContainer from "../components/containers/ContentContainer.astro";
-import PageHeader from "../components/partials/PageHeader.astro";
 import ProfileSection from "../components/partials/ProfileSection.astro";
 import { currentRole } from "../config/personal";
 ---
@@ -14,11 +11,15 @@ import { currentRole } from "../config/personal";
   updatedDate={new Date("1 March 2023")}
   heroImage="/chris/portrait.jpg"
 >
-  <Container>
-    <ContentContainer maxWidth="max-w-5xl">
-      <PageHeader title="About Chris" />
-      
-      <ProfileSection 
+  <div class="mx-auto max-w-5xl">
+    <!-- Page Header -->
+    <div class="mb-10 md:mb-16">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+        <span class="text-gradient">About Chris</span>
+      </h1>
+    </div>
+
+    <ProfileSection 
         imageSrc="/chris/portrait.jpg" 
         imageAlt="Chris Lloyd-Jones"
         showBadges={true}
@@ -45,7 +46,6 @@ import { currentRole } from "../config/personal";
         </p>
       </div>
       
-      </ProfileSection>
-    </ContentContainer>
-  </Container>
+    </ProfileSection>
+  </div>
 </Layout>

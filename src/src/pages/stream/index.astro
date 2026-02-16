@@ -139,7 +139,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   <div class="mx-auto max-w-5xl">
     <!-- Page Header -->
     <div class="mb-10 md:mb-16">
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
         <span class="text-gradient">Stream</span>
       </h1>
       <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
@@ -196,7 +196,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
             if (item.type === 'note' && item.noteItems) {
               return (
                 <div
-                  class="stream-item rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm"
+                  class="stream-item rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm"
                   data-type="note"
                 >
                   {/* Header: Note badge + date + link */}
@@ -257,7 +257,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
                 href={item.url}
                 target={isExternal ? '_blank' : undefined}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
-                class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur border border-zinc-100 dark:border-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+                class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
                 data-type={item.type}
               >
                 <!-- Type Badge -->

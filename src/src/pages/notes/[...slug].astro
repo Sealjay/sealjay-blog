@@ -118,7 +118,7 @@ const pageDescription = daySummary
           <div class="flex flex-wrap items-center gap-2 mb-4">
             {note.data.tags && note.data.tags.length > 0 && (
               note.data.tags.map((tag: string) => (
-                <span class="inline-block rounded-full bg-accent-100 px-3 py-0.5 text-sm font-medium text-accent-700 dark:bg-accent-900/30 dark:text-accent-300">
+                <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
                   #{tag}
                 </span>
               ))
@@ -129,7 +129,7 @@ const pageDescription = daySummary
                 href={note.data.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-3 py-0.5 text-sm font-medium text-accent-600 dark:text-accent-400 hover:bg-zinc-200 dark:hover:bg-zinc-600/70 transition-colors"
+                class="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-accent-600 dark:text-accent-400 hover:bg-zinc-200 dark:hover:bg-zinc-600/70 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
