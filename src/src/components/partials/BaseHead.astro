@@ -71,8 +71,10 @@ const { title, description, image = "/chris/portrait.jpg", ogType = "website", p
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={new URL(image, Astro.url)} />
 
-<!-- Mastodon, because of X (formerly Twitter) -->
+<!-- Identity verification links -->
 <link href="https://fosstodon.org/@sealjay" rel="me" />
+<link href="https://bsky.app/profile/sealjay.com" rel="me" />
+<link href="https://github.com/sealjay" rel="me" />
 
 <!-- JSON-LD Structured Data (Person) -->
 <script is:inline type="application/ld+json">
@@ -90,6 +92,7 @@ const { title, description, image = "/chris/portrait.jpg", ogType = "website", p
   },
   "sameAs": [
     "https://github.com/sealjay",
+    "https://bsky.app/profile/sealjay.com",
     "https://x.com/sealjay_clj",
     "https://uk.linkedin.com/in/chrislloydjones",
     "https://fosstodon.org/@sealjay",

@@ -125,7 +125,8 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
   heroImage="/chris/portrait.jpg"
 >
   <!-- Hero Section -->
-  <div class="w-full max-w-5xl mx-auto pt-6 md:pt-12">
+  <div class="h-card w-full max-w-5xl mx-auto pt-6 md:pt-12">
+    <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
     <div class="flex flex-col md:flex-row md:items-center md:gap-12">
       <!-- Image on mobile (top) and desktop (right) -->
       <div class="md:hidden mb-8 mx-auto">
@@ -133,7 +134,7 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
           <img
             src="/chris/portrait.jpg"
             alt="Chris Lloyd-Jones"
-            class="w-full h-full object-cover"
+            class="u-photo w-full h-full object-cover"
           />
         </div>
       </div>
@@ -141,15 +142,15 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
       <!-- Text Content -->
       <div class="flex-1">
         <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
-          <span class="font-medium">{currentRole.displayText}</span>
+          <span class="p-job-title font-medium">{currentRole.displayText}</span>
         </div>
 
         <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl">
-          Software engineer, open source & sustainability enthusiast.
+          <span class="p-name">Chris Lloyd-Jones</span> &mdash; Software engineer, open source & sustainability enthusiast.
         </h1>
 
-        <p class="mt-6 text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          I&apos;m Chris - or Sealjay; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in London. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
+        <p class="p-note mt-6 text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
+          I&apos;m Chris - or <span class="p-nickname">Sealjay</span>; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in London. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
         </p>
 
         <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
@@ -173,7 +174,7 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
           <img
             src="/chris/portrait.jpg"
             alt="Chris Lloyd-Jones"
-            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            class="u-photo w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
         </div>
       </div>

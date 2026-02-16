@@ -4,6 +4,13 @@
     "apiRuntime": "node:20"
   },
   "routes": [
+    {
+      "route": "/.well-known/atproto-did",
+      "allowedRoles": ["anonymous"],
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8"
+      }
+    },
     { "route": "/.well-known/*", "allowedRoles": ["anonymous"] },
     {
       "route": "/api/*",
