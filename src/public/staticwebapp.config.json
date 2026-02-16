@@ -39,8 +39,8 @@
     }
   ],
   "navigationFallback": {
-    "rewrite": "index.html",
-    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/favicon.ico", "/.well-known/*"]
+    "rewrite": "/404.html",
+    "exclude": ["/images/*.{png,jpg,gif,svg,webp,ico}", "/css/*", "/favicon.ico", "/.well-known/*", "/_astro/*", "/*.xml", "/*.json", "/*.txt", "/*.rss"]
   },
   "responseOverrides": {
     "404": {
