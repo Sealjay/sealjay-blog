@@ -21,7 +21,8 @@
     "format": "biome format --write .",
     "test": "biome check .",
     "sync:str": "node src/scripts/sync-securing-quest.mjs",
-    "sync:webmentions": "node src/scripts/sync-webmentions.mjs"
+    "sync:webmentions": "node src/scripts/sync-webmentions.mjs",
+    "send:webmentions": "node src/scripts/send-webmentions.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",

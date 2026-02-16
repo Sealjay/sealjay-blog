@@ -1,4 +1,4 @@
-name: Sync Securing the Realm Content
+name: Sync Content (Securing Quest + Webmentions)
 
 on:
   schedule:
@@ -37,10 +37,16 @@ jobs:
         working-directory: src
         run: bun run sync:str
 
+      - name: Sync webmentions
+        working-directory: src
+        env:
+          WEBMENTION_IO_TOKEN: ${{ secrets.WEBMENTION_IO_TOKEN }}
+        run: bun run sync:webmentions
+
       - name: Check for changes
         id: changes
         run: |
-          git add src/src/content/blog/str-*
+          git add src/src/content/blog/str-* src/src/data/webmentions.json
           if git diff --cached --quiet; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
@@ -52,5 +58,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: sync new posts from securing.quest"
+          git commit -m "chore: sync content (securing.quest + webmentions)"
           git push

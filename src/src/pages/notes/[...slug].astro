@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content'
 import IndexLayout from '../../layouts/IndexLayout.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Giscus from '../../components/embeds/Giscus.astro'
+import Webmentions from '../../components/partials/Webmentions.astro'
 
 export async function getStaticPaths() {
   const allNotes = await getCollection('note')
@@ -134,7 +135,8 @@ const pageDescription = daySummary
 
     {/* Discussion — one thread per day */}
     <div class="mt-16 mb-8">
-      <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8"></div>
+      <Webmentions />
+      <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8 mt-12"></div>
       <Giscus />
     </div>
   </div>
