@@ -90,6 +90,16 @@ const pageDescription = daySummary
           )}
           {/* Note header */}
           <div class="mb-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs text-zinc-400 dark:text-zinc-500 tabular-nums">
+                {note.data.pubDateTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}
+              </span>
+              {note.data.isHighlight && (
+                <span class="inline-flex items-center rounded-full bg-accent-100 dark:bg-accent-900/40 px-2.5 py-0.5 text-xs font-medium text-accent-700 dark:text-accent-300">
+                  Highlight
+                </span>
+              )}
+            </div>
             {note.data.title && (
               <h2 class="p-name text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">{note.data.title}</h2>
             )}
