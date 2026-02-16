@@ -1,0 +1,123 @@
+---
+title: "AI Browser Automation with Microsoft Foundry and Browser Use"
+description: "Using Browser Use with Microsoft Foundry to build browser agents that read the DOM instead of taking screenshots."
+pubDateTime: "2026-02-16T00:00:00.000Z"
+sourceUrl: "https://github.com/Sealjay/foundry-browser-use"
+tags: ["AI", "Azure", "Open Source", "How To", "Python"]
+---
+
+import SocialEmbed from "../../components/embeds/SocialEmbed.astro";
+
+> I built a browser automation tool that reads the DOM instead of taking screenshots, using Browser Use and Microsoft Foundry. Here's how it works.
+
+I've been using AI agents to control web browsers since last year, when [my team at Avanade explored ChatGPT Operator](/blog/exploring-computer-using-agents). The technology was promising, but it struggled with CAPTCHAs, complex UI interactions, and the overhead of processing screenshots.
+
+The state of the art is moving so quickly, the agentic community has been focussed on working with the DOM directly instead of screenshots. This can be both lighter weight, and cheaper - [Browser Use](https://github.com/browser-use/browser-use) is an open-source Python library that's become the de facto standard (at least, for now) - which launches Chromium via Playwright but communicates with it directly through CDP (Chrome DevTools Protocol), extracting the DOM and sending structured data to the model instead of screenshots.
+
+## Why Browser Use?
+
+Most computer-using agent frameworks - OpenAI's CUA, Anthropic's computer use - rely on screenshots and having the model interpret pixel data. They do use structured action schemas on top of the visual input, but the approach is still vision-first. It's slow, expensive in tokens, and brittle in ways you don't expect.
+
+Browser Use takes the opposite approach. Instead of sending screenshots, it extracts the DOM - the actual structure of the page - and presents interactive elements to the model as structured data. The model decides which element to click, what to type, where to navigate. For a lot of common web tasks, this ends up being faster, cheaper, and more reliable because the model is working with semantics rather than pixels. DOM extraction has its own problems - heavily dynamic SPAs, shadow DOM, canvas-rendered content, and iframe-heavy pages can all trip it up; but for simple information retrieval, form filling, and navigation tasks, it's a more efficient way to interact with the web.
+
+DOM-based approaches aren't new in the research community - but Browser Use packages the idea into something you can actually pick up and use. They've also released [their own model optimised for browser tasks](https://browser-use.com/posts/speed-matters) - BU 2.0, a 30B mixture-of-experts model that only activates 3B parameters at inference time. It's [up on Hugging Face](https://huggingface.co/browser-use/bu-30b-a3b-preview) and can run on a single GPU, which removes the need for API calls altogether.
+
+Earlier versions of Browser Use built on Playwright's API layer, but the project has since [migrated to raw CDP](https://browser-use.com/posts/playwright-to-cdp) - dropping Playwright's node.js relay in favour of direct browser communication via their own [cdp-use](https://github.com/browser-use/cdp-use) library. Playwright still handles browser installation and launching, but page interaction now goes straight to the browser. Stagehand has made a [similar move](https://www.browserbase.com/blog/stagehand-playwright-evolution-browser-automation), suggesting this is becoming the standard architecture for AI browser agents.
+
+## The foundry-browser-use repo
+
+I've published [foundry-browser-use](https://github.com/Sealjay/foundry-browser-use) to make it easy to try DOM-first browser automation with Microsoft Foundry.
+
+It connects Browser Use to [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview?WT.mc_id=AI-MVP-5004204), using GPT-4.1-mini deployed through [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-foundry?WT.mc_id=AI-MVP-5004204). Browser Use handles browser management via Playwright and communicates with the browser over CDP. My repo adds the Azure integration and the interactive CLI on top. It uses uv for package management and Ruff for linting - my usual Python toolchain. Infrastructure can be deployed via Azure CLI or Bicep templates included in the repo.
+
+### What's in the box?
+
+The core of the repo lives in the `browser_agent/` package, with a few entry points depending on how you want to use it:
+
+- **`browse.py`** - an interactive CLI that lets you type what you want to do in natural language, watch the agent work with live status updates, and intervene when the agent needs your input. It supports keyboard shortcuts (B to toggle browser visibility, V for verbose mode, F to toggle vision mode for visually complex pages, I to inject a new instruction, P to pause, Q to quit) so you can stay in control without breaking flow.
+- **`run_task.py`** - a one-shot task runner for when you just want to fire off a single instruction and get a result.
+- **`agent.py`** - a minimal demo/scripting example if you want to embed the agent in your own code.
+- **`infra/`** - Azure CLI and Bicep scripts to deploy the Azure OpenAI resource and model, so you don't have to click through the portal.
+
+What I'm most pleased with is the human-in-the-loop intervention system. The agent will pause and ask for your help when it encounters authentication prompts, CAPTCHAs, ambiguous choices, or when it gets stuck. It's not trying to be fully autonomous, and I think that's the right call for this kind of tool.
+
+There's some useful resilience built in, too. The agent tracks its own actions and detects when it's stuck in a loop by comparing recent actions. It's a rough heuristic - it can occasionally trigger on legitimately repetitive tasks like filling in long forms - but it catches the obvious loops. After two failures, it escalates its strategy, switching to broader selectors, text extraction, and the accessibility tree. If the agent is really struggling with a visually complex page, you can press F to toggle vision mode - this sends screenshots alongside the DOM data so the model has both to work with. Sessions maintain context across multiple tasks, remembering recent actions in detail and summarising earlier ones to save context window space.
+
+Here's how the pieces fit together:
+
+![A colour-coded architecture diagram of the foundry-browser-use system. User input flows through the CLI layer (browse.py and BrowserCLI with keyboard shortcuts B, V, F, I, P, Q) into the AgentRunner, which connects to Azure OpenAI GPT-4.1-mini for reasoning and Browser Use Agent for browser automation. Browser Use launches Chromium via Playwright and communicates with it over CDP (Chrome DevTools Protocol). DOM extraction sends structured element data back to Azure OpenAI by default, with an optional Vision Mode that sends screenshots for complex pages when enabled via the F key. A human-in-the-loop intervention system can pause the agent for authentication, CAPTCHAs, ambiguous choices, or when the agent gets stuck.](/images/2026/02/foundry-browser-use-architecture.svg)
+
+### Getting started
+
+You'll need an Azure subscription with access to Azure OpenAI, and Python 3.12+:
+
+```bash
+# Clone the repo
+git clone https://github.com/Sealjay/foundry-browser-use.git
+cd foundry-browser-use
+
+# Deploy infrastructure (prompts you for resource group, region, etc.)
+chmod +x infra/deploy.sh
+./infra/deploy.sh
+
+# Install dependencies
+uv sync
+
+# Install Chromium (Browser Use uses Playwright for browser management)
+uv run playwright install chromium
+
+# Copy the .env values from the deploy output, then run
+uv run python browse.py
+```
+
+The deploy script is designed to be re-runnable - it uses Azure CLI's create-or-update semantics, though if you change parameters between runs - such as the model name, SKU, or region - you may need to clean up the existing resource manually. It creates the Azure OpenAI resource, deploys GPT-4.1-mini, and prints the `.env` values you need. There's also a `deploy-bicep.sh` if you prefer infrastructure-as-code, and a `teardown.sh` for when you're done.
+
+On cost - most simple tasks cost between $0.01 and $0.05, because DOM extraction uses far fewer tokens than sending screenshots. GPT-4.1-mini is roughly $0.40 per million input tokens and $1.60 per million output tokens as of February 2026 ([check current pricing](https://azure.microsoft.com/en-gb/pricing/details/cognitive-services/openai-service/?WT.mc_id=AI-MVP-5004204)). Complex multi-page workflows will cost more as the context grows with each step, though Browser Use mitigates this by summarising earlier actions rather than keeping the full history.
+
+## How does it compare?
+
+Having spent time with ChatGPT Operator, ChatGPT Agent, Claude Chrome, Microsoft Foundry's [Browser Automation tool](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/browser-automation-samples?WT.mc_id=AI-MVP-5004204), and now Browser Use, here's where I think each sits.
+
+**ChatGPT Agent** and **Claude in Chrome**/Claude Code with Browser are the most accessible - no infrastructure to manage, just describe what you want done. But even though time has passed since Operator launched, they all still struggle with CAPTCHAs, complex multi-step flows, and anything requiring authentication to systems they can't access. They remain mostly screenshot-based, so it's slower and more token-hungry. Claude Code can use Playwright for general automation via MCP, which gives it DOM-level access and avoids the screenshot overhead - but it's a different workflow to a dedicated browser agent.
+
+**Microsoft Foundry Browser Automation** is the managed option. It runs in a sandboxed browser workspace within your Azure subscription, with Entra ID integration and content safety guardrails. If you're building agents through [Foundry Agent Service](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/overview?WT.mc_id=AI-MVP-5004204), it's the natural choice - but at the time of writing it's still in public preview. It also hits the same CAPTCHA and bot-detection problems other managed systems have.
+
+**Browser Use** as a nice open-source option works with the DOM rather than screenshots, so it's fast and cheap. You can swap models, add custom tools, and extend it however you like. The trade-off is that you're managing the browser yourself with no managed identity or governance. There are other DOM-based agent frameworks out there too - Stagehand, Playwright MCP, AgentQL - I've focused on Browser Use because it's what I've been using.
+
+I think it says something good about [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry/what-is-foundry?WT.mc_id=AI-MVP-5004204) that this works at all. Connecting an open-source Python library to Azure OpenAI through langchain-openai's `ChatAzureOpenAI` class was straightforward - you're not forced to use Microsoft's own Agent Framework to use Foundry-hosted models. For developers already on Azure, the pattern of deploying a model through Foundry and connecting it to open-source tooling via standard SDKs is a good one.
+
+For experimentation and personal automation, Browser Use with Azure OpenAI deployed via Foundry is where I'd start. For production enterprise deployments, you'd want governance and security controls - API gating, identity management, runtime monitoring - and the managed option will make more sense once it reaches general availability.
+
+## What about vision-based approaches?
+
+The vision-based approach is still improving at pace. Microsoft Research published [OmniParser](https://www.microsoft.com/en-us/research/articles/omniparser-for-pure-vision-based-gui-agent/) in October 2024, which parses screenshots into structured UI elements before the model sees them - essentially tokenising the screen. Just four months later, [OmniParser V2](https://www.microsoft.com/en-us/research/articles/omniparser-v2-turning-any-llm-into-a-computer-use-agent/) landed with 60% lower latency and a jump from 0.8 to 39.6 on the ScreenSpot Pro benchmark when paired with GPT-4o. The companion [OmniTool](https://github.com/microsoft/OmniParser) dockerises a Windows environment with multiple model backends. It's a different philosophy to Browser Use - vision-first but with structure extraction bolted on - and for desktop applications where there's no DOM to read, it may be the better path. Four months between V1 and V2 gives you a sense of how quickly this space is moving; by the time you read this, the landscape may have shifted again.
+
+Desktop apps aren't as DOM-less as they first appear, though. Windows' UI Automation framework exposes a tree of UI elements that's structurally similar to a web DOM - and projects like [FlaUI-MCP](https://github.com/shanselman/FlaUI-MCP) and [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) are already wrapping these APIs as MCP servers, letting AI agents interact with native Windows apps through structure rather than screenshots.
+
+## The security angle
+
+Since this is an agent that controls a real browser, I want to talk about security. This ties into the work Josh and I have been doing on [Securing the Realm](https://securing.quest) around agentic AI security.
+
+Another motivation to build this was to avoid the worry of giving an agent access to my personal accounts. I can authenticate with tools like 1Password CLI, but I can keep everything running locally. With screenshot-based agents, you're usually running in someone else's virtual machine, potentially with shared cookies and authentication. Those cloud services, such as OpenAI, will also store screenshots of your activity for future research and service improvement. Whilst in this model I am still sending responses to an LLM in someone's cloud, I can limit the data that is sent, I could use [Presidio](https://github.com/microsoft/presidio) or another guardrails tool to strip PII, or I can use the PII removal services (in preview) available as content filters in Microsoft Foundry.
+
+In any event, Browser Use runs actions in a real browser session. It can access anything the browser can - cookies, active sessions, any sites where you're already logged in. If you point it at a site where you're authenticated, the agent has that access too. Microsoft's own [documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/browser-automation-samples?WT.mc_id=AI-MVP-5004204) for their Browser Automation tool recommends running on low-privilege VMs with no access to sensitive data.
+
+The same applies here. Concretely:
+
+- Run it in an isolated environment - a container, VM, or at minimum a dedicated browser profile with no saved credentials.
+- Don't point it at your banking site (or anything you wouldn't hand to an untrusted automation).
+- Restrict network egress where possible.
+- Log all actions for review - the session export feature helps here.
+- Be aware that many websites' Terms of Service prohibit automated access, so verify compliance for your use cases.
+
+Browser-controlling agents also introduce an attack surface that doesn't have a clean analogue in traditional AppSec: prompt injection through browsed content. If the agent is browsing untrusted pages, an adversary could embed instructions in the DOM that the agent interprets as commands. Many of the other controls we need - isolation, least privilege, monitoring - are extensions of what we already know about securing applications that act on behalf of users. But prompt injection through what the agent reads is genuinely new. Microsoft Foundry offers some content filters that help, but it's a very new area of risk - and the kind of challenge we're exploring in our work on [Securing the Realm](https://securing.quest) and [AI AppSec](/blog/str-ai-appsec-is-still-appsec/).
+
+If you'd like to try a DOM-first approach to browser automation on top of Microsoft Foundry, [the repo is MIT-licensed](https://github.com/Sealjay/foundry-browser-use) and I'm open to contributions and comments via issue, discussion, or pull request - let me know how you get on.
+
+<SocialEmbed
+  title="Sealjay/foundry-browser-use"
+  linkUrl="https://github.com/Sealjay/foundry-browser-use"
+  imageUrl="https://github.githubassets.com/favicons/favicon.svg"
+>
+  Browser automation using Browser Use and Microsoft Foundry. Reads the DOM instead of taking screenshots, powered by Azure OpenAI.
+</SocialEmbed>

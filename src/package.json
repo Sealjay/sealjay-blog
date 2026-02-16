@@ -31,7 +31,7 @@
     "@fontsource/manrope": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.10",
-    "astro": "^5.16.15",
+    "astro": "^5.17.2",
     "date-fns": "^3.0.0",
     "fuse.js": "^7.1.0",
     "markdown-it": "^14.1.1",
