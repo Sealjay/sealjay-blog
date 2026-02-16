@@ -12,9 +12,7 @@ export const SITE_NAV = [
   { name: 'Projects', path: '/projects' },
 ]
 
-export const SITE_SECONDARY_NAV = [
-  { name: 'Acknowledgements', path: '/acknowledgements' },
-]
+export const SITE_SECONDARY_NAV = [{ name: 'Acknowledgements', path: '/acknowledgements' }]
 
 export const SITE_FOOTER_NAV = [
   { name: 'Privacy', path: '/privacy' },

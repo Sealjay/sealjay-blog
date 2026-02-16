@@ -16,6 +16,7 @@ const blog = defineCollection({
     tags: z.array(z.string()).optional(),
     sourceUrl: z.string().url().optional(),
     featured: z.boolean().default(false),
+    inReplyTo: z.string().url().optional(),
   }),
 })
 
@@ -47,10 +48,13 @@ const note = defineCollection({
       .transform((val) => new Date(val)),
     tags: z.array(z.string()).optional(),
     externalUrl: z.string().url().optional(),
-    externalPlatform: z.enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace']).optional(),
+    externalPlatform: z
+      .enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace'])
+      .optional(),
     isHighlight: z.boolean().default(false),
     engagementNote: z.string().optional(),
     mastodonUrl: z.string().url().optional(),
+    inReplyTo: z.string().url().optional(),
     daySummary: z.string().optional(),
   }),
 })

@@ -46,6 +46,24 @@ jobs:
         working-directory: src
         run: bun run build
 
+      - name: Send webmentions
+        if: github.event_name == 'push'
+        working-directory: src
+        run: bun run send:webmentions
+
+      - name: Commit sent webmentions tracking
+        if: github.event_name == 'push'
+        run: |
+          git add src/src/data/sent-webmentions.json
+          if git diff --cached --quiet; then
+            echo "No new webmentions sent"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: update sent webmentions tracking"
+            git push
+          fi
+
       - name: Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

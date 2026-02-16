@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content'
 import IndexLayout from '../../layouts/IndexLayout.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Giscus from '../../components/embeds/Giscus.astro'
+import Webmentions from '../../components/partials/Webmentions.astro'
 
 export async function getStaticPaths() {
   const allNotes = await getCollection('note')
@@ -71,15 +72,29 @@ const pageDescription = daySummary
     {/* Notes for this day */}
     <div class="flex flex-col gap-10">
       {rendered.map(({ note, Content }: any) => (
-        <article id={note.slug} class="scroll-mt-20">
+        <article id={note.slug} class="h-entry scroll-mt-20">
+          <a class="u-url" href={`/notes/${dateKey}/#${note.slug}`} style="display:none">{note.data.title || 'Note'}</a>
+          <time class="dt-published" datetime={note.data.pubDateTime.toISOString()} style="display:none">{note.data.pubDateTime.toISOString()}</time>
+          <span class="p-author h-card" style="display:none">
+            <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
+          </span>
+          {note.data.mastodonUrl && (
+            <a class="u-syndication" href={note.data.mastodonUrl} rel="syndication" style="display:none">Mastodon</a>
+          )}
+          {note.data.inReplyTo && (
+            <div class="not-prose mb-4 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+              <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+              <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline break-all" rel="in-reply-to" href={note.data.inReplyTo}>{note.data.inReplyTo}</a>
+            </div>
+          )}
           {/* Note header */}
           <div class="mb-4">
             {note.data.title && (
-              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">{note.data.title}</h2>
+              <h2 class="p-name text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">{note.data.title}</h2>
             )}
 
             {note.data.description && (
-              <p class="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">{note.data.description}</p>
+              <p class="p-summary text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">{note.data.description}</p>
             )}
           </div>
 
@@ -109,7 +124,7 @@ const pageDescription = daySummary
           </div>
 
           {/* Note body (if any MDX content) */}
-          <div class="prose prose-lg dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 dark:prose-a:text-accent-400">
+          <div class="e-content prose prose-lg dark:prose-invert prose-headings:font-semibold prose-a:text-accent-600 dark:prose-a:text-accent-400">
             <Content />
           </div>
 
@@ -123,7 +138,8 @@ const pageDescription = daySummary
 
     {/* Discussion — one thread per day */}
     <div class="mt-16 mb-8">
-      <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8"></div>
+      <Webmentions />
+      <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8 mt-12"></div>
       <Giscus />
     </div>
   </div>

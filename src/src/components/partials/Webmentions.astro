@@ -1,0 +1,182 @@
+---
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+
+interface WebmentionAuthor {
+  type?: string
+  name?: string
+  url?: string
+  photo?: string
+}
+
+interface Webmention {
+  'wm-id': number
+  'wm-source': string
+  'wm-target': string
+  'wm-property': string
+  'wm-received': string
+  author?: WebmentionAuthor
+  url?: string
+  published?: string
+  content?: { html?: string; text?: string }
+}
+
+let allMentions: Record<string, Webmention[]> = {}
+try {
+  const dataPath = join(__dirname, '..', '..', 'data', 'webmentions.json')
+  const raw = await readFile(dataPath, 'utf-8')
+  allMentions = JSON.parse(raw)
+} catch {
+  // No webmentions data yet
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href
+const canonicalWithSlash = canonicalURL.endsWith('/') ? canonicalURL : `${canonicalURL}/`
+const canonicalWithoutSlash = canonicalURL.replace(/\/$/, '')
+
+const mentions = [
+  ...(allMentions[canonicalWithSlash] || []),
+  ...(allMentions[canonicalWithoutSlash] || []),
+]
+
+const seen = new Set<number>()
+const uniqueMentions = mentions.filter((m) => {
+  if (seen.has(m['wm-id'])) return false
+  seen.add(m['wm-id'])
+  return true
+})
+
+const likes = uniqueMentions.filter((m) => m['wm-property'] === 'like-of')
+const reposts = uniqueMentions.filter((m) => m['wm-property'] === 'repost-of')
+const replies = uniqueMentions.filter((m) => m['wm-property'] === 'in-reply-to')
+const otherMentions = uniqueMentions.filter((m) =>
+  m['wm-property'] === 'mention-of' || m['wm-property'] === 'bookmark-of'
+)
+
+const hasAny = uniqueMentions.length > 0
+---
+
+{hasAny && (
+  <div class="webmentions mt-12 sm:mt-16">
+    <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-6 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-accent-500 dark:text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+      Webmentions
+    </h2>
+
+    <div class="bg-white dark:bg-zinc-800/70 rounded-xl border border-zinc-100 dark:border-zinc-700/40 p-4 sm:p-6 shadow-sm space-y-6">
+      {likes.length > 0 && (
+        <div>
+          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+            {likes.length} {likes.length === 1 ? 'Like' : 'Likes'}
+          </h3>
+          <div class="flex flex-wrap gap-1">
+            {likes.map((like) => (
+              <a href={like.author?.url || like.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={like.author?.name || 'Someone'} class="block">
+                {like.author?.photo ? (
+                  <img src={like.author.photo} alt={like.author?.name || ''} class="w-8 h-8 rounded-full ring-2 ring-white dark:ring-zinc-800" loading="lazy" />
+                ) : (
+                  <span class="w-8 h-8 rounded-full bg-accent-100 dark:bg-accent-900/40 flex items-center justify-center text-xs font-medium text-accent-700 dark:text-accent-300">
+                    {(like.author?.name || '?').charAt(0)}
+                  </span>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {reposts.length > 0 && (
+        <div>
+          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+            {reposts.length} {reposts.length === 1 ? 'Repost' : 'Reposts'}
+          </h3>
+          <div class="flex flex-wrap gap-1">
+            {reposts.map((repost) => (
+              <a href={repost.author?.url || repost.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={repost.author?.name || 'Someone'} class="block">
+                {repost.author?.photo ? (
+                  <img src={repost.author.photo} alt={repost.author?.name || ''} class="w-8 h-8 rounded-full ring-2 ring-white dark:ring-zinc-800" loading="lazy" />
+                ) : (
+                  <span class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    {(repost.author?.name || '?').charAt(0)}
+                  </span>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {replies.length > 0 && (
+        <div>
+          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+            {replies.length} {replies.length === 1 ? 'Reply' : 'Replies'}
+          </h3>
+          <div class="flex flex-col gap-4">
+            {replies.map((reply) => (
+              <div class="flex gap-3">
+                <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="shrink-0">
+                  {reply.author?.photo ? (
+                    <img src={reply.author.photo} alt={reply.author?.name || ''} class="w-10 h-10 rounded-full" loading="lazy" />
+                  ) : (
+                    <span class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-sm font-medium text-zinc-600 dark:text-zinc-300">
+                      {(reply.author?.name || '?').charAt(0)}
+                    </span>
+                  )}
+                </a>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-baseline gap-2 mb-1">
+                    <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 hover:text-accent-600 dark:hover:text-accent-400">
+                      {reply.author?.name || 'Anonymous'}
+                    </a>
+                    {reply.published && (
+                      <time class="text-xs text-zinc-400 dark:text-zinc-500" datetime={reply.published}>
+                        {new Date(reply.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </time>
+                    )}
+                  </div>
+                  {reply.content?.text && (
+                    <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                      {reply.content.text.length > 300 ? `${reply.content.text.slice(0, 300)}...` : reply.content.text}
+                    </p>
+                  )}
+                  <a href={reply.url || reply['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="text-xs text-accent-600 dark:text-accent-400 hover:underline mt-1 inline-block">
+                    View original
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {otherMentions.length > 0 && (
+        <div>
+          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+            {otherMentions.length} {otherMentions.length === 1 ? 'Mention' : 'Mentions'}
+          </h3>
+          <ul class="space-y-2">
+            {otherMentions.map((mention) => (
+              <li class="flex items-center gap-2">
+                {mention.author?.photo ? (
+                  <img src={mention.author.photo} alt={mention.author?.name || ''} class="w-6 h-6 rounded-full" loading="lazy" />
+                ) : (
+                  <span class="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-xs text-zinc-500">
+                    {(mention.author?.name || '?').charAt(0)}
+                  </span>
+                )}
+                <a href={mention.url || mention['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-accent-600 dark:hover:text-accent-400 truncate">
+                  {mention.author?.name || mention['wm-source']}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+)}
