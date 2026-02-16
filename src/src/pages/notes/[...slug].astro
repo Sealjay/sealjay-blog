@@ -77,6 +77,12 @@ const pageDescription = daySummary
           <span class="p-author h-card" style="display:none">
             <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
           </span>
+          {note.data.inReplyTo && (
+            <div class="not-prose mb-4 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+              <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+              <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline break-all" rel="in-reply-to" href={note.data.inReplyTo}>{note.data.inReplyTo}</a>
+            </div>
+          )}
           {/* Note header */}
           <div class="mb-4">
             {note.data.title && (

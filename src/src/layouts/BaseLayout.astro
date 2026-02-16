@@ -7,7 +7,7 @@ import { getOGImagePath } from "../lib/og-image";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDateTime, updatedDate, heroImage, tags } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Compute slug from the URL pathname for OG image path
@@ -96,7 +96,14 @@ const articleJsonLd = JSON.stringify({
         />
       </div>
     )}
-    
+
+    {inReplyTo && (
+      <div class="not-prose mb-6 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+        <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+        <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline break-all" rel="in-reply-to" href={inReplyTo}>{inReplyTo}</a>
+      </div>
+    )}
+
     <div class="e-content prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
       <slot />
     </div>
