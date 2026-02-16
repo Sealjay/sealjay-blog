@@ -47,6 +47,19 @@ bun run lint:fix     # Auto-fix lint/format issues (biome check --write .)
 bun run format       # Format code (biome format --write .)
 ```
 
+## Sync scripts
+
+Run from the `src/` directory:
+
+```bash
+bun src/scripts/sync-securing-quest.mjs          # Sync blog posts from securing.quest RSS
+WEBMENTION_IO_TOKEN=xxx bun src/scripts/sync-webmentions.mjs  # Sync webmentions
+MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs     # Sync public Mastodon toots → notes
+MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs --dry-run  # Preview without writing
+```
+
+The Mastodon sync script fetches public toots (skipping replies, boosts, image posts, and non-public toots), deduplicates against existing notes, and creates MDX files in `src/src/content/note/`. Each synced note has `mastodonUrl` set to prevent re-syndication. State is tracked in `src/data/mastodon-sync-state.json`.
+
 ## Content collections
 
 Content uses Astro's content collections with frontmatter schemas defined in `src/src/content/config.ts`.

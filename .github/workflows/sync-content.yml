@@ -1,4 +1,4 @@
-name: Sync Content (Securing Quest + Webmentions)
+name: Sync Content (Securing Quest + Webmentions + Mastodon)
 
 on:
   schedule:
@@ -43,10 +43,18 @@ jobs:
           WEBMENTION_IO_TOKEN: ${{ secrets.WEBMENTION_IO_TOKEN }}
         run: bun run sync:webmentions
 
+      - name: Sync Mastodon toots
+        working-directory: src
+        env:
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+        run: bun run sync:mastodon
+
       - name: Check for changes
         id: changes
         run: |
           git add -A src/src/content/blog/str-*
+          git add -A src/src/content/note/
+          git add -A src/src/data/mastodon-sync-state.json
           git add src/src/data/webmentions.json
           if git diff --cached --quiet; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -59,5 +67,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: sync content (securing.quest + webmentions)"
+          git commit -m "chore: sync content (securing.quest + webmentions + mastodon)"
           git push
