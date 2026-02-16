@@ -194,4 +194,25 @@ const latestProject = sortedProjects.reduce((prev, current) =>
       })}
     </div>
   </div>
+
+  <script>
+    function initProjectTracking() {
+      const footerLinks = document.querySelectorAll<HTMLAnchorElement>('.grid a[target="_blank"]')
+      for (const link of footerLinks) {
+        link.addEventListener('click', () => {
+          if (typeof window.plausible === 'undefined') return
+          const card = link.closest('.group')
+          const project = card?.querySelector('h3')?.textContent?.trim() ?? 'Unknown'
+          const text = link.textContent?.trim().toLowerCase() ?? ''
+          let linkType = 'other'
+          if (text.includes('github')) linkType = 'repo'
+          else if (text.includes('demo') || text.includes('website')) linkType = 'demo'
+          window.plausible('Project Click', { props: { project, linkType } })
+        })
+      }
+    }
+
+    document.addEventListener('astro:page-load', initProjectTracking)
+    initProjectTracking()
+  </script>
 </Layout>

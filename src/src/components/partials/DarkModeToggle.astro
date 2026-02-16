@@ -102,6 +102,9 @@
             toggle?.setAttribute("aria-checked", "true");
             currentMode = modeToSwitch;
           }
+          if (typeof window.plausible !== "undefined") {
+            window.plausible("Dark Mode Toggle", { props: { theme: currentMode } });
+          }
         });
       }
     }

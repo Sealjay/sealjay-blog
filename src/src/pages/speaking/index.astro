@@ -139,7 +139,11 @@ const eventTypes = [...new Set(speakingSlots.map((s) => s.data.eventType))].sort
 
     for (const btn of buttons) {
       btn.addEventListener('click', () => {
-        setFilter(btn.dataset.filter ?? 'all')
+        const filter = btn.dataset.filter ?? 'all'
+        setFilter(filter)
+        if (typeof window.plausible !== 'undefined') {
+          window.plausible('Speaking Filter', { props: { eventType: filter } })
+        }
       })
     }
   }

@@ -77,6 +77,7 @@
     private emptyState: HTMLElement | null = null
     private initialState: HTMLElement | null = null
     private activeIndex = -1
+    private searchTrackTimeout: ReturnType<typeof setTimeout> | null = null
 
     constructor() {
       super()
@@ -176,6 +177,14 @@
       if (!this.fuse) return
 
       const results = this.fuse.search(query, { limit: 10 })
+
+      // Track search queries in Plausible (debounced to avoid firing on every keystroke)
+      if (this.searchTrackTimeout) clearTimeout(this.searchTrackTimeout)
+      this.searchTrackTimeout = setTimeout(() => {
+        if (typeof window.plausible !== 'undefined') {
+          window.plausible('Search', { props: { query, resultCount: String(results.length) } })
+        }
+      }, 1000)
 
       this.clearResults()
       this.activeIndex = -1
