@@ -21,7 +21,7 @@ Then create the MDX file at `src/src/content/note/<slug>.mdx` where `<slug>` is 
 Before creating the note, check if `src/src/data/mastodon-sync-state.json` exists and has a `daysNeedingSummary` array. For each day listed:
 
 1. Read all notes for that day in `src/src/content/note/`
-2. Generate a single-sentence `daySummary` prefixed with "AI summary:" covering all notes that day
+2. Generate a single-sentence `daySummary` covering all notes that day (do **not** prefix with "AI summary:" — the UI labels it automatically)
 3. Add it to the **last note of the day** (by `pubDateTime`)
 4. Remove the day from the `daysNeedingSummary` array and save the updated state file
 
@@ -34,12 +34,11 @@ After creating the note, check if there are other notes for the same day (same `
 If there are **2 or more notes** for the same day (including the one just created):
 
 1. Read all notes for that day to understand their content
-2. Write a single-sentence `daySummary` that summarises the day's notes overall
-3. **Always prefix with "AI summary:"** — e.g. `"AI summary: Thoughts on open source tooling and a new AI paper."`
-4. Add the `daySummary` field to the **most recently created** note's frontmatter (the one just created)
+2. Write a single-sentence `daySummary` that summarises the day's notes overall — do **not** prefix with "AI summary:" as the UI adds its own label automatically
+3. Add the `daySummary` field to the **most recently created** note's frontmatter (the one just created)
 5. If an older note from the same day already has a `daySummary`, remove it from that note (only one note per day should carry the summary)
 
-The `daySummary` is AI-generated (hence the prefix) and should be a short, single sentence capturing the flavour of all notes that day.
+The `daySummary` is AI-generated (the UI displays an "AI summary" label automatically) and should be a short, single sentence capturing the flavour of all notes that day.
 
 ## File Template
 
