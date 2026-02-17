@@ -12,7 +12,7 @@
 
 ## Overview
 
-The source behind [sealjay.com](https://sealjay.com) — a personal site that brings together long-form blog posts, short-form notes, speaking engagements, and project showcases in one place. The site is built with [Astro](https://astro.build/) and deployed to [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/?WT.mc_id=AI-MVP-5004204).
+The source behind [sealjay.com](https://sealjay.com) - a personal site that brings together long-form blog posts, short-form notes, speaking engagements, and project showcases in one place. The site is built with [Astro](https://astro.build/) and deployed to [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/?WT.mc_id=AI-MVP-5004204).
 
 ## Tech stack
 
@@ -24,35 +24,15 @@ The source behind [sealjay.com](https://sealjay.com) — a personal site that br
 
 ## Features
 
-- **Content collections** — Blog posts, speaking engagements, short-form notes, projects, and acknowledgements, each with typed frontmatter schemas
-- **RSS feed** — Available at [`/rss.xml`](https://sealjay.com/rss.xml)
-- **Sitemap** — Auto-generated via `@astrojs/sitemap`
-- **Search** — Client-side fuzzy search powered by [Fuse.js](https://www.fusejs.io/) over a generated search index
-- **Dynamic OG images** — Category-themed Open Graph cards generated with [Satori](https://github.com/vercel/satori) and [resvg](https://github.com/nicbou/resvg-js)
-- **Webmentions** — Receives via [webmention.io](https://webmention.io/) and sends on deploy
-- **Content sync** — Automated weekly sync of Mastodon toots and [Securing Quest](https://securing.quest/) RSS posts
-- **Comments** — [Giscus](https://giscus.app/) powered by GitHub Discussions
-- **Embeds** — YouTube, tweets, GitHub Gists, and CodePen
-
-## Project structure
-
-```
-src/
-├── src/
-│   ├── components/     # Astro and React components
-│   ├── config/         # Site configuration (personal.ts, speakerKit.ts)
-│   ├── content/        # Content collections (blog/, speaking/, note/, project/, acknowledgement/)
-│   ├── layouts/        # Page layouts
-│   ├── pages/          # Route pages
-│   ├── scripts/        # Sync and utility scripts
-│   └── styles/         # Global styles
-├── public/             # Static assets and images
-├── data/               # Sync state and webmention data
-├── astro.config.mjs    # Astro configuration
-├── biome.json          # Biome linter/formatter configuration
-├── package.json        # Dependencies and scripts
-└── tsconfig.json       # TypeScript configuration
-```
+- **Content collections** - Blog posts, speaking engagements, short-form notes, projects, and acknowledgements, each with typed frontmatter schemas
+- **RSS feed** - Available at [`/rss.xml`](https://sealjay.com/rss.xml)
+- **Sitemap** - Auto-generated via `@astrojs/sitemap`
+- **Search** - Client-side fuzzy search powered by [Fuse.js](https://www.fusejs.io/) over a generated search index
+- **Dynamic OG images** - Category-themed Open Graph cards generated with [Satori](https://github.com/vercel/satori) and [resvg](https://github.com/nicbou/resvg-js)
+- **Webmentions** - Receives via [webmention.io](https://webmention.io/) and sends on deploy
+- **Content sync** - Automated weekly sync of Mastodon toots and [Securing Quest](https://securing.quest/) RSS posts
+- **Comments** - [Giscus](https://giscus.app/) powered by GitHub Discussions
+- **Embeds** - YouTube, tweets, GitHub Gists, and CodePen
 
 ## Getting started
 
@@ -87,16 +67,13 @@ MASTODON_TOKEN=xxx bun run sync:mastodon -- --dry-run  # Preview without writing
 
 Two GitHub Actions workflows automate deployment and content:
 
-- **`swa-deploy.yml`** — Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions
-- **`sync-content.yml`** — Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, and Mastodon toots
+- **`swa-deploy.yml`** - Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions
+- **`sync-content.yml`** - Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, and Mastodon toots
 
 ## Licensing
 
 ### Source code
-The source code in this project is licensed under the [MIT Licence](./LICENCE) and is freely available to End Users.
-
-### Underlying site content
-The underlying site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license). Changes and additions are licenced under the MIT licence, as an End Product released open source and freely available to End Users.
+The source code in this project is licensed under the [MIT Licence](./LICENCE). The initial concept for this site drew on the [Tailwind UI Spotlight](https://tailwindui.com/templates/spotlight) template. The layout, components, and feature set have since been substantially reworked - rebuilt in [Astro](https://astro.build/) with fediverse integration, webmention support, and new content types - but credit to [Tailwind Labs](https://tailwindcss.com/) for the original inspiration.
 
 ### Blog content
 All content within the blog is copyright &copy; 2018-2026 Chris Lloyd-Jones, under the name Sealjay(R), except where using other people's work with permission.
@@ -105,8 +82,8 @@ Content is licenced under the [Creative Commons Attribution-ShareAlike 4.0 Inter
 
 ## Contact
 
-Feel free to contact me [on X](https://x.com/sealjay_clj) or [on Mastodon](https://fosstodon.org/@sealjay). For bugs, please [raise an issue on GitHub](https://github.com/Sealjay/sealjay-blog/issues).
+Feel free to contact me [on Mastodon](https://fosstodon.org/@sealjay). For bugs, please [raise an issue on GitHub](https://github.com/Sealjay/sealjay-blog/issues).
 
 ## Contributing
 
-Contributions are welcome! This repository uses [GitHub flow](https://guides.github.com/introduction/flow/) with [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`, `blog:`).
+Bug reports are welcome via [GitHub Issues](https://github.com/Sealjay/sealjay-blog/issues), or feel free to message me [on Mastodon](https://fosstodon.org/@sealjay).

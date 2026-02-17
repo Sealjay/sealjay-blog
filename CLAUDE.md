@@ -54,7 +54,7 @@ Run from the `src/` directory:
 ```bash
 bun src/scripts/sync-securing-quest.mjs          # Sync blog posts from securing.quest RSS
 WEBMENTION_IO_TOKEN=xxx bun src/scripts/sync-webmentions.mjs  # Sync webmentions
-MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs     # Sync public Mastodon toots → notes
+MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs     # Sync public Mastodon toots to notes
 MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs --dry-run  # Preview without writing
 ```
 
@@ -87,6 +87,6 @@ Content uses Astro's content collections with frontmatter schemas defined in `sr
 ## Conventions
 
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`)
-- Blog content is copyright Chris Lloyd-Jones, licensed CC BY-SA 4.0
 - Source code is MIT licensed
-- **Never rename blog post files or change their URL slugs** — existing URLs are important for search indexing and inbound links
+- Blog content is copyright Chris Lloyd-Jones, licensed CC BY-SA 4.0
+- **Never rename blog post files or change their URL slugs** - existing URLs are important for search indexing and inbound links
