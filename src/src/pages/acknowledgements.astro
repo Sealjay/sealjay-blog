@@ -1,8 +1,5 @@
 ---
-import Layout from "../layouts/BaseLayout.astro";
-import Container from "../components/containers/Container.astro";
-import ContentContainer from "../components/containers/ContentContainer.astro";
-import PageHeader from "../components/partials/PageHeader.astro";
+import Layout from "../layouts/IndexLayout.astro";
 import { getCollection } from "astro:content";
 import Card from "../components/partials/Card.astro";
 
@@ -15,52 +12,62 @@ const acknowledgements = await getCollection("acknowledgement");
   pubDateTime={new Date("11 May 2023")}
   updatedDate={new Date("17 February 2026")}
 >
-  <Container>
-    <ContentContainer>
-      <PageHeader
-        title="Colophon"
-        subtitle="This site was built using a collection of open source projects, tools, knowledge, and articles. I've tried to cite and reference all of them here. If I'm missing you, please let me know!"
-      />
+  <div class="mx-auto max-w-5xl">
+    <!-- Page Header -->
+    <div class="mb-10 md:mb-16">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+        <span class="text-gradient">Colophon</span>
+      </h1>
+      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
+        This site was built using a collection of open source projects, tools, knowledge, and articles. I've tried to cite and reference all of them here. If I'm missing you, please let me know!
+      </p>
+    </div>
 
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {acknowledgements.map((acknowledgement) => (
-          <Card 
-            url={acknowledgement.data.url}
-            cta="Visit project"
-            hasHeaderBg={true}
-            compactHeader={true}
-            contentGap="gap-2"
-          >
-            <div class="flex items-center space-x-3" slot="title">
-              <img
-                class="h-8 w-8"
-                src={`/images/acknowledgements/${acknowledgement.data.image}`}
-                alt={acknowledgement.data.title}
-              />
-              <span class="font-medium text-zinc-800 dark:text-zinc-100">
-                {acknowledgement.data.title}
-              </span>
-            </div>
-            <div class="space-y-1.5">
-              <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                {acknowledgement.data.description}
-              </p>
-              <p class="text-xs text-zinc-500 dark:text-zinc-500">
-                {acknowledgement.data.notes}
-              </p>
-            </div>
-            <div slot="bottom-left" class="flex items-center space-x-1">
-              <span class="text-xs text-zinc-500 dark:text-zinc-400">License:</span>
-              <a 
-                href={acknowledgement.data.licenceUrl}
-                class="text-xs text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
-              >
-                {acknowledgement.data.licence}
-              </a>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </ContentContainer>
-  </Container>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {acknowledgements.map((acknowledgement) => (
+        <Card
+          url={acknowledgement.data.url}
+          cta="Visit project"
+          hasHeaderBg={true}
+          compactHeader={true}
+          contentGap="gap-2"
+        >
+          <div class="flex items-center space-x-3" slot="title">
+            <img
+              class="h-8 w-8"
+              src={`/images/acknowledgements/${acknowledgement.data.image}`}
+              alt={acknowledgement.data.title}
+            />
+            <span class="font-medium text-zinc-800 dark:text-zinc-100">
+              {acknowledgement.data.title}
+            </span>
+          </div>
+          <div class="space-y-1.5">
+            <p class="text-sm text-zinc-600 dark:text-zinc-400">
+              {acknowledgement.data.description}
+            </p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-500">
+              {acknowledgement.data.notes}
+            </p>
+          </div>
+          <div slot="bottom-left" class="flex items-center space-x-1">
+            <span class="text-xs text-zinc-500 dark:text-zinc-400">License:</span>
+            <a
+              href={acknowledgement.data.licenceUrl}
+              class="text-xs text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
+            >
+              {acknowledgement.data.licence}
+            </a>
+          </div>
+        </Card>
+      ))}
+    </div>
+
+    <!-- Trademark Notice -->
+    <div class="mt-12 md:mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700/40">
+      <p class="text-xs text-zinc-400 dark:text-zinc-500">
+        Sealjay&reg; is a registered trademark of Chris Lloyd-Jones (UK00003592625, Class 42).
+      </p>
+    </div>
+  </div>
 </Layout>
