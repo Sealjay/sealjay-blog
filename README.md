@@ -73,7 +73,7 @@ Two GitHub Actions workflows automate deployment and content:
 ## Licensing
 
 ### Source code
-The source code in this project is licensed under the [MIT Licence](./LICENCE). The site's page structure and design were originally inspired by the [Tailwind UI Spotlight](https://tailwindui.com/templates/spotlight) template (a Next.js personal site). All code has since been completely rewritten in [Astro](https://astro.build/). The original template was purchased under the [Tailwind UI licence](https://tailwindui.com/license), which permits use as an open-source end product.
+The source code in this project is licensed under the [MIT Licence](./LICENCE). The initial concept for this site drew on the [Tailwind UI Spotlight](https://tailwindui.com/templates/spotlight) template. The layout, components, and feature set have since been substantially reworked - rebuilt in [Astro](https://astro.build/) with fediverse integration, webmention support, and new content types - but credit to [Tailwind Labs](https://tailwindcss.com/) for the original inspiration.
 
 ### Blog content
 All content within the blog is copyright &copy; 2018-2026 Chris Lloyd-Jones, under the name Sealjay(R), except where using other people's work with permission.
@@ -86,15 +86,4 @@ Feel free to contact me [on Mastodon](https://fosstodon.org/@sealjay). For bugs,
 
 ## Contributing
 
-Bug reports and security issues are welcome via [GitHub Issues](https://github.com/Sealjay/sealjay-blog/issues). This repository uses [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`).
-
-### Development setup
-
-1. Install [Bun](https://bun.sh/)
-2. Clone the repository and run `cd src && bun install`
-3. Start the dev server with `bun run dev`
-
-### Before submitting a PR
-
-- Run `bun run lint:fix` and `bun run format` to ensure code passes [Biome](https://biomejs.dev/) checks (2-space indent, 120-char line width, single quotes, no semicolons)
-- **Never rename blog post files or change their URL slugs** - existing URLs are important for search indexing and inbound links
+Bug reports are welcome via [GitHub Issues](https://github.com/Sealjay/sealjay-blog/issues), or feel free to message me [on Mastodon](https://fosstodon.org/@sealjay).

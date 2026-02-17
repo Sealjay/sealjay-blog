@@ -87,6 +87,6 @@ Content uses Astro's content collections with frontmatter schemas defined in `sr
 ## Conventions
 
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`)
-- Source code is MIT licensed (design originally inspired by Tailwind UI Spotlight, fully rewritten in Astro)
+- Source code is MIT licensed
 - Blog content is copyright Chris Lloyd-Jones, licensed CC BY-SA 4.0
 - **Never rename blog post files or change their URL slugs** - existing URLs are important for search indexing and inbound links
