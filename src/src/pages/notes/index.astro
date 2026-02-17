@@ -2,6 +2,7 @@
 import Layout from "../../layouts/IndexLayout.astro";
 import { getCollection } from "astro:content";
 import FormattedDate from "../../components/partials/FormattedDate.astro";
+import Mastodon from "../../components/socialicons/Mastodon.astro";
 
 const notes = (await getCollection("note")).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
@@ -145,6 +146,19 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
                             {note.data.externalPlatform || 'Link'}
+                          </a>
+                        )}
+
+                        {note.data.mastodonUrl && (
+                          <a
+                            href={note.data.mastodonUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center justify-center rounded-full text-zinc-400 dark:text-zinc-500 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
+                            title="View on Mastodon"
+                          >
+                            <Mastodon class="h-4 w-4" />
+                            <span class="sr-only">View on Mastodon</span>
                           </a>
                         )}
                       </div>
