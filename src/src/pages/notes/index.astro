@@ -51,7 +51,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     </div>
 
     <!-- Timeline -->
-    <div class="relative">
+    <div class="h-feed relative">
       <!-- Vertical timeline line -->
       <div class="absolute left-[9px] top-2 bottom-2 w-px bg-zinc-200 dark:bg-zinc-700/60"></div>
 
@@ -79,7 +79,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
               {/* Notes for this day */}
               <div class="flex flex-col gap-4">
                 {dayNotes.map((note) => (
-                  <div id={note.slug} class="relative pl-10 scroll-mt-20">
+                  <div id={note.slug} class="h-entry relative pl-10 scroll-mt-20">
                     {/* Timeline dot */}
                     <div
                       class:list={[
@@ -129,7 +129,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                       <div class="flex flex-wrap items-center gap-2">
                         {note.data.tags && note.data.tags.length > 0 && (
                           note.data.tags.map((tag: string) => (
-                            <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                            <span class="p-category inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
                               #{tag}
                             </span>
                           ))
