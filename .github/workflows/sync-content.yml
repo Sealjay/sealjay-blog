@@ -69,3 +69,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: sync content (securing.quest + webmentions + mastodon)"
           git push
+
+    outputs:
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.has_changes == 'true'
+    uses: ./.github/workflows/swa-deploy.yml
+    secrets: inherit
