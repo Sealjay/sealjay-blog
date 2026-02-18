@@ -106,10 +106,10 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                         )}
                         {note.data.inReplyTo && (
                           <span class="inline-flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500" title={`Reply to ${note.data.inReplyTo}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v3m-5-3l5 5m-5-5l5-5" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                             </svg>
-                            reply
+                            <span aria-label="This note is a reply">reply</span>
                           </span>
                         )}
                       </div>
