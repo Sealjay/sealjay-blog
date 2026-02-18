@@ -30,6 +30,43 @@ const { dateKey, notes } = Astro.props
 const dateObj = new Date(dateKey + 'T00:00:00Z')
 const daySummary = notes.find((n: any) => n.data.daySummary)?.data.daySummary
 
+// Build a lookup from mastodonUrl → local note for resolving self-reply threads
+const allNotes = await getCollection('note')
+const mastodonUrlToNote = new Map<string, { slug: string; dateKey: string; description?: string }>()
+for (const n of allNotes) {
+  if (n.data.mastodonUrl) {
+    const nDateKey = n.data.pubDateTime.toISOString().slice(0, 10)
+    mastodonUrlToNote.set(n.data.mastodonUrl, {
+      slug: n.slug,
+      dateKey: nDateKey,
+      description: n.data.description,
+    })
+  }
+}
+
+// Extract a human-readable label from a URL (e.g. @user@instance for Mastodon)
+function getReplyLabel(url: string): string {
+  try {
+    const parsed = new URL(url)
+    const pathMatch = parsed.pathname.match(/^\/@([^/]+)/)
+    if (pathMatch) {
+      return `@${pathMatch[1]}@${parsed.hostname}`
+    }
+    return parsed.hostname + parsed.pathname
+  } catch {
+    return url
+  }
+}
+
+// Resolve an inReplyTo URL: if it points to a local note, return the local path
+function resolveReplyLink(url: string): { href: string; isLocal: boolean } {
+  const localNote = mastodonUrlToNote.get(url)
+  if (localNote) {
+    return { href: `/notes/${localNote.dateKey}/#${localNote.slug}`, isLocal: true }
+  }
+  return { href: url, isLocal: false }
+}
+
 // Render all note bodies
 const rendered = await Promise.all(notes.map(async (n: any) => {
   const { Content } = await n.render()
@@ -85,12 +122,37 @@ const pageDescription = daySummary
           {note.data.mastodonUrl && (
             <a class="u-syndication" href={note.data.mastodonUrl} rel="syndication" style="display:none">Mastodon</a>
           )}
-          {note.data.inReplyTo && (
-            <div class="not-prose mb-4 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
-              <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
-              <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline break-all" rel="in-reply-to" href={note.data.inReplyTo}>{note.data.inReplyTo}</a>
-            </div>
-          )}
+          {note.data.inReplyTo && (() => {
+            const reply = resolveReplyLink(note.data.inReplyTo)
+            const label = getReplyLabel(note.data.inReplyTo)
+            const isSelfThread = reply.isLocal
+            const localParent = isSelfThread ? mastodonUrlToNote.get(note.data.inReplyTo) : undefined
+            const selfThreadLabel = localParent?.description
+              ? localParent.description.length > 80 ? localParent.description.slice(0, 80) + '…' : localParent.description
+              : label
+            return (
+              <div class="not-prose mb-4 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+                <div class="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent-500 dark:text-accent-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                  </svg>
+                  <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">
+                    {isSelfThread ? 'Continuing thread' : 'In reply to'}
+                  </span>
+                </div>
+                <a
+                  class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline focus:underline focus:outline-none truncate"
+                  rel={isSelfThread ? 'in-reply-to' : 'in-reply-to noopener noreferrer'}
+                  href={reply.href}
+                  title={isSelfThread ? selfThreadLabel : note.data.inReplyTo}
+                  {...(!reply.isLocal ? { target: '_blank' } : {})}
+                >
+                  {isSelfThread ? selfThreadLabel : label}
+                  {!reply.isLocal && <span class="sr-only"> (opens in new tab)</span>}
+                </a>
+              </div>
+            )
+          })()}
           {/* Note header */}
           <div class="mb-4">
             <div class="flex items-center gap-2 mb-2">
