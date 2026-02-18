@@ -73,6 +73,20 @@ function buildLastmodMap() {
     }
   }
 
+  // Projects: use the latest project date for the index page
+  const projectDir = path.join(contentDir, 'project')
+  let latestProjectDate = null
+  if (fs.existsSync(projectDir)) {
+    for (const file of fs.readdirSync(projectDir)) {
+      if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue
+      const fm = parseFrontmatter(path.join(projectDir, file))
+      if (fm.date) {
+        const date = new Date(fm.date)
+        if (!latestProjectDate || date > latestProjectDate) latestProjectDate = date
+      }
+    }
+  }
+
   // Index and static pages: use latest content dates or file mtime
   if (latestBlogDate) {
     map.set(`${siteUrl}/`, latestBlogDate)
@@ -83,6 +97,7 @@ function buildLastmodMap() {
     map.set(`${siteUrl}/speaking/`, latestSpeakingDate)
     map.set(`${siteUrl}/speaking/kit/`, latestSpeakingDate)
   }
+  if (latestProjectDate) map.set(`${siteUrl}/projects/`, latestProjectDate)
 
   // Static pages: use file modification time
   const staticPages = {
