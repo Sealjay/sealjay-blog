@@ -58,7 +58,12 @@ MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs     # Sync public Mas
 MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs --dry-run  # Preview without writing
 ```
 
-The Mastodon sync script fetches public toots (skipping replies, boosts, image posts, and non-public toots), deduplicates against existing notes, and creates MDX files in `src/src/content/note/`. Each synced note has `mastodonUrl` set to prevent re-syndication. State is tracked in `src/data/mastodon-sync-state.json`.
+The Mastodon sync script fetches public toots (skipping replies to others, boosts, image posts, and non-public toots), deduplicates against existing notes, and creates MDX files in `src/src/content/note/`. Self-reply threads (replies to own toots) are included and linked via `inReplyTo`. Each synced note has `mastodonUrl` set to prevent re-syndication. State is tracked in `src/data/mastodon-sync-state.json`.
+
+To review replies to others for manual syncing, use the `/review-mastodon-replies` skill or run:
+```bash
+MASTODON_TOKEN=xxx bun src/scripts/review-mastodon-replies.mjs  # Review reply candidates
+```
 
 ## Content collections
 

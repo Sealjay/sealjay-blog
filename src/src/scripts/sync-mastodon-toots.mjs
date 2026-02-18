@@ -1,10 +1,12 @@
 /**
  * Sync public toots from Mastodon/Fosstodon into notes.
  *
- * Fetches recent public toots (skipping replies, boosts, image posts,
- * and non-public visibility), deduplicates against existing notes,
- * and creates MDX note files. Sets mastodonUrl on each synced note
- * to prevent re-syndication via the u-syndication microformat.
+ * Fetches recent public toots (skipping replies to others, boosts,
+ * image posts, and non-public visibility), deduplicates against
+ * existing notes, and creates MDX note files. Self-reply threads
+ * (replies to own toots) are included and linked via inReplyTo.
+ * Sets mastodonUrl on each synced note to prevent re-syndication
+ * via the u-syndication microformat.
  *
  * Usage: MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs [--dry-run] [--limit=N]
  */
@@ -70,7 +72,8 @@ async function fetchToots(sinceId) {
     const remaining = fetchLimit - allStatuses.length
     const batchLimit = Math.min(remaining, 40)
 
-    let path = `/api/v1/accounts/${account.id}/statuses?exclude_replies=true&exclude_reblogs=true&limit=${batchLimit}`
+    // Don't exclude replies — we want self-reply threads
+    let path = `/api/v1/accounts/${account.id}/statuses?exclude_reblogs=true&limit=${batchLimit}`
     if (sinceId) path += `&since_id=${sinceId}`
     if (maxId) path += `&max_id=${maxId}`
 
@@ -83,17 +86,42 @@ async function fetchToots(sinceId) {
     if (batch.length < batchLimit) break
   }
 
-  return allStatuses
+  return { statuses: allStatuses, accountId: account.id }
 }
 
 // --- Toot filtering ---
 
-function shouldInclude(toot) {
-  if (toot.in_reply_to_id) return 'reply'
+function shouldInclude(toot, ownAccountId) {
+  if (toot.in_reply_to_id && String(toot.in_reply_to_account_id) !== String(ownAccountId)) return 'reply-to-other'
   if (toot.reblog) return 'boost'
   if (toot.media_attachments?.length > 0) return 'has-images'
   if (toot.visibility !== 'public') return `visibility:${toot.visibility}`
   return null
+}
+
+// --- Parent toot resolution (for self-reply threads) ---
+
+async function resolveParentUrl(toot, batchMap, existingMastodonUrls) {
+  if (!toot.in_reply_to_id) return null
+
+  // Check if parent is in the current batch
+  const parentInBatch = batchMap.get(toot.in_reply_to_id)
+  if (parentInBatch) return parentInBatch.url
+
+  // Check if parent was already synced as an existing note
+  for (const url of existingMastodonUrls) {
+    // Mastodon URLs end with the status ID
+    if (url.endsWith(`/${toot.in_reply_to_id}`)) return url
+  }
+
+  // Fetch parent from the API
+  try {
+    const parent = await mastodonGet(`/api/v1/statuses/${toot.in_reply_to_id}`)
+    return parent.url
+  } catch {
+    console.log(`  Warning: could not resolve parent toot ${toot.in_reply_to_id}`)
+    return null
+  }
 }
 
 // --- Text processing ---
@@ -292,7 +320,7 @@ function detectPlatform(url) {
   }
 }
 
-function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [] } = {}) {
+function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [], inReplyTo = null } = {}) {
   const pubDateTime = new Date(toot.created_at).toISOString().replace(/:\d{2}\.\d{3}Z$/, ':00.000Z')
 
   // Ensure "mastodon" tag is present for synced notes
@@ -308,6 +336,10 @@ function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [] } =
     const platform = detectPlatform(externalUrl)
     lines.push(`externalUrl: "${externalUrl}"`)
     if (platform) lines.push(`externalPlatform: "${platform}"`)
+  }
+
+  if (inReplyTo) {
+    lines.push(`inReplyTo: "${inReplyTo}"`)
   }
 
   lines.push(`mastodonUrl: "${toot.url}"`)
@@ -351,7 +383,7 @@ async function main() {
   console.log(`Fetching up to ${fetchLimit} toots...`)
   if (sinceId) console.log(`  Since ID: ${sinceId}`)
 
-  const toots = await fetchToots(sinceId)
+  const { statuses: toots, accountId } = await fetchToots(sinceId)
   console.log(`Fetched ${toots.length} toot(s).`)
 
   if (toots.length === 0) {
@@ -362,15 +394,19 @@ async function main() {
   const existingNotes = await loadExistingNotes()
   const existingMastodonUrls = new Set(existingNotes.map((n) => n.mastodonUrl).filter(Boolean))
 
+  // Build a map of toot ID → toot for resolving self-reply parent URLs within the batch
+  const batchMap = new Map(toots.map((t) => [t.id, t]))
+
   let created = 0
   let skipped = 0
+  let selfReplies = 0
   const affectedDays = new Set()
 
   // Process oldest first so since_id advances correctly
   const sorted = [...toots].sort((a, b) => a.id.localeCompare(b.id))
 
   for (const toot of sorted) {
-    const skipReason = shouldInclude(toot)
+    const skipReason = shouldInclude(toot, accountId)
     if (skipReason) {
       if (dryRun) console.log(`  [SKIP:${skipReason}] ${toot.url}`)
       skipped++
@@ -407,23 +443,32 @@ async function main() {
       continue
     }
 
+    // Resolve parent URL for self-reply threads
+    const isSelfReply = !!toot.in_reply_to_id
+    let inReplyTo = null
+    if (isSelfReply) {
+      inReplyTo = await resolveParentUrl(toot, batchMap, existingMastodonUrls)
+      selfReplies++
+    }
+
     // Generate note
     const slug = generateSlug(description, toot.created_at)
     const uniqueSlug = await ensureUniqueSlug(slug)
-    const { content } = generateMDX(toot, description, tags, { bodyMarkdown, urls })
+    const { content } = generateMDX(toot, description, tags, { bodyMarkdown, urls, inReplyTo })
     const filename = `${uniqueSlug}.mdx`
 
     if (dryRun) {
-      console.log(`  [CREATE] ${filename}`)
+      console.log(`  [CREATE${isSelfReply ? ':self-reply' : ''}] ${filename}`)
       console.log(`    Text: "${description.slice(0, 120)}${description.length > 120 ? '...' : ''}"`)
       console.log(`    Tags: ${[...new Set([...tags, 'mastodon'])].join(', ')}`)
       if (urls.length) console.log(`    External: ${urls[0]} (${detectPlatform(urls[0])})`)
       if (bodyMarkdown) console.log(`    Body: has markdown links`)
+      if (inReplyTo) console.log(`    Thread: reply to ${inReplyTo}`)
       console.log(`    URL:  ${toot.url}`)
     } else {
       await mkdir(NOTE_DIR, { recursive: true })
       await writeFile(join(NOTE_DIR, filename), content, 'utf-8')
-      console.log(`  Created: ${filename}`)
+      console.log(`  Created: ${filename}${isSelfReply ? ' (self-reply thread)' : ''}`)
     }
 
     affectedDays.add(tootDay)
@@ -455,6 +500,7 @@ async function main() {
   }
 
   console.log(`\nDone. Created ${created} note(s), skipped ${skipped}.`)
+  if (selfReplies > 0) console.log(`  Including ${selfReplies} self-reply thread continuation(s).`)
   if (dryRun) console.log('(Dry run — no files were written.)')
 }
 
