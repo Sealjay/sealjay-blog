@@ -98,12 +98,27 @@ const articleJsonLd = JSON.stringify({
       </div>
     )}
 
-    {inReplyTo && (
-      <div class="not-prose mb-6 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
-        <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
-        <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline break-all" rel="in-reply-to" href={inReplyTo}>{inReplyTo}</a>
-      </div>
-    )}
+    {inReplyTo && (() => {
+      let replyLabel: string
+      try {
+        const parsed = new URL(inReplyTo)
+        const pathMatch = parsed.pathname.match(/^\/@([^/]+)/)
+        replyLabel = pathMatch ? `@${pathMatch[1]}@${parsed.hostname}` : parsed.hostname + parsed.pathname
+      } catch {
+        replyLabel = inReplyTo
+      }
+      return (
+        <div class="not-prose mb-6 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+          <div class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent-500 dark:text-accent-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v3m-5-3l5 5m-5-5l5-5" />
+            </svg>
+            <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+          </div>
+          <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline truncate" rel="in-reply-to noopener noreferrer" href={inReplyTo} target="_blank" title={inReplyTo}>{replyLabel}</a>
+        </div>
+      )
+    })()}
 
     <div class="e-content prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
       <slot />
