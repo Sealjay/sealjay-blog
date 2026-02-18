@@ -10,6 +10,10 @@ on:
   workflow_dispatch:
   workflow_call:
 
+concurrency:
+  group: swa-deploy
+  cancel-in-progress: true
+
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
