@@ -20,4 +20,5 @@ export const SITE_SECONDARY_NAV = [
 export const SITE_FOOTER_NAV = [
   { name: 'Privacy', path: '/privacy' },
   { name: 'RSS', path: '/rss.xml' },
+  { name: 'JSON Feed', path: '/feed.json' },
 ]

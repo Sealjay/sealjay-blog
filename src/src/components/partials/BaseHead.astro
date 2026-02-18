@@ -23,6 +23,7 @@ const { title, description, image = "/chris/portrait.jpg", ogType = "website", p
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 <link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <meta name="generator" content={Astro.generator} />
 
 <!-- Modern Fonts -->
@@ -84,6 +85,9 @@ const { title, description, image = "/chris/portrait.jpg", ogType = "website", p
 <!-- Bridgy Fed: Bluesky fediverse bridge verification -->
 <link href="https://bsky.brid.gy/ap/did:plc:lamiqq7bkfqygjzdbdz673q3" rel="me" />
 
+<!-- Feed discovery -->
+<link rel="alternate" type="application/feed+json" title="Sealjay JSON Feed" href="/feed.json" />
+
 <!-- Bridgy Fed: ActivityPub discovery for fediverse search -->
 <link rel="alternate" type="application/activity+json" href={`https://fed.brid.gy/r/${canonicalURL}`} />
 
@@ -110,6 +114,24 @@ const { title, description, image = "/chris/portrait.jpg", ogType = "website", p
     "https://orcid.org/0000-0001-7995-7865"
   ],
   "knowsAbout": ["Artificial Intelligence", "Open Source", "Green Software", "Sustainability"]
+}
+</script>
+
+<!-- JSON-LD Structured Data (WebSite + SearchAction) -->
+<script is:inline type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Sealjay",
+  "url": "https://sealjay.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://sealjay.com/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>
 

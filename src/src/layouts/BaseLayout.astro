@@ -38,7 +38,33 @@ const articleJsonLd = JSON.stringify({
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": canonicalURL.href
-  }
+  },
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/"
+});
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://sealjay.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://sealjay.com/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": title,
+      "item": canonicalURL.href
+    }
+  ]
 });
 ---
 
@@ -53,6 +79,8 @@ const articleJsonLd = JSON.stringify({
   tags={tags}
 >
   <script type="application/ld+json" set:html={articleJsonLd} />
+  <script type="application/ld+json" set:html={breadcrumbJsonLd} />
+  <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" />
   <article class="h-entry max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
     <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
     <span class="p-author h-card" style="display:none">
