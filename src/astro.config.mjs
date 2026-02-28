@@ -1,11 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import mdx from '@astrojs/mdx'
-import rehypeMvpUrl from './src/plugins/rehype-mvp-url'
 import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
 import { defineConfig } from 'astro/config'
 import { legacyRedirectSlugs } from './src/data/legacy-redirects'
+import rehypeMvpUrl from './src/plugins/rehype-mvp-url'
 
 const siteUrl = 'https://sealjay.com'
 const redirectUrls = new Set(legacyRedirectSlugs.map((slug) => `${siteUrl}/${slug}/`))
