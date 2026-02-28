@@ -1,0 +1,171 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PageLayout from "./BaseLayout.astro";
+import FormattedDate from "../components/partials/FormattedDate.astro";
+import Giscus from "../components/embeds/Giscus.astro";
+import Webmentions from "../components/partials/Webmentions.astro";
+import { getOGImagePath } from "../lib/og-image";
+
+type Props = CollectionEntry<"blog">["data"];
+
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Compute slug from the URL pathname for OG image path
+const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
+const ogImagePath = getOGImagePath(slug);
+// Only show custom hero images on the page — auto-generated OG images repeat the title/date and are redundant
+const hasCustomHero = heroImage && heroImage !== "/placeholder-hero.png";
+const displayHeroImage = hasCustomHero ? heroImage : null;
+const articleJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": new URL(ogImagePath, Astro.site).href,
+  "datePublished": pubDateTime?.toISOString(),
+  "dateModified": updatedDate?.toISOString() || pubDateTime?.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL.href
+  },
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/"
+});
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://sealjay.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://sealjay.com/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": title,
+      "item": canonicalURL.href
+    }
+  ]
+});
+---
+
+<PageLayout
+  title={title}
+  description={description}
+  pubDateTime={pubDateTime}
+  updatedDate={updatedDate}
+  heroImage={displayHeroImage}
+  image={ogImagePath}
+  ogType="article"
+  tags={tags}
+>
+  <script type="application/ld+json" set:html={articleJsonLd} />
+  <script type="application/ld+json" set:html={breadcrumbJsonLd} />
+  <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" />
+  <article class="h-entry max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
+    <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
+    <span class="p-author h-card" style="display:none">
+      <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
+    </span>
+    {tags && tags.length > 0 && (
+      <span style="display:none">
+        {tags.map((tag: string) => (
+          <span class="p-category">{tag}</span>
+        ))}
+      </span>
+    )}
+    <h1
+      class="p-name text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
+    >
+      {title}
+    </h1>
+    <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-6">
+      <span class="flex items-center gap-1.5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Published <FormattedDate date={pubDateTime} class="dt-published" /></span>
+      </span>
+      
+      {updatedDate && (
+        <>
+          <span class="text-zinc-400 dark:text-zinc-600">•</span>
+          <span class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Updated <FormattedDate date={updatedDate} class="dt-updated" /></span>
+          </span>
+        </>
+      )}
+    </div>
+    
+    {displayHeroImage && (
+      <div class="relative w-full max-h-72 mb-8 overflow-hidden rounded-xl">
+        <img
+          src={displayHeroImage}
+          alt=""
+          width="1200"
+          height="630"
+          fetchpriority="high"
+          decoding="async"
+          class="u-photo w-full h-full object-cover"
+        />
+      </div>
+    )}
+
+    {inReplyTo && (() => {
+      let replyLabel: string
+      try {
+        const parsed = new URL(inReplyTo)
+        const pathMatch = parsed.pathname.match(/^\/@([^/]+)/)
+        replyLabel = pathMatch ? `@${pathMatch[1]}@${parsed.hostname}` : parsed.hostname + parsed.pathname
+      } catch {
+        replyLabel = inReplyTo
+      }
+      return (
+        <div class="not-prose mb-6 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
+          <div class="flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent-500 dark:text-accent-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+            </svg>
+            <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+          </div>
+          <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline focus:underline focus:outline-none truncate" rel="in-reply-to noopener noreferrer" href={inReplyTo} target="_blank" title={inReplyTo}>
+            {replyLabel}
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+        </div>
+      )
+    })()}
+
+    <div class="e-content prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
+      <slot />
+    </div>
+  </article>
+  
+  <div class="max-w-3xl mx-auto mt-16 mb-8">
+    <Webmentions />
+    <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8 mt-12"></div>
+    <Giscus />
+  </div>
+</PageLayout>
