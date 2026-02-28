@@ -13,7 +13,6 @@ tags:
     "PowerBI",
     "Anomaly Detector",
   ]
-heroImage: "/placeholder-hero.png"
 ---
 
 > **Update (February 2026):** The Python scripting approach described below still works for querying the current state of your twins. However, for production dashboards and historical analysis, Microsoft now recommends using [Azure Digital Twins Data History](https://learn.microsoft.com/en-us/azure/digital-twins/concepts-data-history?WT.mc_id=AI-MVP-5004204) to automatically historise graph updates to [Azure Data Explorer](https://learn.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?WT.mc_id=AI-MVP-5004204), and then connecting Power BI via the [native Azure Data Explorer connector](https://learn.microsoft.com/en-us/azure/data-explorer/power-bi-data-connector?WT.mc_id=AI-MVP-5004204). This gives you time-series history, better scalability, DirectQuery support, and no custom Python code to maintain. The [companion repository](https://github.com/Sealjay/powerbi-adt) remains archived for reference.
