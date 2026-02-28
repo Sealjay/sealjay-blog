@@ -1,7 +1,13 @@
 {
   "trailingSlash": "auto",
-  "platform": {
-    "apiRuntime": "node:20"
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "X-XSS-Protection": "0",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://giscus.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://giscus.app; connect-src 'self' https://plausible.io https://webmention.io"
   },
   "routes": [
     {
@@ -96,15 +102,13 @@
     { "route": "/unlocking-content-with-summaries-and-insight", "redirect": "/blog/unlocking-content-with-summaries-and-insight", "statusCode": 301 },
     { "route": "/whats-on-the-horizon-2021-mit-future-compute", "redirect": "/blog/whats-on-the-horizon-2021-mit-future-compute", "statusCode": 301 },
     { "route": "/why-cios-should-focus-on-trimming-their-internal-email-footprint", "redirect": "/blog/why-cios-should-focus-on-trimming-their-internal-email-footprint", "statusCode": 301 },
+    { "route": "/tag/event", "redirect": "/blog/tag/event", "statusCode": 301 },
+    { "route": "/tag/*", "redirect": "/blog/", "statusCode": 301 },
     {
       "route": "/*",
       "allowedRoles": ["anonymous"]
     }
   ],
-  "navigationFallback": {
-    "rewrite": "/404.html",
-    "exclude": ["/images/*.{png,jpg,gif,svg,webp,ico}", "/css/*", "/favicon.ico", "/.well-known/*", "/_astro/*", "/*.xml", "/*.json", "/*.txt", "/*.rss"]
-  },
   "responseOverrides": {
     "404": {
       "rewrite": "/404.html",

@@ -31,6 +31,7 @@ export async function getStaticPaths() {
 }
 
 const { tag, posts } = Astro.props;
+const isThinTag = posts.length < 2;
 
 const groupedPosts = posts.reduce((acc, post) => {
   const date = new Date(post.data.pubDateTime);
@@ -48,6 +49,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime);
     description={`Blog posts tagged with "${tag}"`}
     pubDateTime={new Date("1 March 2023")}
     updatedDate={lastPostDate}
+    noindex={isThinTag}
 >
     <div class="mx-auto max-w-5xl">
         <!-- Back link -->
