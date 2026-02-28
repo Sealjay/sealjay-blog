@@ -27,21 +27,22 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
-    "@astrojs/rss": "^4.0.14",
+    "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
-    "@astrojs/tailwind": "^5.0.0",
+    "@astrojs/tailwind": "^5.1.5",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/manrope": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
-    "@tailwindcss/typography": "^0.5.10",
-    "astro": "^5.17.2",
-    "date-fns": "^3.0.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "astro": "^5.18.0",
+    "date-fns": "^3.6.0",
     "fuse.js": "^7.1.0",
     "markdown-it": "^14.1.1",
     "satori": "^0.19.2",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^3.4.19",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.15"
+    "@biomejs/biome": "^2.4.4"
   }
 }
