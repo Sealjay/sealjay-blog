@@ -9,6 +9,7 @@ const { pathname } = Astro.url;
 
 <header class="relative py-4 sm:py-5">
   <Container>
+    <mobile-nav style="display:contents">
     <nav class="relative flex items-center justify-between">
       <div class="flex items-center">
         <a href="/" aria-label="Home" class="block group">
@@ -62,10 +63,10 @@ const { pathname } = Astro.url;
           aria-expanded="false"
           aria-controls="mobile-menu"
         >
-          <svg class="block h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon" aria-hidden="true">
+          <svg class="block h-6 w-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <svg class="hidden h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon" aria-hidden="true">
+          <svg class="hidden h-6 w-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -73,7 +74,7 @@ const { pathname } = Astro.url;
     </nav>
 
     <!-- Mobile menu -->
-    <div class="hidden md:hidden absolute inset-x-0 top-full mt-4 z-50 origin-top transform transition" id="mobile-menu" aria-label="Mobile navigation">
+    <div class="hidden md:hidden absolute inset-x-0 top-full mt-4 z-50" id="mobile-menu" aria-label="Mobile navigation">
       <div class="rounded-xl bg-white/95 p-3 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-lg dark:bg-zinc-800/95 dark:text-zinc-200 dark:ring-zinc-800">
         <ul class="flex flex-col space-y-1">
           {
@@ -116,60 +117,73 @@ const { pathname } = Astro.url;
         </ul>
       </div>
     </div>
+    </mobile-nav>
   </Container>
 </header>
 
 <script>
-  // Enhanced mobile menu functionality with animations
-  document.addEventListener('astro:page-load', () => {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const menuOpenIcon = document.getElementById('menu-open-icon');
-    const menuCloseIcon = document.getElementById('menu-close-icon');
+  class MobileNav extends HTMLElement {
+    private controller = new AbortController()
 
-    if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
-      mobileMenuButton.addEventListener('click', () => {
-        const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-        mobileMenuButton.setAttribute('aria-expanded', !expanded ? 'true' : 'false');
-        
-        if (!expanded) {
-          // Add animation classes when opening
-          mobileMenu.classList.remove('hidden');
-          mobileMenu.classList.add('animate-fade-in');
-          menuOpenIcon.classList.add('hidden');
-          menuCloseIcon.classList.remove('hidden');
-        } else {
-          // Close with animation
-          mobileMenu.classList.add('hidden');
-          mobileMenu.classList.remove('animate-fade-in');
-          menuOpenIcon.classList.remove('hidden');
-          menuCloseIcon.classList.add('hidden');
-        }
-      });
-      
-      // Close menu when clicking outside
-      document.addEventListener('click', (event) => {
-        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-        if (isExpanded && !mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
-          closeMenu();
-        }
-      });
+    constructor() {
+      super()
 
-      // Close menu on Escape key
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && mobileMenuButton.getAttribute('aria-expanded') === 'true') {
-          closeMenu();
-          mobileMenuButton.focus();
-        }
-      });
+      const button = this.querySelector('#mobile-menu-button') as HTMLButtonElement | null
+      const menu = this.querySelector('#mobile-menu') as HTMLElement | null
+      const openIcon = this.querySelector('#menu-open-icon') as SVGElement | null
+      const closeIcon = this.querySelector('#menu-close-icon') as SVGElement | null
 
-      function closeMenu() {
-        mobileMenuButton.setAttribute('aria-expanded', 'false');
-        mobileMenu.classList.add('hidden');
-        mobileMenu.classList.remove('animate-fade-in');
-        menuOpenIcon.classList.remove('hidden');
-        menuCloseIcon.classList.add('hidden');
+      if (!button || !menu || !openIcon || !closeIcon) return
+
+      const { signal } = this.controller
+
+      const closeMenu = () => {
+        button.setAttribute('aria-expanded', 'false')
+        menu.classList.add('hidden')
+        menu.classList.remove('animate-fade-in')
+        openIcon.classList.remove('hidden')
+        openIcon.classList.add('block')
+        closeIcon.classList.add('hidden')
+        closeIcon.classList.remove('block')
       }
+
+      button.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const expanded = button.getAttribute('aria-expanded') === 'true'
+
+        if (expanded) {
+          closeMenu()
+        } else {
+          menu.classList.remove('hidden')
+          menu.classList.add('animate-fade-in')
+          openIcon.classList.add('hidden')
+          openIcon.classList.remove('block')
+          closeIcon.classList.remove('hidden')
+          closeIcon.classList.add('block')
+          button.setAttribute('aria-expanded', 'true')
+        }
+      }, { signal })
+
+      document.addEventListener('click', (event) => {
+        if (button.getAttribute('aria-expanded') === 'true' &&
+            !menu.contains(event.target as Node) &&
+            !button.contains(event.target as Node)) {
+          closeMenu()
+        }
+      }, { signal })
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+          closeMenu()
+          button.focus()
+        }
+      }, { signal })
     }
-  });
+
+    disconnectedCallback() {
+      this.controller.abort()
+    }
+  }
+
+  customElements.define('mobile-nav', MobileNav)
 </script>
