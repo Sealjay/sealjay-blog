@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import mdx from '@astrojs/mdx'
+import rehypeMvpUrl from './src/plugins/rehype-mvp-url'
 import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
 import { defineConfig } from 'astro/config'
@@ -162,6 +163,8 @@ export default defineConfig({
       },
     }),
     tailwind(),
-    mdx(),
+    mdx({
+      rehypePlugins: [rehypeMvpUrl],
+    }),
   ],
 })
