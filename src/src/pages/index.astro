@@ -2,14 +2,12 @@
 import { getCollection } from 'astro:content'
 import Layout from '../layouts/IndexLayout.astro'
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
-import FormattedDate from '../components/partials/FormattedDate.astro'
 import Badge from '../components/partials/Badge.astro'
 import LatestArticle from '../components/home/LatestArticle.astro'
 import RecentTalks from '../components/home/RecentTalks.astro'
 import FeaturedProjects from '../components/home/FeaturedProjects.astro'
 import LatestNotes from '../components/home/LatestNotes.astro'
-import { professionalBadges, formerRoles, currentRole, youtubeShorts } from '../config/personal'
-import { getShorts } from '../lib/youtube'
+import { professionalBadges, currentRole } from '../config/personal'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -24,7 +22,6 @@ const notes = (await getCollection('note')).sort(
 const projectEntries = (await getCollection('project')).sort(
   (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
 )
-const shorts = await getShorts(youtubeShorts)
 
 // --- Curated section data ---
 const latestPost = posts[0]
@@ -63,105 +60,6 @@ const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
   url: `/notes/${latestDayKey}/#${n.slug}`,
 }))
 
-// --- Stream data with diversity algorithm ---
-interface StreamItem {
-  type: 'article' | 'talk' | 'note' | 'project' | 'short'
-  title: string
-  description?: string
-  date: Date
-  url: string
-  isExternal: boolean
-}
-
-const allStreamItems: StreamItem[] = [
-  ...posts.map((p) => ({
-    type: 'article' as const,
-    title: p.data.title,
-    description: p.data.description,
-    date: new Date(p.data.pubDateTime),
-    url: `/blog/${p.slug}/`,
-    isExternal: false,
-  })),
-  ...speakingEntries.slice(0, 10).map((s) => ({
-    type: 'talk' as const,
-    title: s.data.title,
-    description: s.data.event,
-    date: new Date(s.data.date),
-    url: s.data.url,
-    isExternal: true,
-  })),
-  ...[...notesByDay.entries()].map(([dateKey, dayNotes]) => {
-    const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
-    const daySummary = sorted.find((n) => n.data.daySummary)?.data.daySummary
-    return {
-      type: 'note' as const,
-      title: sorted.length === 1 ? 'Note' : `${sorted.length} Notes`,
-      description: daySummary ?? sorted.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
-      date: new Date(sorted[0].data.pubDateTime),
-      url: `/notes/${dateKey}/`,
-      isExternal: false,
-    }
-  }),
-  ...projectEntries.map((p) => ({
-    type: 'project' as const,
-    title: p.data.title,
-    description: p.data.description,
-    date: new Date(p.data.date),
-    url: p.data.repoUrl ?? '/projects',
-    isExternal: !!p.data.repoUrl,
-  })),
-  ...shorts.slice(0, 3).map((s) => ({
-    type: 'short' as const,
-    title: s.title,
-    description: s.source,
-    date: s.published,
-    url: s.youtubeUrl,
-    isExternal: true,
-  })),
-].sort((a, b) => b.date.valueOf() - a.date.valueOf())
-
-// Diversity algorithm: max 2 note groups, guarantee 1 article (if < 6 months old)
-const sixMonthsAgo = new Date()
-sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-
-const diverseStream: StreamItem[] = []
-let noteCount = 0
-let hasArticle = false
-const guaranteeArticle = posts.length > 0 && new Date(posts[0].data.pubDateTime) > sixMonthsAgo
-
-for (const item of allStreamItems) {
-  if (diverseStream.length >= 8) break
-  if (item.type === 'note') {
-    if (noteCount >= 2) continue
-    noteCount++
-  }
-  if (item.type === 'article') hasArticle = true
-  diverseStream.push(item)
-}
-
-// If we need to guarantee an article and haven't included one, swap the last item
-if (guaranteeArticle && !hasArticle && diverseStream.length > 0) {
-  const latestArticle = allStreamItems.find((i) => i.type === 'article')
-  if (latestArticle) {
-    diverseStream[diverseStream.length - 1] = latestArticle
-  }
-}
-
-const badgeClasses: Record<StreamItem['type'], string> = {
-  article: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-  note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  project: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
-  short: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
-}
-
-const badgeLabels: Record<StreamItem['type'], string> = {
-  article: 'Article',
-  talk: 'Talk',
-  note: 'Note',
-  project: 'Project',
-  short: 'Short',
-}
 ---
 
 <Layout
@@ -183,6 +81,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
             src="/chris/portrait.jpg"
             alt="Chris Lloyd-Jones"
             class="u-photo w-full [height:100%] object-cover"
+            loading="lazy"
           />
         </div>
       </div>
@@ -202,7 +101,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
         </p>
 
         <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
-          {professionalBadges.map(badge => (
+          {professionalBadges.slice(0, 3).map(badge => (
             <Badge
               text={badge.text}
               url={badge.url}
@@ -230,13 +129,11 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   </div>
 
   <!-- Section Divider -->
-  <div class="w-full max-w-5xl mx-auto my-12 md:my-16">
-    <div class="h-px bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent"></div>
-  </div>
+  <div class="section-divider max-w-5xl mx-auto"></div>
 
   <!-- Curated Sections Band -->
   <div class="w-full max-w-5xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {latestPost && <LatestArticle post={latestPost} />}
       {recentTalks.length > 0 && <RecentTalks entries={recentTalks} />}
       {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
@@ -244,9 +141,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   </div>
 
   <!-- Section Divider -->
-  <div class="w-full max-w-5xl mx-auto my-10 md:my-12">
-    <div class="h-px bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent"></div>
-  </div>
+  <div class="section-divider max-w-5xl mx-auto"></div>
 
   <!-- Latest Notes Strip -->
   {latestDayKey && sortedLatestDay.length > 0 && (
@@ -261,99 +156,5 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     </div>
   )}
 
-  <!-- Tabbed Stream -->
-  <div class="w-full max-w-5xl mx-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100">Recent Activity</h2>
-      <a href="/stream" class="text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium text-sm flex items-center gap-1 transition-colors">
-        View full stream
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
-    </div>
-
-    <!-- Filter Pills -->
-    <div class="mb-4 flex flex-wrap gap-2" id="home-stream-filters">
-      <button data-filter="all" class="home-filter-btn active inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900">All</button>
-      <button data-filter="article" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Articles</button>
-      <button data-filter="talk" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Speaking</button>
-      <button data-filter="note" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Notes</button>
-      <button data-filter="project" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Projects</button>
-      <button data-filter="short" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Shorts</button>
-    </div>
-
-    <!-- Stream Items (compact single-line format) -->
-    <div class="flex flex-col gap-2">
-      {diverseStream.map((item) => (
-        <a
-          href={item.url}
-          target={item.isExternal ? '_blank' : undefined}
-          rel={item.isExternal ? 'noopener noreferrer' : undefined}
-          class="home-stream-item group flex items-center gap-3 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-2.5 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-          data-type={item.type}
-        >
-          <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
-            {badgeLabels[item.type]}
-          </span>
-          <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
-            <FormattedDate date={item.date} />
-          </span>
-          <div class="min-w-0 flex-1">
-            <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
-              {item.title}
-            </span>
-            {item.description && (
-              <span class="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-400 ml-2 truncate">
-                &mdash; {item.description}
-              </span>
-            )}
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
-      ))}
-    </div>
-  </div>
 </Layout>
 
-<script>
-  function initHomeStreamFilters() {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.home-filter-btn')
-    const items = document.querySelectorAll<HTMLElement>('.home-stream-item')
-
-    const activeClass = 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
-    const inactiveClass =
-      'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'
-
-    function setFilter(filter: string) {
-      for (const btn of buttons) {
-        const isActive = btn.dataset.filter === filter
-        for (const cls of [...activeClass.split(' '), ...inactiveClass.split(' ')]) {
-          btn.classList.remove(cls)
-        }
-        for (const cls of (isActive ? activeClass : inactiveClass).split(' ')) {
-          btn.classList.add(cls)
-        }
-      }
-
-      for (const item of items) {
-        if (filter === 'all' || item.dataset.type === filter) {
-          item.classList.remove('hidden')
-        } else {
-          item.classList.add('hidden')
-        }
-      }
-    }
-
-    for (const btn of buttons) {
-      btn.addEventListener('click', () => {
-        setFilter(btn.dataset.filter ?? 'all')
-      })
-    }
-  }
-
-  document.addEventListener('astro:page-load', initHomeStreamFilters)
-  initHomeStreamFilters()
-</script>

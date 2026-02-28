@@ -86,10 +86,6 @@
 
 /* Responsive typography utilities */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
   /* Fix for 100vh issues on mobile */
   .h-screen-safe {
     height: 100vh;
@@ -101,37 +97,21 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-600 to-accent-400 dark:from-accent-400 dark:to-accent-600;
   }
 
-  /* Aspect ratios for images */
-  .aspect-w-16 {
-    position: relative;
-    padding-bottom: calc(var(--tw-aspect-h) / var(--tw-aspect-w) * 100%);
-    --tw-aspect-w: 16;
-  }
-
-  .aspect-h-9 {
-    --tw-aspect-h: 9;
-  }
-
-  .aspect-w-16 > * {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  /* Line clamp for text truncation */
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
 
   /* Consistent content width */
   .content-width {
     @apply max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

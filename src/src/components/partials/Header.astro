@@ -121,7 +121,7 @@ const { pathname } = Astro.url;
 
 <script>
   // Enhanced mobile menu functionality with animations
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     const menuOpenIcon = document.getElementById('menu-open-icon');

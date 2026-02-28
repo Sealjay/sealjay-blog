@@ -16,24 +16,25 @@ export const currentRole = {
 export const location = 'London'
 
 export const professionalBadges: Badge[] = [
+  // Homepage badges (first 3 shown on homepage, all shown on About)
   {
     text: '6x Microsoft MVP in AI',
     url: 'https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4',
-  },
-  {
-    text: 'Contributor, ISO/IEC 21031:2024',
   },
   {
     text: 'Doctoral Student, Green AI (UEL, 2022\u20132027)',
     url: 'https://orcid.org/0000-0001-7995-7865',
   },
   {
-    text: 'OpenUK Ambassador',
-    url: 'https://openuk.uk/',
-  },
-  {
     text: 'OpenUK New Year\u2019s Honours 2025/26 Recipient',
     url: 'https://openuk.uk/honours/',
+  },
+  {
+    text: 'Contributor, ISO/IEC 21031:2024',
+  },
+  {
+    text: 'OpenUK Ambassador',
+    url: 'https://openuk.uk/',
   },
   {
     text: 'Securing the Realm',

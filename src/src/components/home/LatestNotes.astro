@@ -20,13 +20,13 @@ const { date, dayUrl, daySummary, noteCount, previews } = Astro.props
 const overflow = noteCount - previews.length
 ---
 
-<div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm">
+<div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm">
   <div class="flex items-center gap-3 mb-2">
     <span class="shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
       Notes
     </span>
     <span class="text-xs text-zinc-500 dark:text-zinc-400">
-      <FormattedDate date={date} /> &middot; {noteCount} {noteCount === 1 ? 'note' : 'notes'}
+      Quick thoughts from Mastodon &middot; <FormattedDate date={date} /> &middot; {noteCount} {noteCount === 1 ? 'note' : 'notes'}
     </span>
     <a
       href="/notes"
