@@ -4,10 +4,14 @@ import Layout from '../layouts/IndexLayout.astro'
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
 import Badge from '../components/partials/Badge.astro'
+import LatestArticle from '../components/home/LatestArticle.astro'
+import RecentTalks from '../components/home/RecentTalks.astro'
+import FeaturedProjects from '../components/home/FeaturedProjects.astro'
+import LatestNotes from '../components/home/LatestNotes.astro'
 import { professionalBadges, formerRoles, currentRole, youtubeShorts } from '../config/personal'
-import { getOGImagePath } from '../lib/og-image'
 import { getShorts } from '../lib/youtube'
 
+// --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
 )
@@ -17,40 +21,66 @@ const speakingEntries = (await getCollection('speaking')).sort(
 const notes = (await getCollection('note')).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
 )
-const projects = (await getCollection('project')).sort(
+const projectEntries = (await getCollection('project')).sort(
   (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
 )
 const shorts = await getShorts(youtubeShorts)
 
-interface NoteDetail {
-  description?: string
-  title?: string
-  time: string
-  hasExternalLink: boolean
-  externalUrl?: string
-  url: string
+// --- Curated section data ---
+const latestPost = posts[0]
+const recentTalks = speakingEntries.slice(0, 3)
+const featuredProjects = (() => {
+  const featured = projectEntries.filter((p) => p.data.featured)
+  if (featured.length >= 3) return featured.slice(0, 3)
+  const remaining = projectEntries.filter((p) => !p.data.featured)
+  return [...featured, ...remaining].slice(0, 3)
+})()
+
+// --- Notes day-group data ---
+const notesByDay = new Map<string, typeof notes>()
+for (const n of notes) {
+  const key = new Date(n.data.pubDateTime).toISOString().slice(0, 10)
+  if (!notesByDay.has(key)) notesByDay.set(key, [])
+  notesByDay.get(key)!.push(n)
 }
 
-interface ActivityItem {
+const sortedDayKeys = [...notesByDay.keys()].sort((a, b) => b.localeCompare(a))
+const latestDayKey = sortedDayKeys[0]
+const latestDayNotes = latestDayKey ? notesByDay.get(latestDayKey)! : []
+const sortedLatestDay = [...latestDayNotes].sort(
+  (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
+)
+const latestDaySummary = sortedLatestDay.find((n) => n.data.daySummary)?.data.daySummary
+const latestDayUrl = latestDayKey ? `/notes/${latestDayKey}/` : '/notes'
+const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
+  description: n.data.description,
+  title: n.data.title,
+  time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }),
+  url: `/notes/${latestDayKey}/#${n.slug}`,
+}))
+
+// --- Stream data with diversity algorithm ---
+interface StreamItem {
   type: 'article' | 'talk' | 'note' | 'project' | 'short'
   title: string
   description?: string
   date: Date
   url: string
-  heroImage?: string
-  slug?: string
-  noteItems?: NoteDetail[]
+  isExternal: boolean
 }
 
-const allActivity: ActivityItem[] = [
+const allStreamItems: StreamItem[] = [
   ...posts.map((p) => ({
     type: 'article' as const,
     title: p.data.title,
     description: p.data.description,
     date: new Date(p.data.pubDateTime),
     url: `/blog/${p.slug}/`,
-    heroImage: p.data.heroImage && p.data.heroImage !== '/placeholder-hero.png' ? p.data.heroImage : undefined,
-    slug: p.slug,
+    isExternal: false,
   })),
   ...speakingEntries.slice(0, 10).map((s) => ({
     type: 'talk' as const,
@@ -58,47 +88,27 @@ const allActivity: ActivityItem[] = [
     description: s.data.event,
     date: new Date(s.data.date),
     url: s.data.url,
+    isExternal: true,
   })),
-  // Group notes by day and emit one activity item per day
-  ...(() => {
-    const notesByDay = new Map<string, typeof notes>()
-    for (const n of notes) {
-      const key = new Date(n.data.pubDateTime).toISOString().slice(0, 10)
-      if (!notesByDay.has(key)) notesByDay.set(key, [])
-      notesByDay.get(key)!.push(n)
+  ...[...notesByDay.entries()].map(([dateKey, dayNotes]) => {
+    const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
+    const daySummary = sorted.find((n) => n.data.daySummary)?.data.daySummary
+    return {
+      type: 'note' as const,
+      title: sorted.length === 1 ? 'Note' : `${sorted.length} Notes`,
+      description: daySummary ?? sorted.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
+      date: new Date(sorted[0].data.pubDateTime),
+      url: `/notes/${dateKey}/`,
+      isExternal: false,
     }
-    return [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
-      // Sort notes within each day oldest-first (earliest at top)
-      const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
-      const daySummary = sorted.find((n) => n.data.daySummary)?.data.daySummary
-      const dayUrl = `/notes/${dateKey}/`
-      return {
-        type: 'note' as const,
-        title: sorted.length === 1 ? (sorted[0].data.title ?? 'Note') : `${sorted.length} Notes`,
-        description: daySummary ?? sorted.map((n) => n.data.title ?? n.data.description).filter(Boolean).join(', '),
-        date: new Date(sorted[0].data.pubDateTime),
-        url: dayUrl,
-        noteItems: sorted.map((n) => ({
-          description: n.data.description,
-          title: n.data.title,
-          time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          }),
-          hasExternalLink: !!n.data.externalUrl,
-          externalUrl: n.data.externalUrl,
-          url: `${dayUrl}#${n.slug}`,
-        })),
-      }
-    })
-  })(),
-  ...projects.map((p) => ({
+  }),
+  ...projectEntries.map((p) => ({
     type: 'project' as const,
     title: p.data.title,
     description: p.data.description,
     date: new Date(p.data.date),
-    url: p.data.repoUrl,
+    url: p.data.repoUrl ?? '/projects',
+    isExternal: !!p.data.repoUrl,
   })),
   ...shorts.slice(0, 3).map((s) => ({
     type: 'short' as const,
@@ -106,12 +116,38 @@ const allActivity: ActivityItem[] = [
     description: s.source,
     date: s.published,
     url: s.youtubeUrl,
+    isExternal: true,
   })),
-]
-  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-  .slice(0, 8)
+].sort((a, b) => b.date.valueOf() - a.date.valueOf())
 
-const badgeClasses: Record<ActivityItem['type'], string> = {
+// Diversity algorithm: max 2 note groups, guarantee 1 article (if < 6 months old)
+const sixMonthsAgo = new Date()
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+const diverseStream: StreamItem[] = []
+let noteCount = 0
+let hasArticle = false
+const guaranteeArticle = posts.length > 0 && new Date(posts[0].data.pubDateTime) > sixMonthsAgo
+
+for (const item of allStreamItems) {
+  if (diverseStream.length >= 8) break
+  if (item.type === 'note') {
+    if (noteCount >= 2) continue
+    noteCount++
+  }
+  if (item.type === 'article') hasArticle = true
+  diverseStream.push(item)
+}
+
+// If we need to guarantee an article and haven't included one, swap the last item
+if (guaranteeArticle && !hasArticle && diverseStream.length > 0) {
+  const latestArticle = allStreamItems.find((i) => i.type === 'article')
+  if (latestArticle) {
+    diverseStream[diverseStream.length - 1] = latestArticle
+  }
+}
+
+const badgeClasses: Record<StreamItem['type'], string> = {
   article: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
@@ -119,7 +155,7 @@ const badgeClasses: Record<ActivityItem['type'], string> = {
   short: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 }
 
-const badgeLabels: Record<ActivityItem['type'], string> = {
+const badgeLabels: Record<StreamItem['type'], string> = {
   article: 'Article',
   talk: 'Talk',
   note: 'Note',
@@ -198,124 +234,126 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
     <div class="h-px bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent"></div>
   </div>
 
-  <!-- Recent Activity Section -->
+  <!-- Curated Sections Band -->
   <div class="w-full max-w-5xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {latestPost && <LatestArticle post={latestPost} />}
+      {recentTalks.length > 0 && <RecentTalks entries={recentTalks} />}
+      {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
+    </div>
+  </div>
+
+  <!-- Section Divider -->
+  <div class="w-full max-w-5xl mx-auto my-10 md:my-12">
+    <div class="h-px bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent"></div>
+  </div>
+
+  <!-- Latest Notes Strip -->
+  {latestDayKey && sortedLatestDay.length > 0 && (
+    <div class="w-full max-w-5xl mx-auto mb-10 md:mb-12">
+      <LatestNotes
+        date={sortedLatestDay[0].data.pubDateTime}
+        dayUrl={latestDayUrl}
+        daySummary={latestDaySummary}
+        noteCount={sortedLatestDay.length}
+        previews={latestDayPreviews}
+      />
+    </div>
+  )}
+
+  <!-- Tabbed Stream -->
+  <div class="w-full max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100">Recent Activity</h2>
       <a href="/stream" class="text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium text-sm flex items-center gap-1 transition-colors">
-        View all
+        View full stream
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
     </div>
 
-    <div class="flex flex-col gap-3">
-      {
-        allActivity.map((item) => {
-          const isExternal = item.type === 'talk' || item.type === 'project' || item.type === 'short'
+    <!-- Filter Pills -->
+    <div class="mb-4 flex flex-wrap gap-2" id="home-stream-filters">
+      <button data-filter="all" class="home-filter-btn active inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900">All</button>
+      <button data-filter="article" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Articles</button>
+      <button data-filter="talk" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Speaking</button>
+      <button data-filter="note" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Notes</button>
+      <button data-filter="project" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Projects</button>
+      <button data-filter="short" class="home-filter-btn inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Shorts</button>
+    </div>
 
-          {/* Notes: grouped bullet format under date header */}
-          if (item.type === 'note' && item.noteItems) {
-            return (
-              <div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm">
-                {/* Header: Note badge + date + link */}
-                <div class="flex items-center gap-3 mb-2">
-                  <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
-                    {item.noteItems && item.noteItems.length > 1 ? 'Notes' : 'Note'}
-                  </span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">
-                    <FormattedDate date={item.date} />
-                  </span>
-                  <a
-                    href={item.url}
-                    class="ml-auto text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium transition-colors flex items-center gap-0.5"
-                  >
-                    View all
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-                {/* Individual notes as bullet list */}
-                <div class="flex flex-col gap-0.5">
-                  {item.noteItems.map((note) => (
-                    <div class="flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-1">
-                      <span class="text-zinc-400 dark:text-zinc-500 leading-5" aria-hidden="true">&#8226;</span>
-                      <a
-                        href={note.url}
-                        class="flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors truncate leading-5"
-                      >
-                        {note.description || note.title || 'Note'}
-                      </a>
-                      {note.hasExternalLink && note.externalUrl && (
-                        <a
-                          href={note.externalUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="shrink-0 text-accent-500 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-                          title="External link"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        </a>
-                      )}
-                      <span class="shrink-0 text-xs text-zinc-400 dark:text-zinc-500 tabular-nums leading-5">
-                        @ {note.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-
-          {/* Other items: article, talk, project */}
-          return (
-            <a
-              href={item.url}
-              target={isExternal ? '_blank' : undefined}
-              rel={isExternal ? 'noopener noreferrer' : undefined}
-              class="group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
-            >
-              {/* Type Badge */}
-              <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
-                {badgeLabels[item.type]}
+    <!-- Stream Items (compact single-line format) -->
+    <div class="flex flex-col gap-2">
+      {diverseStream.map((item) => (
+        <a
+          href={item.url}
+          target={item.isExternal ? '_blank' : undefined}
+          rel={item.isExternal ? 'noopener noreferrer' : undefined}
+          class="home-stream-item group flex items-center gap-3 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-2.5 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+          data-type={item.type}
+        >
+          <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
+            {badgeLabels[item.type]}
+          </span>
+          <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
+            <FormattedDate date={item.date} />
+          </span>
+          <div class="min-w-0 flex-1">
+            <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
+              {item.title}
+            </span>
+            {item.description && (
+              <span class="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-400 ml-2 truncate">
+                &mdash; {item.description}
               </span>
-
-              {/* Date */}
-              <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
-                <FormattedDate date={item.date} />
-              </span>
-
-              {/* Title & Description */}
-              <div class="min-w-0 flex-1">
-                <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
-                  {item.title}
-                </span>
-                {item.description && (
-                  <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-                    {item.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Arrow */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-          )
-        })
-      }
+            )}
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      ))}
     </div>
   </div>
 </Layout>
+
+<script>
+  function initHomeStreamFilters() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.home-filter-btn')
+    const items = document.querySelectorAll<HTMLElement>('.home-stream-item')
+
+    const activeClass = 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
+    const inactiveClass =
+      'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'
+
+    function setFilter(filter: string) {
+      for (const btn of buttons) {
+        const isActive = btn.dataset.filter === filter
+        for (const cls of [...activeClass.split(' '), ...inactiveClass.split(' ')]) {
+          btn.classList.remove(cls)
+        }
+        for (const cls of (isActive ? activeClass : inactiveClass).split(' ')) {
+          btn.classList.add(cls)
+        }
+      }
+
+      for (const item of items) {
+        if (filter === 'all' || item.dataset.type === filter) {
+          item.classList.remove('hidden')
+        } else {
+          item.classList.add('hidden')
+        }
+      }
+    }
+
+    for (const btn of buttons) {
+      btn.addEventListener('click', () => {
+        setFilter(btn.dataset.filter ?? 'all')
+      })
+    }
+  }
+
+  document.addEventListener('astro:page-load', initHomeStreamFilters)
+  initHomeStreamFilters()
+</script>
