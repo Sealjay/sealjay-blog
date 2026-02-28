@@ -4,8 +4,9 @@ import Layout from '../layouts/IndexLayout.astro'
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
 import Badge from '../components/partials/Badge.astro'
-import { professionalBadges, formerRoles, currentRole } from '../config/personal'
+import { professionalBadges, formerRoles, currentRole, youtubeShorts } from '../config/personal'
 import { getOGImagePath } from '../lib/og-image'
+import { getShorts } from '../lib/youtube'
 
 const posts = (await getCollection('blog')).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
@@ -19,6 +20,7 @@ const notes = (await getCollection('note')).sort(
 const projects = (await getCollection('project')).sort(
   (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
 )
+const shorts = await getShorts(youtubeShorts)
 
 interface NoteDetail {
   description?: string
@@ -30,7 +32,7 @@ interface NoteDetail {
 }
 
 interface ActivityItem {
-  type: 'article' | 'talk' | 'note' | 'project'
+  type: 'article' | 'talk' | 'note' | 'project' | 'short'
   title: string
   description?: string
   date: Date
@@ -98,6 +100,13 @@ const allActivity: ActivityItem[] = [
     date: new Date(p.data.date),
     url: p.data.repoUrl,
   })),
+  ...shorts.slice(0, 3).map((s) => ({
+    type: 'short' as const,
+    title: s.title,
+    description: s.source,
+    date: s.published,
+    url: s.youtubeUrl,
+  })),
 ]
   .sort((a, b) => b.date.valueOf() - a.date.valueOf())
   .slice(0, 8)
@@ -107,6 +116,7 @@ const badgeClasses: Record<ActivityItem['type'], string> = {
   talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
   project: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  short: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 }
 
 const badgeLabels: Record<ActivityItem['type'], string> = {
@@ -114,6 +124,7 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
   talk: 'Talk',
   note: 'Note',
   project: 'Project',
+  short: 'Short',
 }
 ---
 
@@ -202,7 +213,7 @@ const badgeLabels: Record<ActivityItem['type'], string> = {
     <div class="flex flex-col gap-3">
       {
         allActivity.map((item) => {
-          const isExternal = item.type === 'talk' || item.type === 'project'
+          const isExternal = item.type === 'talk' || item.type === 'project' || item.type === 'short'
 
           {/* Notes: grouped bullet format under date header */}
           if (item.type === 'note' && item.noteItems) {

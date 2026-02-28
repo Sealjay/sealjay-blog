@@ -9,10 +9,11 @@ export const SITE_NAV = [
   { name: 'Blog', path: '/blog' },
   { name: 'Speaking', path: '/speaking' },
   { name: 'Notes', path: '/notes' },
-  { name: 'Projects', path: '/projects' },
+  { name: 'Shorts', path: '/shorts' },
 ]
 
 export const SITE_SECONDARY_NAV = [
+  { name: 'Projects', path: '/projects' },
   { name: 'Stream', path: '/stream' },
   { name: 'Colophon', path: '/acknowledgements' },
 ]

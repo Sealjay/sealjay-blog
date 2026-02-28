@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/IndexLayout.astro'
+import FormattedDate from '../../components/partials/FormattedDate.astro'
+import { getShorts } from '../../lib/youtube'
+import { youtubeShorts } from '../../config/personal'
+
+const shorts = await getShorts(youtubeShorts)
+
+const latestDate = shorts.length > 0 ? shorts[0].published : new Date()
+---
+
+<Layout
+  title="Shorts"
+  description="Short-form videos on AI, security, and open source."
+  pubDateTime={new Date('1 March 2023')}
+  updatedDate={latestDate}
+>
+  <div class="mx-auto max-w-5xl">
+    <!-- Page Header -->
+    <div class="mb-10 md:mb-16">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
+        <span class="text-gradient">Shorts</span>
+      </h1>
+      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
+        Short-form videos on AI, security, and open source.
+      </p>
+    </div>
+
+    {shorts.length === 0 ? (
+      <p class="text-zinc-500 dark:text-zinc-400">No shorts available yet.</p>
+    ) : (
+      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        {shorts.map((short) => (
+          <a
+            href={short.youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col rounded-xl overflow-hidden bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+          >
+            {/* Thumbnail with play overlay */}
+            <div class="relative aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+              <img
+                src={short.thumbnailUrl}
+                alt=""
+                width="480"
+                height="270"
+                loading="lazy"
+                decoding="async"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              {/* Play icon overlay */}
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm group-hover:bg-red-600/90 transition-colors duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+              {/* Source badge */}
+              <div class="absolute top-2 left-2">
+                <span class="inline-flex items-center rounded-full bg-red-100/90 dark:bg-red-900/60 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-red-700 dark:text-red-300">
+                  Short
+                </span>
+              </div>
+            </div>
+
+            {/* Card body */}
+            <div class="flex flex-col flex-grow p-4">
+              <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors line-clamp-2 mb-2">
+                {short.title}
+              </h3>
+
+              <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                <FormattedDate date={short.published} />
+                <span class="text-zinc-300 dark:text-zinc-600">&middot;</span>
+                <span>{short.source}</span>
+              </div>
+
+              {/* Tags */}
+              {short.tags.length > 0 && (
+                <div class="flex flex-wrap gap-1.5 mt-auto">
+                  {short.tags.slice(0, 4).map((tag) => (
+                    <span class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-700/70 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

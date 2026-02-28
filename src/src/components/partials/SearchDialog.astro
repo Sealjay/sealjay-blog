@@ -27,7 +27,7 @@
           type="search"
           id="search-input"
           class="w-full border-0 bg-transparent py-4 pl-12 pr-4 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0 text-base"
-          placeholder="Search posts, talks, notes, and projects..."
+          placeholder="Search posts, talks, notes, projects, and shorts..."
           autocomplete="off"
           aria-label="Search query"
           aria-controls="search-results"
@@ -66,7 +66,7 @@
     description: string
     tags: string[]
     url: string
-    type: 'blog' | 'speaking' | 'note' | 'project'
+    type: 'blog' | 'speaking' | 'note' | 'project' | 'short'
   }
 
   class SiteSearch extends HTMLElement {
@@ -207,7 +207,7 @@
         li.setAttribute('aria-selected', 'false')
         li.id = `search-result-${i}`
 
-        const isExternal = item.type === 'speaking' || item.type === 'project'
+        const isExternal = item.type === 'speaking' || item.type === 'project' || item.type === 'short'
         const rel = isExternal ? ' rel="noopener noreferrer" target="_blank"' : ''
         const externalIcon = isExternal
           ? '<span class="sr-only">(opens in new tab)</span>'
@@ -218,6 +218,7 @@
           speaking: { bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-600 dark:text-zinc-400', label: 'Speaking' },
           note: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-300', label: 'Note' },
           project: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-700 dark:text-violet-300', label: 'Project' },
+          short: { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-300', label: 'Short' },
         }
         const labelInfo = typeLabelMap[item.type] ?? typeLabelMap.blog
         const typeLabel = `<span class="inline-flex items-center rounded-full ${labelInfo.bg} px-2 py-0.5 text-xs ${labelInfo.text}">${labelInfo.label}</span>`

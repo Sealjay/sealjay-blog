@@ -3,6 +3,8 @@ import Layout from '../../layouts/IndexLayout.astro'
 import { getCollection } from 'astro:content'
 import { format } from 'date-fns'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
+import { getShorts } from '../../lib/youtube'
+import { youtubeShorts } from '../../config/personal'
 
 interface NoteDetail {
   description: string
@@ -14,19 +16,21 @@ interface NoteDetail {
 }
 
 interface StreamItem {
-  type: 'article' | 'talk' | 'note' | 'project'
+  type: 'article' | 'talk' | 'note' | 'project' | 'short'
   title: string
   description: string
   date: Date
   url: string
   tags: string[]
   noteItems?: NoteDetail[]
+  thumbnailUrl?: string
 }
 
 const blogEntries = await getCollection('blog')
 const speakingEntries = await getCollection('speaking')
 const noteEntries = await getCollection('note')
 const projectEntries = await getCollection('project')
+const shorts = await getShorts(youtubeShorts)
 
 const blogItems: StreamItem[] = blogEntries.map((entry) => ({
   type: 'article',
@@ -88,7 +92,17 @@ const projectItems: StreamItem[] = projectEntries.map((entry) => ({
   tags: entry.data.tags ?? [],
 }))
 
-const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteGroupItems, ...projectItems].sort(
+const shortItems: StreamItem[] = shorts.map((short) => ({
+  type: 'short',
+  title: short.title,
+  description: short.source,
+  date: short.published,
+  url: short.youtubeUrl,
+  tags: short.tags,
+  thumbnailUrl: short.thumbnailUrl,
+}))
+
+const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteGroupItems, ...projectItems, ...shortItems].sort(
   (a, b) => b.date.valueOf() - a.date.valueOf(),
 )
 
@@ -120,6 +134,7 @@ const badgeClasses: Record<StreamItem['type'], string> = {
   talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
   project: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  short: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 }
 
 const badgeLabels: Record<StreamItem['type'], string> = {
@@ -127,6 +142,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   talk: 'Speaking',
   note: 'Note',
   project: 'Project',
+  short: 'Short',
 }
 ---
 
@@ -179,6 +195,12 @@ const badgeLabels: Record<StreamItem['type'], string> = {
       >
         Projects
       </button>
+      <button
+        data-filter="short"
+        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        Shorts
+      </button>
     </div>
 
     <!-- Stream Items Grouped by Month -->
@@ -190,7 +212,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
         </h2>
         <div class="flex flex-col gap-3">
           {items.map((item) => {
-            const isExternal = item.type === 'talk' || item.type === 'project'
+            const isExternal = item.type === 'talk' || item.type === 'project' || item.type === 'short'
 
             {/* Notes: grouped bullet format under date header */}
             if (item.type === 'note' && item.noteItems) {

@@ -82,3 +82,12 @@ export const formerRoles: Badge[] = [
 
 // Export all badges together
 export const allBadges = [...professionalBadges, ...formerRoles]
+
+// YouTube Shorts playlists fetched at build time
+export const youtubeShorts = [
+  {
+    playlistId: 'PLo9Ah7HeyG1Rkqq0cc1QJtttkywXKWd9g',
+    source: 'Securing the Realm',
+    defaultTags: ['YouTube', 'Shorts', 'Security'],
+  },
+]

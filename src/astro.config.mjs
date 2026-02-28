@@ -99,6 +99,9 @@ function buildLastmodMap() {
   }
   if (latestProjectDate) map.set(`${siteUrl}/projects/`, latestProjectDate)
 
+  // Shorts page: use current date as shorts are fetched at build time from YouTube RSS
+  map.set(`${siteUrl}/shorts/`, new Date())
+
   // Static pages: use file modification time
   const staticPages = {
     about: './src/pages/about.astro',

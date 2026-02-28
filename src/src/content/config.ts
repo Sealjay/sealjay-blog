@@ -79,6 +79,24 @@ const project = defineCollection({
   }),
 })
 
+const short = defineCollection({
+  type: 'data',
+  schema: z.object({
+    youtubeId: z.string(),
+    title: z.string().optional(),
+    relatedContent: z
+      .array(
+        z.object({
+          type: z.string(),
+          slug: z.string(),
+          title: z.string(),
+        }),
+      )
+      .optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+})
+
 const acknowledgement = defineCollection({
   schema: z.object({
     title: z.string(),
@@ -91,4 +109,4 @@ const acknowledgement = defineCollection({
   }),
 })
 
-export const collections = { blog, speaking, note, project, acknowledgement }
+export const collections = { blog, speaking, note, project, short, acknowledgement }
