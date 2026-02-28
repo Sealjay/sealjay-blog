@@ -1,0 +1,162 @@
+---
+title: "Your AI Agents Need a Bouncer"
+description: "Using Azure APIM with Microsoft Foundry to govern models, tools, and agents."
+pubDateTime: "2026-02-28T00:00:00.000Z"
+sourceUrl: "https://securing.quest/blog/your-ai-agents-need-a-bouncer/"
+tags: ["External Media", "Securing the Realm", "azure-apim", "ai-security", "microsoft-foundry", "ai-agents", "api-management", "ai-governance", "azure", "microsoft", "appsec", "prompt-injection", "agent-security", "mcp-servers", "enterprise-ai"]
+---
+*This post was originally published on [Securing the Realm](https://securing.quest/blog/your-ai-agents-need-a-bouncer/).*
+
+**Using Azure APIM with Microsoft Foundry to govern models, tools, and agents.**
+
+## The problem: agents everywhere, governance nowhere
+
+Agents might seem like magic, but most are orchestration loops - a language model receives prompts and tool definitions, selects an action, and returns a structured response. Once you see the loop clearly, there are many places you can track, limit, or audit actions so your agents do what you expect.
+
+The challenge is that many organisations are building agents in more than one place, and with appropriate controls, that’s fine. Those using Copilot Studio or custom GPTs have different needs from those using Microsoft Foundry, and in a multicloud world, agents also live outside the Microsoft ecosystem - perhaps on Google Vertex AI or AWS Bedrock. On top of the agents themselves, there’s the supporting infrastructure - the tools, the MCP servers, and the data sources that agents can access or that get injected as context.
+
+## Framing the risks
+
+Two OWASP frameworks help us think about these risks: the [LLM Top 10 2025](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and the newer [Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/). The LLM Top 10 covers foundational model risks - prompt injection, sensitive information disclosure, supply chain vulnerabilities. The Agentic Top 10 extends this to autonomous systems that plan, delegate, and act across tools and other agents. Together, they give us a shared language for the risks we need to govern.
+
+Four risks thread through everything that follows:
+
+| Risk | Framework | Why it matters here |
+| --- | --- | --- |
+| Unbounded Consumption (LLM10) | LLM Top 10 2025 | Agents in loops can spiral API calls and costs without guardrails |
+| Excessive Agency (LLM06) | LLM Top 10 2025 | Agents with unchecked autonomy take actions beyond their intended scope |
+| Identity and Privilege Abuse (ASI03) | Agentic Top 10 2026 | Agents inherit or delegate credentials without proper scoping, creating attribution gaps |
+| Insecure Inter-Agent Communication (ASI07) | Agentic Top 10 2026 | Weaknesses in agent-to-agent protocols and semantic validation open lateral attack paths |
+
+If the core risk is that agents call APIs or use tools that might delete files or update databases in ways you don’t expect - excessive agency (LLM06) in OWASP terms - then you need to govern that traffic. That means a single place to validate agent identity (ASI03), scan for prompt injection, enforce rate limiting to prevent runaway loops or cost spikes (LLM10), and add observability so you can see what’s happening.
+
+Many agents across many systems means heavy traffic and a mix of protocols - including agent-to-agent communication that may lack consistent validation (ASI07). How do we manage all of this and standardise - perhaps even create a single pane of glass for governing it?
+
+## Enter Azure API Management
+
+APIM has been the developer workhorse for API governance for years. Its ‘[AI Gateway](https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities?WT.mc_id=AI-MVP-5004204)’ capabilities position it as the central hub for your enterprise AI backends, creating a single chokepoint where all agentic traffic converges. It covers three governance surfaces: models (LLM endpoints), tools (MCP servers and function calls), and agents (autonomous identities acting on behalf of users).
+
+## Architecture: APIM AI Gateway in the agentic stack
+
+The AI Gateway is a set of capabilities built into APIM - a service that processes 3 trillion requests monthly. It sits between your agents and your backends, providing a consistent governance layer across Foundry model deployments, MCP servers, A2A agent endpoints, data and vector stores, content safety services, monitoring through [Application Insights](https://learn.microsoft.com/azure/api-management/api-management-howto-app-insights?WT.mc_id=AI-MVP-5004204), and third-party LLM providers like Google and Amazon.
+
+If you’re using Microsoft Foundry, the [AI Gateway integration](https://learn.microsoft.com/azure/ai-foundry/configuration/enable-ai-api-management-gateway-portal?WT.mc_id=AI-MVP-5004204) auto-provisions a Basic v2 APIM instance with a free tier included (see [API Management Pricing](https://azure.microsoft.com/pricing/details/api-management/?WT.mc_id=AI-MVP-5004204) for current details). You can configure it in the Foundry portal under Operate > Admin > AI Gateway, with governance surfaces for models (TPM rate limits per project), agents (registration and throttling), and tools (MCP governance and discovery). For production workloads, Standard v2 or Premium v2 is recommended - see the [pricing page](https://azure.microsoft.com/pricing/details/api-management/?WT.mc_id=AI-MVP-5004204) for costs by tier.
+
+![Screenshot of the Microsoft Foundry portal&apos;s Operate tab, showing the Add AI Gateway button and options to create or select an APIM instance.](https://securing.quest/_astro/apim-bifrost-add-new.BitB1BbR_2ah95U.webp)
+> **Note** - If you already have a ‘traditional’ APIM instance, it won’t be detected in the Foundry Admin portal. You’ll need to create a new one as an AI gateway.
+
+![Architecture diagram showing agents on the left sending requests through a seven-step APIM AI Gateway policy pipeline, then into a backend pool of up to 30 endpoints organised by priority, with PTU first and serverless fallback.](https://securing.quest/_astro/fig2-apim-architecture.qniANa51_Z1qXheM.svg)
+*Figure 2: All agentic traffic flows through the APIM AI Gateway’s seven-step policy pipeline before reaching a [backend pool](https://learn.microsoft.com/azure/api-management/backends?WT.mc_id=MVP_466754) of up to 30 endpoints, organised by priority (PTU first, serverless fallback) with circuit breakers, weighted routing, and session-aware load balancing.*
+
+## Token rate limiting and cost governance
+
+*Maps to: OWASP LLM10 - Unbounded Consumption*
+
+APIM gives you two token governance policies - [azure-openai-token-limit](https://learn.microsoft.com/azure/api-management/azure-openai-token-limit-policy?WT.mc_id=MVP_466754) for Azure OpenAI backends, and [llm-token-limit](https://learn.microsoft.com/azure/api-management/llm-token-limit-policy?WT.mc_id=AI-MVP-5004204) for everything else including third-party models and Azure AI Model Inference. Both let you set tokens-per-minute limits for burst control and token quotas over longer periods for hard budget caps. You can configure these in the Foundry Admin portal or directly as APIM policies.
+
+The feature worth knowing about is `estimate-prompt-tokens`. APIM can pre-calculate how many tokens a request will consume before it reaches the backend. If it’s over your limit, the request gets rejected at the gateway - no backend tokens consumed, no cost incurred. Pair that with [token metrics](https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy?WT.mc_id=MVP_466754) flowing into Application Insights and you get cost control and visibility from the same layer. When an agent gets stuck in a loop, you’ll see the token spike in your dashboard before it hits your invoice.
+
+> **Note** - Token estimates and actual token emission can still vary.
+
+## Prompt shielding and content safety
+
+*Maps to: OWASP LLM01 - Prompt Injection, ASI01 - Agent Goal Hijack*
+
+APIM integrates with [Azure AI Content Safety](https://learn.microsoft.com/azure/api-management/llm-content-safety-policy?WT.mc_id=MVP_466754) to moderate prompts at the gateway. Out of the box, it checks four harm categories (hate, sexual, self-harm, violence) with independent severity thresholds. Content that trips a threshold gets a 403 before it ever reaches your model.
+
+The more interesting capability for agentic workloads is [prompt shielding](https://learn.microsoft.com/azure/ai-services/content-safety/concepts/jailbreak-detection?WT.mc_id=MVP_466754). This detects both direct injection (jailbreaks, role-play attacks, encoding tricks) and indirect injection - hidden instructions embedded in documents or web content that the agent processes. That second category is the one that catches people out. Your agent summarises a customer’s PDF and the PDF contains a hidden instruction to exfiltrate data. Prompt shielding catches that at the gateway before the model sees it.
+
+You can also extend scanning to model outputs, giving you bidirectional protection. If the model generates something it shouldn’t, it gets blocked on the way out. Custom blocklists let you add organisation-specific terms on top. You’ll need an Azure AI Content Safety resource, a backend entity in APIM pointing to it, and the APIM managed identity with the Cognitive Services User role - quick to set up if you’re already running APIM.
+
+## Semantic caching
+
+*Maps to: cost and latency reduction, supports LLM10 mitigation*
+
+[Semantic caching](https://learn.microsoft.com/azure/api-management/azure-openai-enable-semantic-caching?WT.mc_id=MVP_466754) lets APIM vectorise incoming prompts and check them against previously cached responses in Azure Managed Redis. If someone asks a question that’s semantically close enough to one that’s already been answered, the cached response comes back with no backend call. Cached responses typically return in under 200ms - often more than 10x faster than a full LLM call, and at zero token cost.
+
+The threshold matters here. Microsoft recommends starting strict (0.05) and loosening cautiously - go above 0.2 and you risk returning responses that don’t actually match the question. In practice, stripping system prompts before embedding improves hit rates without sacrificing accuracy, since the system prompt is usually identical across requests and just adds noise to the similarity comparison.
+
+One infrastructure note: you need Azure Managed Redis with the RediSearch module enabled at creation time. It can’t be added later, so plan for it upfront.
+
+## Governing MCP tools
+
+*Maps to: OWASP LLM06 - Excessive Agency, ASI02 - Tool Misuse*
+
+APIM’s [MCP server support](https://learn.microsoft.com/azure/api-management/mcp-server-overview?WT.mc_id=AI-MVP-5004204) (currently in preview) works in two ways. You can expose any existing REST API as an MCP server directly from the portal - APIM wraps it and generates the MCP endpoint, no custom MCP code required. Or you can proxy external MCP servers built with any framework, applying the same authentication, rate limiting, and content safety policies to all proxied traffic. Either way, your agents get tools through a governed pipe.
+
+The governance layer is where this gets practical. Agents never hold backend tokens directly - APIM manages OAuth credentials on their behalf. JWT validation, rate limiting, IP filtering, and audit logging all apply at the gateway. [Azure API Center](https://learn.microsoft.com/azure/api-center/register-discover-mcp-server?WT.mc_id=AI-MVP-5004204) (mcp.azure.com) acts as your enterprise MCP registry, so you can configure it as a private registry for VS Code agent mode and GitHub Copilot. That means you control which tools your agents can even discover, not just which ones they can call.
+
+The [remote-mcp-apim-functions-python](https://github.com/Azure-Samples/remote-mcp-apim-functions-python) sample is a good starting point - it implements the MCP Authorisation specification with OAuth 2.0/PKCE via Entra ID.
+
+## Agent identity with Microsoft Entra Agent ID
+
+*Maps to: OWASP ASI03 - Identity and Privilege Abuse, ASI10 - Rogue Agents*
+
+If agents are acting autonomously across your systems, they need identities you can govern. The instinct is to reuse existing app registrations or service principals, but agents aren’t traditional applications - they make decisions, delegate to other agents, and act on behalf of users. [Microsoft Entra Agent ID](https://learn.microsoft.com/entra/agent-id/identity-platform/what-is-agent-id?WT.mc_id=AI-MVP-5004204) (currently in preview) treats them as what they are: a distinct identity type.
+
+The model is built around accountability. You define blueprints for each agent type, then create agent identities from those blueprints with unique IDs and limited permissions by default. Every agent has a sponsor - a human user who’s accountable for it. If that person leaves the organisation, sponsorship transfers to their manager automatically. No orphaned agents silently running with nobody responsible. The [Agent Registry](https://learn.microsoft.com/entra/agent-id/identity-platform/what-is-agent-registry?WT.mc_id=AI-MVP-5004204) gives you centralised visibility across all deployed agents, including those outside the Microsoft ecosystem.
+
+APIM plugs into this directly. You can authenticate agents at the gateway, enforce per-agent rate limits, and apply conditional access policies before anything hits your backends. Agents can’t sign in to Entra ID sign-in pages, can’t join dynamic groups, and tokens are bounded within the agent’s tenant - so if an agent identity is compromised, the blast radius is contained by design.
+
+This is the practical answer to two of the OWASP risks we flagged earlier. Limited-by-default permissions and sponsor accountability address the credential scoping gaps in ASI03. The centralised registry and tenant-bounded tokens give you the visibility to catch rogue agents (ASI10) before they drift.
+
+## OWASP risk mapping
+
+The following table shows how APIM’s AI Gateway capabilities map to the two OWASP frameworks. APIM is transport-layer governance - the chokepoint where you enforce auth, rate limiting, content safety, and observability. It does that well. But it doesn’t inspect function-calling payloads, doesn’t orchestrate agent workflows, and has limited reach into model-level risks like data poisoning or embedding weaknesses. You still need complementary controls at the model, application, and data layers. APIM is a strong foundation, not the whole house.
+
+| OWASP Risk | APIM Capability | Coverage |
+| --- | --- | --- |
+| LLM01 Prompt Injection | `llm-content-safety` with `shield-prompt` | Strong (direct + indirect) |
+| LLM05 Improper Output Handling | `enforce-on-completions` scanning | Strong |
+| LLM06 Excessive Agency | MCP governance, OAuth, per-consumer rate limits | Strong |
+| LLM10 Unbounded Consumption | Token rate limiting, semantic caching, circuit breakers | Strong |
+| ASI02 Tool Misuse | MCP server auth, rate limits | Moderate (server-level, not per-tool) |
+| ASI03 Identity Abuse | Entra Agent ID + [validate-azure-ad-token](https://learn.microsoft.com/azure/api-management/validate-azure-ad-token-policy?WT.mc_id=MVP_466754) | Strong (preview) |
+| ASI07 Insecure Inter-Agent Comms | A2A APIs with mutual auth and TLS | Moderate (preview) |
+| LLM04 Data and Model Poisoning, LLM08 Vector and Embedding Weaknesses, LLM09 Misinformation | Limited - model/data layer concerns | Weak - needs complementary controls |
+
+## Getting the policy order right
+
+When you combine all these controls into a single APIM policy, the sequence matters - requests that fail early never reach later stages, which protects both your backends and your budget.
+
+Think of inbound processing as a series of gates, where each one reduces what hits the next. Authenticate first - unauthenticated requests never reach content safety. Content safety comes second - a prompt injection caught here never burns your rate limit tokens. Cache lookup sits before rate limiting, so a cached response doesn’t count against your quota. Then rate limiting, emit metrics, routing, and finally backend auth using managed identity. By the time a request actually reaches your backend, it’s authenticated, safe, within quota, logged, and routed - in that order.
+
+The AI-Gateway labs repo includes a complete annotated production policy template you can use as a starting point.
+
+## Getting started
+
+Everything described in this post is deployable via Bicep. If you’re using agentic coding tools like Claude Code or GitHub Copilot, the Azure CLI is quick and scriptable for iterating. But from an IaC perspective, you’ll want proper templates. Four repos are worth bookmarking, depending on where you’re starting from.
+
+- **[Azure-Samples/AI-Gateway](https://github.com/Azure-Samples/AI-Gateway)** - The flagship. 30+ Jupyter notebook labs covering load balancing, rate limiting, auth, MCP, and agentic orchestration. Also includes an enterprise AI Gateway e-Book. Start here if you want to understand the full picture.
+- **[Azure-Samples/apim-genai-gateway-toolkit](https://github.com/Azure-Samples/apim-genai-gateway-toolkit)** - Accelerator with an OpenAI API Simulator for cost-free testing and Locust load tests. Demonstrates PTU spillover, request prioritisation, and lowest-latency routing. Start here if you want to test without spending.
+- **[Azure-Samples/apim-lbpool-openai-quickstart](https://github.com/Azure-Samples/apim-lbpool-openai-quickstart)** - Minimal Bicep quickstart. A Basic v2 instance with two Azure OpenAI backends in a native pool. Start here if you just want to learn the pool feature without the complexity.
+- **[Azure/apim-landing-zone-accelerator](https://github.com/Azure/apim-landing-zone-accelerator)** - Cloud Adoption Framework-aligned enterprise architecture, including a GenAI Gateway workload scenario with private endpoints and opinionated policies. Available in both Bicep and Terraform. Start here if you’re deploying at enterprise scale.
+
+## Conclusion
+
+APIM is already the control plane where models, tools, and agents converge. If you’re already running it, you don’t need new infrastructure - you have new policies to configure. There’s a wealth of other policies and configuration available in APIM that apply to AI and non-AI API’s alike. Give them a go!
+
+The GA capabilities handle transport-level risks today: token limiting, content safety, semantic caching, and backend pools. The preview features - MCP governance, agent identity, and Foundry integration - address the agentic risks that OWASP formalised in December 2025 and are being hardened for regulated workloads. Preview features may change before reaching general availability. You’ll still need controls at the model, application, and data layers, but starting with auth, rate limiting, content safety, and observability will take you a long way - extending your existing AppSec investment rather than replacing it.
+
+Get started with the [AI-Gateway labs](https://github.com/Azure-Samples/AI-Gateway), use the production policy template and Bicep templates to codify your governance baseline, and build from there. Josh and Chris will also be at [Scottish Summit 2026](https://scottishsummit.com/) running a workshop on APIM and AI Gateways in multi-cloud scenarios if you want hands-on support.
+
+## Appendix: Feature maturity
+
+Preview features are subject to change and may have different terms of use. The table below reflects status as of February 2026.
+
+| Capability | Status | Notes |
+| --- | --- | --- |
+| Token rate limiting (`azure-openai-token-limit` / `llm-token-limit`) | GA | All tiers except Consumption |
+| Token metrics (`emit-token-metric`) | GA | All tiers including Consumption |
+| Content safety (`llm-content-safety`) | GA | Since April 2025 |
+| Semantic caching | GA | All tiers; not workspaces |
+| Backend pools with priority routing | GA | All tiers |
+| Circuit breaker with `acceptRetryAfter` | GA | All except Consumption |
+| `validate-azure-ad-token` | GA | All tiers |
+| Premium v2 tier | GA | Since November 2025 |
+| MCP server support (Patterns A and B) | Preview | Classic + v2 + self-hosted |
+| AI Gateway in Microsoft Foundry | Preview | V2 tiers; since November 2025 |
+| Session-aware load balancing | Preview | Early update channel, v2 tiers |
+| Microsoft Entra Agent ID | Preview | Expanded November 2025 |
+| Agent Registry | Preview | Since November 2025 |
+| API Center as MCP Registry | Preview | Free tier available |

@@ -122,6 +122,17 @@ function htmlToMarkdown(html) {
   // Normalize line endings
   md = md.replace(/\r\n/g, '\n')
 
+  // Decode HTML entities FIRST so regexes can match tags.
+  // Run twice to handle double-encoded entities (&amp;gt; → &gt; → >).
+  for (let i = 0; i < 2; i++) {
+    md = md.replace(/&amp;/g, '&')
+    md = md.replace(/&lt;/g, '<')
+    md = md.replace(/&gt;/g, '>')
+    md = md.replace(/&quot;/g, '"')
+    md = md.replace(/&#39;/g, "'")
+    md = md.replace(/&nbsp;/g, ' ')
+  }
+
   // Convert headings
   md = md.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, content) => `# ${stripHtml(content)}\n\n`)
   md = md.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, content) => `## ${stripHtml(content)}\n\n`)
@@ -184,19 +195,49 @@ function htmlToMarkdown(html) {
   // Convert horizontal rules
   md = md.replace(/<hr\s*\/?>/gi, '\n---\n\n')
 
-  // Self-close img tags for MDX compatibility
-  md = md.replace(/<img([^>]*[^/])>/gi, '<img$1 />')
+  // Convert images to markdown, resolving relative paths to absolute URLs
+  md = md.replace(/<img[^>]*\bsrc="([^"]*)"[^>]*\balt="([^"]*)"[^>]*\/?>/gi, (_, src, alt) => {
+    const absoluteSrc = src.startsWith('/') ? `${SITE_BASE}${src}` : src
+    return `![${alt}](${absoluteSrc})`
+  })
+  // Handle img tags with alt before src
+  md = md.replace(/<img[^>]*\balt="([^"]*)"[^>]*\bsrc="([^"]*)"[^>]*\/?>/gi, (_, alt, src) => {
+    const absoluteSrc = src.startsWith('/') ? `${SITE_BASE}${src}` : src
+    return `![${alt}](${absoluteSrc})`
+  })
+  // Handle img tags with no alt attribute
+  md = md.replace(/<img[^>]*\bsrc="([^"]*)"[^>]*\/?>/gi, (_, src) => {
+    const absoluteSrc = src.startsWith('/') ? `${SITE_BASE}${src}` : src
+    return `![](${absoluteSrc})`
+  })
+
+  // Convert HTML tables to markdown pipe tables
+  md = md.replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, (_, tableContent) => {
+    const rows = []
+    const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi
+    for (const trMatch of tableContent.matchAll(trRegex)) {
+      const cells = []
+      const cellRegex = /<(?:td|th)[^>]*>([\s\S]*?)<\/(?:td|th)>/gi
+      for (const cellMatch of trMatch[1].matchAll(cellRegex)) {
+        cells.push(cellMatch[1].replace(/<[^>]+>/g, '').trim())
+      }
+      rows.push(cells)
+    }
+    if (rows.length === 0) return ''
+    const colCount = Math.max(...rows.map((r) => r.length))
+    const lines = []
+    for (let i = 0; i < rows.length; i++) {
+      const padded = rows[i].concat(Array(colCount - rows[i].length).fill(''))
+      lines.push(`| ${padded.join(' | ')} |`)
+      if (i === 0) {
+        lines.push(`| ${Array(colCount).fill('---').join(' | ')} |`)
+      }
+    }
+    return `${lines.join('\n')}\n\n`
+  })
 
   // Strip remaining HTML tags
   md = md.replace(/<[^>]+>/g, '')
-
-  // Decode HTML entities
-  md = md.replace(/&amp;/g, '&')
-  md = md.replace(/&lt;/g, '<')
-  md = md.replace(/&gt;/g, '>')
-  md = md.replace(/&quot;/g, '"')
-  md = md.replace(/&#39;/g, "'")
-  md = md.replace(/&nbsp;/g, ' ')
 
   // Clean up excessive whitespace
   md = md.replace(/\n{3,}/g, '\n\n')
