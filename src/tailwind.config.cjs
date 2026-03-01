@@ -130,6 +130,7 @@ module.exports = {
       },
       maxWidth: {
         content: '720px',
+        article: '960px',
         layout: '1120px',
       },
       transitionTimingFunction: {

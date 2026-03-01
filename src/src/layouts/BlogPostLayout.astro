@@ -248,7 +248,7 @@ const breadcrumbJsonLd = JSON.stringify({
   </article>
 
   <!-- Below article: webmentions and comments -->
-  <div class="blog-footer mx-auto max-w-content lg:max-w-[960px] px-5 md:px-10">
+  <div class="blog-footer mx-auto max-w-content lg:max-w-article px-5 md:px-10">
     <Webmentions />
     <div class="blog-footer__divider"></div>
     <Giscus />
@@ -266,7 +266,7 @@ const breadcrumbJsonLd = JSON.stringify({
 
   @media (min-width: 1024px) {
     .article-wrapper {
-      max-width: 960px;
+      max-width: 960px; /* matches Tailwind max-w-article token */
     }
   }
 
