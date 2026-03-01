@@ -4,30 +4,32 @@
 <site-search>
   <button
     type="button"
-    class="flex items-center justify-center rounded-full p-2 text-zinc-500 hover:bg-zinc-100 hover:text-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-1 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+    class="search-trigger"
     aria-label="Search site"
     id="search-open-button"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   </button>
 
   <dialog
     id="search-dialog"
-    class="fixed inset-0 z-[200] m-0 h-full w-full max-h-full max-w-full bg-black/50 backdrop-blur-sm p-0 open:flex open:items-start open:justify-center overscroll-contain"
+    class="search-overlay"
+    role="dialog"
+    aria-modal="true"
     aria-label="Search"
   >
-    <div class="mt-[5vh] sm:mt-[10vh] w-full max-w-xl mx-4 rounded-xl bg-white dark:bg-zinc-900 shadow-2xl ring-1 ring-zinc-200 dark:ring-zinc-700 overflow-hidden" role="document">
-      <div class="relative">
-        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <div class="search-panel" role="document">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" class="search-input-icon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
           type="search"
           id="search-input"
-          class="w-full border-0 bg-transparent py-4 pl-12 pr-4 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0 text-base"
-          placeholder="Search posts, talks, notes, projects, and shorts..."
+          class="search-input"
+          placeholder="Search posts, notes, projects..."
           autocomplete="off"
           aria-label="Search query"
           aria-controls="search-results"
@@ -36,27 +38,192 @@
           aria-expanded="false"
           aria-haspopup="listbox"
         />
-        <kbd class="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center rounded border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">Esc</kbd>
+        <kbd class="search-kbd">Esc</kbd>
       </div>
 
-      <div class="border-t border-zinc-100 dark:border-zinc-800">
-        <ul
-          id="search-results"
-          role="listbox"
-          aria-label="Search results"
-          class="max-h-[50vh] overflow-y-auto p-2"
-        >
-          <li id="search-empty" class="hidden px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400" role="status">
-            No results found.
-          </li>
-          <li id="search-initial" class="px-4 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Start typing to search...
-          </li>
-        </ul>
-      </div>
+      <div class="search-divider"></div>
+      <ul
+        id="search-results"
+        role="listbox"
+        aria-label="Search results"
+        class="search-results"
+      >
+        <li id="search-empty" class="search-status hidden" role="status">
+          No results found.
+        </li>
+        <li id="search-initial" class="search-status">
+          Start typing to search...
+        </li>
+      </ul>
     </div>
   </dialog>
 </site-search>
+
+<style>
+  /* Trigger button */
+  .search-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+
+  .search-trigger:hover {
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+  }
+
+  .search-trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Overlay */
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    overscroll-behavior: contain;
+  }
+
+  .search-overlay[open] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .search-overlay::backdrop {
+    display: none;
+  }
+
+  /* Dialog panel */
+  .search-panel {
+    margin-top: 5vh;
+    width: calc(100% - 32px);
+    max-width: 560px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (min-width: 640px) {
+    .search-panel {
+      margin-top: 10vh;
+    }
+  }
+
+  /* Search input area */
+  .search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-subtle);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 48px 0 48px;
+    border: none;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    margin: 8px;
+    font-family: var(--font-body, 'Source Serif 4', Georgia, serif);
+    font-size: 1rem;
+    color: var(--color-text);
+    outline: none;
+    transition: box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-subtle);
+  }
+
+  .search-input:focus {
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  /* Escape key badge */
+  .search-kbd {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
+    padding: 2px 8px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.6875rem;
+    color: var(--color-text-subtle);
+    line-height: 1.4;
+  }
+
+  @media (min-width: 640px) {
+    .search-kbd {
+      display: inline-flex;
+    }
+  }
+
+  /* Divider between input and results */
+  .search-divider {
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  /* Results list */
+  .search-results {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 8px;
+    margin: 0;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  /* Status messages (empty + initial) */
+  .search-status {
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
 
 <script>
   import Fuse from 'fuse.js'
@@ -213,27 +380,28 @@
           ? '<span class="sr-only">(opens in new tab)</span>'
           : ''
 
-        const typeLabelMap: Record<string, { bg: string; text: string; label: string }> = {
-          blog: { bg: 'bg-accent-50 dark:bg-accent-900/20', text: 'text-accent-700 dark:text-accent-300', label: 'Blog' },
-          speaking: { bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-600 dark:text-zinc-400', label: 'Speaking' },
-          note: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-300', label: 'Note' },
-          project: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-700 dark:text-violet-300', label: 'Project' },
-          short: { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-300', label: 'Short' },
+        // Type badge colour mapping using CSS variables
+        const typeBadgeMap: Record<string, { cssVar: string; label: string }> = {
+          blog: { cssVar: 'primary', label: 'Blog' },
+          speaking: { cssVar: 'subtle', label: 'Talk' },
+          note: { cssVar: 'warm', label: 'Note' },
+          project: { cssVar: 'subtle', label: 'Project' },
+          short: { cssVar: 'success', label: 'Short' },
         }
-        const labelInfo = typeLabelMap[item.type] ?? typeLabelMap.blog
-        const typeLabel = `<span class="inline-flex items-center rounded-full ${labelInfo.bg} px-2 py-0.5 text-xs ${labelInfo.text}">${labelInfo.label}</span>`
+        const badgeInfo = typeBadgeMap[item.type] ?? typeBadgeMap.blog
+        const typeLabel = `<span class="search-badge search-badge--${badgeInfo.cssVar}">${badgeInfo.label}</span>`
 
         li.innerHTML = `
-          <a href="${item.url}"${rel} class="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors cursor-pointer">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
+          <a href="${item.url}"${rel} class="search-result-link">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 ${typeLabel}
                 ${externalIcon}
               </div>
-              <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">${this.escapeHtml(item.title)}</div>
-              <div class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">${this.escapeHtml(item.description)}</div>
+              <div class="search-result-title">${this.escapeHtml(item.title)}</div>
+              <div class="search-result-desc">${this.escapeHtml(item.description)}</div>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 4px; color: var(--color-text-subtle);" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </a>
@@ -250,7 +418,8 @@
       // Deselect current
       if (this.activeIndex >= 0 && this.activeIndex < items.length) {
         items[this.activeIndex].setAttribute('aria-selected', 'false')
-        items[this.activeIndex].querySelector('a')?.classList.remove('bg-zinc-50', 'dark:bg-zinc-800/70')
+        const link = items[this.activeIndex].querySelector('a') as HTMLElement
+        if (link) link.style.background = ''
       }
 
       this.activeIndex += direction
@@ -259,7 +428,8 @@
 
       const active = items[this.activeIndex]
       active.setAttribute('aria-selected', 'true')
-      active.querySelector('a')?.classList.add('bg-zinc-50', 'dark:bg-zinc-800/70')
+      const activeLink = active.querySelector('a') as HTMLElement
+      if (activeLink) activeLink.style.background = 'var(--color-primary-muted)'
       active.scrollIntoView({ block: 'nearest' })
       this.input?.setAttribute('aria-activedescendant', active.id)
     }
@@ -283,3 +453,78 @@
 
   customElements.define('site-search', SiteSearch)
 </script>
+
+<style is:global>
+  /* Result link - needs global because it's injected via JS */
+  .search-result-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .search-result-link:hover {
+    background: var(--color-surface-hover);
+  }
+
+  /* Result title */
+  .search-result-title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Result description */
+  .search-result-desc {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* Type badges */
+  .search-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .search-badge--primary {
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+  }
+
+  .search-badge--warm {
+    background: var(--color-warm-muted);
+    color: var(--color-warm);
+  }
+
+  .search-badge--success {
+    background: rgba(5, 150, 105, 0.08);
+    color: var(--color-success);
+  }
+
+  [data-theme="dark"] .search-badge--success {
+    background: rgba(52, 211, 153, 0.15);
+  }
+
+  .search-badge--subtle {
+    background: var(--color-surface-hover);
+    color: var(--color-text-subtle);
+  }
+</style>
