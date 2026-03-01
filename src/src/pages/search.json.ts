@@ -16,7 +16,32 @@ export async function GET() {
     if (id) mdxYouTubeIds.add(id)
   }
 
+  const staticPages = [
+    {
+      title: 'About',
+      description: 'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, doctoral researcher, open source contributor.',
+      tags: ['about', 'bio', 'background'],
+      url: '/about/',
+      type: 'page' as const,
+    },
+    {
+      title: 'Speaker Kit',
+      description: 'Bio, headshot, talk topics, and logistics for event organisers.',
+      tags: ['speaker', 'bio', 'headshot', 'booking'],
+      url: '/speaking/kit/',
+      type: 'page' as const,
+    },
+    {
+      title: 'Privacy Policy',
+      description: 'How personal data is handled on sealjay.com, including analytics, comments, and your rights.',
+      tags: ['privacy', 'data', 'GDPR'],
+      url: '/privacy/',
+      type: 'page' as const,
+    },
+  ]
+
   const searchIndex = [
+    ...staticPages,
     ...blogs.map((post) => ({
       title: post.data.title,
       description: post.data.description,
@@ -25,9 +50,9 @@ export async function GET() {
       type: 'blog' as const,
     })),
     ...speaking.map((entry) => ({
-      title: entry.data.title,
+      title: `${entry.data.title} — ${entry.data.event}`,
       description: entry.data.description,
-      tags: [entry.data.eventType],
+      tags: [entry.data.eventType, entry.data.event],
       url: entry.data.url,
       type: 'speaking' as const,
     })),

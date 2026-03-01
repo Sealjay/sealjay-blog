@@ -260,7 +260,7 @@
     description: string
     tags: string[]
     url: string
-    type: 'blog' | 'speaking' | 'note' | 'project' | 'short'
+    type: 'blog' | 'speaking' | 'note' | 'project' | 'short' | 'page'
   }
 
   class SiteSearch extends HTMLElement {
@@ -430,7 +430,7 @@
         li.setAttribute('aria-selected', 'false')
         li.id = `search-result-${i}`
 
-        const isExternal = item.type === 'speaking' || item.type === 'project' || item.type === 'short'
+        const isExternal = item.type === 'speaking' || item.type === 'project' || item.type === 'short' || (item.type === 'page' && item.url.startsWith('http'))
         const rel = isExternal ? ' rel="noopener noreferrer" target="_blank"' : ''
         const externalIcon = isExternal
           ? '<span class="sr-only">(opens in new tab)</span>'
@@ -443,6 +443,7 @@
           note: { cssVar: 'warm', label: 'Note' },
           project: { cssVar: 'subtle', label: 'Project' },
           short: { cssVar: 'success', label: 'Short' },
+          page: { cssVar: 'subtle', label: 'Page' },
         }
         const badgeInfo = typeBadgeMap[item.type] ?? typeBadgeMap.blog
         const typeLabel = `<span class="search-badge search-badge--${badgeInfo.cssVar}">${badgeInfo.label}</span>`
