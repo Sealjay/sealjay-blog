@@ -73,10 +73,10 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
 
 <Layout
   title="Chris Lloyd-Jones | Sealjay"
-  description="AI security, green software, and open source — Chris Lloyd-Jones (Sealjay), London"
+  description="AI transformation, green software, and open source — Chris Lloyd-Jones (Sealjay), VP at Kyndryl and 6x Microsoft AI MVP"
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={new Date('1 March 2023')}
-  heroImage="/chris/portrait.jpg"
+  updatedDate={new Date('1 March 2026')}
+  heroImage="/chris/avatar.jpg"
 >
   <!-- Hero Section -->
   <div class="hero-section">
@@ -86,13 +86,6 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
       <div class="h-card">
         <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
         <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
-
-        <!-- Expertise tags -->
-        <div class="hero-tags hero-anim" style="animation-delay: 0s;">
-          {expertiseTags.map((tag) => (
-            <Badge label={tag} variant="default" />
-          ))}
-        </div>
 
         <!-- Name -->
         <h1 class="hero-title font-heading hero-anim" style="animation-delay: 0.08s;">
@@ -109,14 +102,21 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
           I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. I bridge AI transformation with enterprise governance, sustainability, and open source &mdash; from green software to agentic AI. 6x Microsoft MVP, doctoral researcher in Green Software Engineering, and co-host of <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a>.
         </p>
 
+        <!-- Expertise tags -->
+        <div class="hero-tags hero-anim" style="animation-delay: 0.28s;">
+          {expertiseTags.map((tag) => (
+            <Badge label={tag} variant="default" />
+          ))}
+        </div>
+
         <!-- Bento grid: Latest Article + Next Speaking -->
-        <div class="hero-bento hero-anim" style="animation-delay: 0.32s;">
+        <div class="hero-bento hero-anim" style="animation-delay: 0.36s;">
           {latestPost && <LatestArticle post={latestPost} />}
           {nextTalk.length > 0 && <RecentTalks entries={nextTalk} />}
         </div>
 
         <!-- Code signature -->
-        <div class="hero-code-signature hero-anim" style="animation-delay: 0.40s;">
+        <div class="hero-code-signature hero-anim" style="animation-delay: 0.44s;">
           <code><span class="code-comment">// </span><span class="code-keyword">open</span>, sustainable, real</code>
         </div>
       </div>
@@ -130,6 +130,8 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
       <div class="writing-list">
         {recentPosts.map((post) => {
           const firstTag = post.data.tags?.[0]
+          const words = post.body?.split(/\s+/).length ?? 0
+          const readingTime = Math.max(1, Math.ceil(words / 200))
           return (
             <a href={`/blog/${post.slug}/`} class="writing-card">
               <div class="writing-card__row">
@@ -137,6 +139,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
                   <span class="writing-card__tag">{firstTag}</span>
                 )}
                 <FormattedDate date={post.data.pubDateTime} class="writing-card__date" />
+                <span class="writing-card__reading-time">{readingTime} min read</span>
               </div>
               <h3 class="writing-card__title font-heading">{post.data.title}</h3>
             </a>
@@ -229,7 +232,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
     display: flex;
     flex-wrap: wrap;
     gap: 0.375rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
   .hero-title {
@@ -398,12 +401,12 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   }
 
   .writing-card:hover {
-    transform: translateX(4px);
+    transform: translateY(-2px);
     border-color: var(--color-border-strong);
   }
 
   .writing-card:focus-visible {
-    transform: translateX(4px);
+    transform: translateY(-2px);
     border-color: var(--color-border-strong);
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
@@ -429,6 +432,12 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
 
   /* Override FormattedDate scoped styles when used as compact date */
   .writing-card :global(.formatted-date.writing-card__date) {
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1;
+  }
+
+  .writing-card__reading-time {
     font-size: 11px;
     color: var(--color-text-subtle);
     line-height: 1;

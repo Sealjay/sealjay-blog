@@ -2,7 +2,8 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 export const SITE_TITLE = 'Sealjay'
-export const SITE_DESCRIPTION = 'Software engineer, open source & sustainability enthusiast.'
+export const SITE_DESCRIPTION =
+  'VP, AI Consulting Transformation at Kyndryl. 6x Microsoft AI MVP. Agentic AI, open source, and green software. // open, sustainable, real.'
 
 export const SITE_NAV = [
   { name: 'About', path: '/about' },

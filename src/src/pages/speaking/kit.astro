@@ -18,7 +18,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   title="Speaker Kit | Chris Lloyd-Jones"
   description={speakerBio.short}
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={new Date('15 February 2026')}
+  updatedDate={new Date('1 March 2026')}
   heroImage={headshot}
 >
   <Container>
@@ -220,7 +220,7 @@ const featuredSpeaking = (await getCollection('speaking'))
 <style>
   /* Section rhythm */
   .kit-section {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .kit-section-heading {
@@ -240,7 +240,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   .kit-divider {
     height: 1px;
     background: linear-gradient(to right, transparent, var(--color-border), transparent);
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   /* Headshot */
@@ -325,7 +325,7 @@ const featuredSpeaking = (await getCollection('speaking'))
     border: none;
     background: transparent;
     color: var(--color-primary);
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
@@ -342,7 +342,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   }
 
   .kit-bio-block__text {
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     font-size: 0.9375rem;
     line-height: 1.75;
     color: var(--color-text-muted);
@@ -419,7 +419,6 @@ const featuredSpeaking = (await getCollection('speaking'))
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-width: 42rem;
   }
 
   .kit-format-item {
@@ -547,7 +546,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   }
 
   .kit-testimonial__text {
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     font-size: 0.9375rem;
     line-height: 1.75;
     color: var(--color-text-muted);
@@ -556,7 +555,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   }
 
   .kit-testimonial__author-name {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-text);
@@ -577,7 +576,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   }
 
   .kit-logistics-item__label {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
