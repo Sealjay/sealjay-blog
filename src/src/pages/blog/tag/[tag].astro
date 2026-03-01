@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import Container from '../../../components/containers/Container.astro'
 import PageHeader from '../../../components/partials/PageHeader.astro'
@@ -39,7 +40,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
 ---
 
 <BaseLayout
-  title={`Tagged: ${tag}`}
+  title={`${tag} Posts`}
   description={`Blog posts tagged with "${tag}"`}
   pubDateTime={new Date('1 March 2023')}
   updatedDate={lastPostDate}
@@ -47,7 +48,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
 >
   <Container>
     <PageHeader
-      title={`Tagged: ${tag}`}
+      title={tag}
       subtitle={`${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`}
       center={false}
       breadcrumbs={[
@@ -80,8 +81,6 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
     {/* Article list */}
     <div class="blog-list" data-page-size="12">
       {posts.map((post, index) => {
-        const hasHeroImage = !!post.data.heroImage
-        const heroSrc = hasHeroImage ? post.data.heroImage : getOGImagePath(post.slug)
         const firstTag = post.data.tags?.[0]
         const wordCount = post.body ? post.body.split(/\s+/).length : 0
         const readingTime = wordCount > 0 ? Math.max(1, Math.ceil(wordCount / 200)) : undefined
@@ -98,17 +97,32 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
             data-post-index={index}
             style={index >= 12 ? 'display:none' : undefined}
           >
-            <div class="blog-card__image">
-              <img
-                src={heroSrc}
-                alt=""
-                width="1200"
-                height="630"
-                loading="lazy"
-                decoding="async"
-                class="blog-card__img"
-              />
-            </div>
+            {post.data.heroImage ? (
+              <div class="blog-card__image">
+                <Picture
+                  src={post.data.heroImage}
+                  formats={['avif', 'webp']}
+                  alt=""
+                  width={800}
+                  height={450}
+                  layout="constrained"
+                  loading="lazy"
+                  class="blog-card__img"
+                />
+              </div>
+            ) : (
+              <div class="blog-card__image">
+                <img
+                  src={getOGImagePath(post.slug)}
+                  alt=""
+                  width="1200"
+                  height="630"
+                  loading="lazy"
+                  decoding="async"
+                  class="blog-card__img"
+                />
+              </div>
+            )}
             <div class="blog-card__body">
               {firstTag && (
                 <span class="blog-card__tag" style={getTagStyle(firstTag)}>{firstTag}</span>

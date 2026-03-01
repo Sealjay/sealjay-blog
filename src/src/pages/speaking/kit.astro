@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets'
 import Layout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
@@ -7,7 +8,8 @@ import Badge from '../../components/partials/Badge.astro'
 import SpeakerUl from '../../components/partials/SpeakerUl.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import { getCollection } from 'astro:content'
-import { speakerBio, topics, talkFormats, testimonials, logistics, contactCta, headshot } from '../../config/speakerKit'
+import { speakerBio, topics, talkFormats, testimonials, logistics, contactCta } from '../../config/speakerKit'
+import headshotImage from '../../assets/chris/avatar.jpg'
 
 const featuredSpeaking = (await getCollection('speaking'))
   .filter((entry) => entry.data.featured === true)
@@ -15,11 +17,11 @@ const featuredSpeaking = (await getCollection('speaking'))
 ---
 
 <Layout
-  title="Speaker Kit | Chris Lloyd-Jones"
+  title="Speaker Kit"
   description={speakerBio.short}
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2026')}
-  heroImage={headshot}
+  heroImage={headshotImage.src}
 >
   <Container>
     <PageHeader
@@ -36,9 +38,12 @@ const featuredSpeaking = (await getCollection('speaking'))
     <section class="kit-section">
       <div class="kit-headshot-row">
         <div class="kit-headshot-photo">
-          <img
-            src={headshot}
+          <Image
+            src={headshotImage}
             alt="Chris Lloyd-Jones"
+            width={160}
+            height={160}
+            layout="fixed"
             class="kit-headshot-img"
           />
         </div>
@@ -46,7 +51,7 @@ const featuredSpeaking = (await getCollection('speaking'))
           <h2 class="kit-section-heading font-heading">Headshot</h2>
           <p class="kit-section-desc">High-resolution photo for event listings and promotional materials.</p>
           <div class="kit-headshot-actions">
-            <Button variant="secondary" size="sm" href={headshot}>
+            <Button variant="secondary" size="sm" href={headshotImage.src}>
               <svg xmlns="http://www.w3.org/2000/svg" class="kit-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>

@@ -5,14 +5,16 @@ import PageHeader from '../components/partials/PageHeader.astro'
 import ProfileSection from '../components/partials/ProfileSection.astro'
 import Badge from '../components/partials/Badge.astro'
 import { currentRole } from '../config/personal'
+import portrait from '../assets/chris/portrait.jpg'
+import avatar from '../assets/chris/avatar.jpg'
 ---
 
 <Layout
-  title="About Me | Chris Lloyd-Jones"
+  title="About"
   description="Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. 6x Microsoft AI MVP. Doctoral researcher in Green Software Engineering."
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2026')}
-  heroImage="/chris/avatar.jpg"
+  heroImage={avatar.src}
 >
   <Container>
     <PageHeader
@@ -25,7 +27,7 @@ import { currentRole } from '../config/personal'
     />
 
     <ProfileSection
-      imageSrc="/chris/portrait.jpg"
+      imageSrc={portrait}
       imageAlt="Chris Lloyd-Jones"
       showBadges={true}
       showFormerRoles={true}

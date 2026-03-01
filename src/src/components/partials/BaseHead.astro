@@ -2,6 +2,7 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import "../../styles/global.css";
+import avatarImage from '../../assets/chris/avatar.jpg'
 
 export interface Props {
   title: string;
@@ -13,9 +14,63 @@ export interface Props {
   noindex?: boolean;
 }
 
+const SITE_SUFFIX = ' | Chris Lloyd-Jones, Sealjay'
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = "/chris/avatar.jpg", ogType = "website", pubDate, tags, noindex } = Astro.props;
+const defaultImage = avatarImage.src
+const { title: rawTitle, description, image = defaultImage, ogType = "website", pubDate, tags, noindex } = Astro.props;
+
+// Auto-append site suffix unless the title already contains the brand name
+const title = rawTitle.includes('Chris Lloyd-Jones') ? rawTitle : rawTitle + SITE_SUFFIX;
+
+// Build JSON-LD in frontmatter so we can use dynamic avatar URL
+const avatarAbsoluteUrl = new URL(defaultImage, 'https://sealjay.com').href
+
+const personJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  'name': 'Chris Lloyd-Jones',
+  'alternateName': 'Sealjay',
+  'url': 'https://sealjay.com',
+  'image': avatarAbsoluteUrl,
+  'jobTitle': 'VP, AI Consulting Transformation',
+  'worksFor': {
+    '@type': 'Organization',
+    'name': 'Kyndryl',
+  },
+  'sameAs': [
+    'https://github.com/sealjay',
+    'https://bsky.app/profile/sealjay.com',
+    'https://x.com/sealjay_clj',
+    'https://uk.linkedin.com/in/chrislloydjones',
+    'https://fosstodon.org/@sealjay',
+    'https://orcid.org/0000-0001-7995-7865',
+  ],
+  'knowsAbout': [
+    'Artificial Intelligence',
+    'Agentic AI',
+    'AI Governance',
+    'Open Source',
+    'Green Software',
+    'Sustainability',
+  ],
+})
+
+const websiteJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  'name': 'Sealjay',
+  'url': 'https://sealjay.com',
+  'potentialAction': {
+    '@type': 'SearchAction',
+    'target': {
+      '@type': 'EntryPoint',
+      'urlTemplate': 'https://sealjay.com/search?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+})
 ---
 
 <!-- Global Metadata -->
@@ -106,48 +161,10 @@ const { title, description, image = "/chris/avatar.jpg", ogType = "website", pub
 <link rel="alternate" type="application/activity+json" href={`https://fed.brid.gy/r/${canonicalURL}`} />
 
 <!-- JSON-LD Structured Data (Person) -->
-<script is:inline type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Chris Lloyd-Jones",
-  "alternateName": "Sealjay",
-  "url": "https://sealjay.com",
-  "image": "https://sealjay.com/chris/avatar.jpg",
-  "jobTitle": "VP, AI Consulting Transformation",
-  "worksFor": {
-    "@type": "Organization",
-    "name": "Kyndryl"
-  },
-  "sameAs": [
-    "https://github.com/sealjay",
-    "https://bsky.app/profile/sealjay.com",
-    "https://x.com/sealjay_clj",
-    "https://uk.linkedin.com/in/chrislloydjones",
-    "https://fosstodon.org/@sealjay",
-    "https://orcid.org/0000-0001-7995-7865"
-  ],
-  "knowsAbout": ["Artificial Intelligence", "Agentic AI", "AI Governance", "Open Source", "Green Software", "Sustainability"]
-}
-</script>
+<script type="application/ld+json" set:html={personJsonLd} />
 
 <!-- JSON-LD Structured Data (WebSite + SearchAction) -->
-<script is:inline type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Sealjay",
-  "url": "https://sealjay.com",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": "https://sealjay.com/search?q={search_term_string}"
-    },
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
+<script type="application/ld+json" set:html={websiteJsonLd} />
 
 <!-- Plausible -->
 <script

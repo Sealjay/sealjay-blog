@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { Picture } from "astro:assets";
 import PageLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 import Giscus from "../components/embeds/Giscus.astro";
@@ -24,7 +25,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
 const ogImagePath = getOGImagePath(slug);
 // Only show custom hero images on the page — auto-generated OG images repeat the title/date and are redundant
-const hasCustomHero = heroImage && heroImage !== "/placeholder-hero.png";
+const hasCustomHero = !!heroImage;
 const displayHeroImage = hasCustomHero ? heroImage : null;
 
 // Compute prev/next posts
@@ -181,13 +182,14 @@ const breadcrumbJsonLd = JSON.stringify({
     <!-- Hero image -->
     {displayHeroImage && (
       <div class="article-hero">
-        <img
+        <Picture
           src={displayHeroImage}
+          formats={['avif', 'webp']}
           alt=""
-          width="1200"
-          height="675"
+          width={1200}
+          height={675}
+          layout="full-width"
           fetchpriority="high"
-          decoding="async"
           class="u-photo article-hero-img"
         />
       </div>

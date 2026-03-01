@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets'
 import Layout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
@@ -52,13 +53,14 @@ const latestProject = sortedProjects.reduce((prev, current) =>
               {/* Hero Image */}
               {project.data.heroImage && (
                 <div class="project-card__image">
-                  <img
+                  <Picture
                     src={project.data.heroImage}
+                    formats={['avif', 'webp']}
                     alt=""
-                    width="800"
-                    height="450"
+                    width={800}
+                    height={450}
+                    layout="constrained"
                     loading="lazy"
-                    decoding="async"
                     class="project-card__img"
                   />
                 </div>

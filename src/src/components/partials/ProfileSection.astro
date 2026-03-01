@@ -1,10 +1,12 @@
 ---
+import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
 import { currentRole, location as configLocation, professionalBadges, formerRoles } from "../../config/personal";
 import SocialLinks from "./IndexSocialLinks.astro";
 import Badge from "./Badge.astro";
 
 interface Props {
-  imageSrc: string;
+  imageSrc: ImageMetadata;
   imageAlt: string;
   title?: string;
   job?: string;
@@ -25,9 +27,12 @@ const {
   <!-- Image (Mobile: top, Desktop: left) -->
   <div class="profile-section__image-col">
     <div class="profile-section__image-wrapper">
-      <img
+      <Image
         src={imageSrc}
         alt={imageAlt}
+        width={280}
+        height={280}
+        layout="constrained"
         class="profile-section__photo"
       />
     </div>
