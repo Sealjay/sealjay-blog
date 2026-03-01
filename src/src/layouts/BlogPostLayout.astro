@@ -4,6 +4,7 @@ import PageLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/partials/FormattedDate.astro";
 import Giscus from "../components/embeds/Giscus.astro";
 import Webmentions from "../components/partials/Webmentions.astro";
+import RelatedPosts from "../components/partials/RelatedPosts.astro";
 import { getOGImagePath } from "../lib/og-image";
 
 type Props = CollectionEntry<"blog">["data"];
@@ -88,6 +89,17 @@ const breadcrumbJsonLd = JSON.stringify({
       <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
     </span>
 
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="/blog">Blog</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page">{title}</li>
+      </ol>
+    </nav>
+
     <!-- Tag badges -->
     {tags && tags.length > 0 && (
       <div class="article-tags">
@@ -168,6 +180,9 @@ const breadcrumbJsonLd = JSON.stringify({
       )
     })()}
 
+    <!-- Separator -->
+    <hr class="article-separator" />
+
     <!-- Article body -->
     <div class="e-content prose prose-lg">
       <slot />
@@ -180,9 +195,49 @@ const breadcrumbJsonLd = JSON.stringify({
     <div class="section-divider"></div>
     <Giscus />
   </div>
+
+  <!-- Related posts -->
+  <RelatedPosts currentSlug={slug} tags={tags ?? []} />
 </PageLayout>
 
 <style>
+  /* Breadcrumb */
+  .breadcrumb {
+    margin-bottom: 1rem;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Literata', Georgia, serif;
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .breadcrumb li a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .breadcrumb li a:hover {
+    color: var(--color-primary);
+  }
+
+  .breadcrumb li[aria-hidden='true'] {
+    color: var(--color-text-subtle);
+    user-select: none;
+  }
+
+  .breadcrumb li[aria-current='page'] {
+    color: var(--color-text);
+  }
+
   /* Tag badges */
   .article-tags {
     display: flex;
@@ -321,7 +376,11 @@ const breadcrumbJsonLd = JSON.stringify({
     text-decoration: underline;
   }
 
-  .article-reply-to-link:focus {
-    outline: none;
+  /* Header/body separator */
+  .article-separator {
+    border: 0;
+    height: 1px;
+    background: var(--color-border);
+    margin: 0 0 2rem;
   }
 </style>
