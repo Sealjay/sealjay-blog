@@ -189,10 +189,6 @@
     @apply max-w-full;
   }
 
-  /* Standardise section spacing */
-  section {
-    @apply py-10 md:py-16;
-  }
 }
 
 /* ============================================================
