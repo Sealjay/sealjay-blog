@@ -18,7 +18,7 @@ const ackImages = import.meta.glob<{ default: ImageMetadata }>(
   title="Colophon"
   description="The open-source projects, tools, and resources this site is built with"
   pubDateTime={new Date('11 May 2023')}
-  updatedDate={new Date('17 February 2026')}
+  updatedDate={new Date('01 March 2026')}
 >
   <Container>
     <PageHeader
@@ -96,11 +96,6 @@ const ackImages = import.meta.glob<{ default: ImageMetadata }>(
       ))}
     </div>
 
-    <div class="ack-trademark">
-      <p>
-        Sealjay&reg; is a <a href="https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003592625" target="_blank" rel="noopener noreferrer">registered trademark</a> of Chris Lloyd-Jones.
-      </p>
-    </div>
   </Container>
 </Layout>
 
@@ -248,25 +243,4 @@ const ackImages = import.meta.glob<{ default: ImageMetadata }>(
     transform: translateX(4px);
   }
 
-  .ack-trademark {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .ack-trademark p {
-    font-size: 0.75rem;
-    color: var(--color-text-subtle);
-  }
-
-  .ack-trademark a {
-    color: var(--color-text-subtle);
-    text-decoration: underline;
-    text-decoration-color: var(--color-border);
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .ack-trademark a:hover {
-    color: var(--color-text-muted);
-  }
 </style>
