@@ -1,13 +1,19 @@
 ---
 import { getCollection } from 'astro:content'
 import Layout from '../layouts/BaseLayout.astro'
+import IndexWaves from '../components/partials/IndexWaves.astro'
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
 import Badge from '../components/partials/Badge.astro'
+import Button from '../components/partials/Button.astro'
 import LatestArticle from '../components/home/LatestArticle.astro'
 import RecentTalks from '../components/home/RecentTalks.astro'
 import FeaturedProjects from '../components/home/FeaturedProjects.astro'
 import LatestNotes from '../components/home/LatestNotes.astro'
-import { professionalBadges, currentRole } from '../config/personal'
+import Container from '../components/containers/Container.astro'
+import Section from '../components/containers/Section.astro'
+import FormattedDate from '../components/partials/FormattedDate.astro'
+import { getOGImagePath } from '../lib/og-image'
+import { currentRole } from '../config/personal'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -25,7 +31,8 @@ const projectEntries = (await getCollection('project')).sort(
 
 // --- Curated section data ---
 const latestPost = posts[0]
-const recentTalks = speakingEntries.slice(0, 3)
+const recentPosts = posts.slice(0, 3)
+const nextTalk = speakingEntries.slice(0, 1)
 const featuredProjects = (() => {
   const featured = projectEntries.filter((p) => p.data.featured)
   if (featured.length >= 3) return featured.slice(0, 3)
@@ -60,6 +67,20 @@ const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
   url: `/notes/${latestDayKey}/#${n.slug}`,
 }))
 
+// --- Expertise tags for hero ---
+const expertiseTags = ['AI Security', 'Green Software', 'Open Source', 'Azure MVP']
+
+// --- Recent writing card helpers ---
+function getPostHero(post: typeof posts[0]) {
+  const hasHero = post.data.heroImage && post.data.heroImage !== '/placeholder-hero.png'
+  return hasHero ? post.data.heroImage! : getOGImagePath(post.slug)
+}
+
+function estimateReadingTime(body?: string) {
+  if (!body) return undefined
+  const wordCount = body.split(/\s+/).length
+  return wordCount > 0 ? Math.max(1, Math.ceil(wordCount / 200)) : undefined
+}
 ---
 
 <Layout
@@ -70,91 +91,352 @@ const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
   heroImage="/chris/portrait.jpg"
 >
   <!-- Hero Section -->
-  <div class="h-card w-full max-w-5xl mx-auto pt-6 md:pt-12">
-    <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
-    <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
-    <div class="flex flex-col md:flex-row md:items-center md:gap-12">
-      <!-- Image on mobile (top) and desktop (right) -->
-      <div class="md:hidden mb-8 mx-auto">
-        <div class="relative w-32 [height:8rem] overflow-hidden rounded-full ring-4 ring-accent-100 dark:ring-accent-900">
-          <img
-            src="/chris/portrait.jpg"
-            alt="Chris Lloyd-Jones"
-            class="u-photo w-full [height:100%] object-cover"
-            loading="lazy"
-          />
-        </div>
-      </div>
+  <div class="hero-section">
+    <IndexWaves />
+    <Container class="hero-content">
+      <div class="h-card">
+        <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
+        <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
 
-      <!-- Text Content -->
-      <div class="flex-1">
-        <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
-          <span class="p-job-title font-medium">{currentRole.displayText}</span>
-        </div>
-
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 md:text-5xl">
-          <span class="p-name">Chris Lloyd-Jones</span> &mdash; Software engineer, open source & sustainability enthusiast.
-        </h1>
-
-        <p class="p-note mt-6 text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          I&apos;m Chris - or <span class="p-nickname">Sealjay</span>; I&apos;m a software engineer, and &lsquo;open&rsquo; enthusiast, living in London. I&apos;m deeply embedded in the Open Source community, and a passionate advocate for the thoughtful &amp; sustainable use of AI.
-        </p>
-
-        <div class="mt-4 flex flex-wrap gap-2 text-sm text-accent-600 dark:text-accent-400 font-medium">
-          {professionalBadges.slice(0, 3).map(badge => (
-            <Badge
-              text={badge.text}
-              url={badge.url}
-              isFormerRole={badge.isFormerRole}
-            />
+        <!-- Expertise tags -->
+        <div class="hero-tags">
+          {expertiseTags.map((tag) => (
+            <Badge label={tag} variant="default" />
           ))}
         </div>
 
-        <div class="mt-8">
-          <SocialLinks />
-        </div>
-      </div>
+        <!-- Name -->
+        <h1 class="hero-title font-heading">
+          <span class="p-name">Chris Lloyd-Jones</span>
+        </h1>
 
-      <!-- Image on desktop (right side) -->
-      <div class="hidden md:block flex-shrink-0">
-        <div class="relative w-56 [height:14rem] overflow-hidden rounded-2xl shadow-xl ring-1 ring-zinc-100 dark:ring-zinc-700/30">
-          <img
-            src="/chris/portrait.jpg"
-            alt="Chris Lloyd-Jones"
-            class="u-photo w-full [height:100%] object-cover transition-transform duration-500 hover:scale-105"
-          />
+        <!-- Subtitle -->
+        <p class="hero-subtitle font-body">
+          <span class="p-job-title">{currentRole.title}</span> &mdash; {currentRole.company}
+        </p>
+
+        <!-- Bio -->
+        <p class="hero-bio font-body p-note">
+          I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. A software engineer and 'open' enthusiast living in London, deeply embedded in the Open Source community and a passionate advocate for the thoughtful &amp; sustainable use of AI.
+        </p>
+
+        <!-- Bento grid: Latest Article + Next Speaking -->
+        <div class="hero-bento">
+          {latestPost && <LatestArticle post={latestPost} />}
+          {nextTalk.length > 0 && <RecentTalks entries={nextTalk} />}
         </div>
       </div>
-    </div>
+    </Container>
   </div>
 
-  <!-- Section Divider -->
-  <div class="section-divider max-w-5xl mx-auto"></div>
+  <!-- Recent Writing Section -->
+  <Section bg="alt" ariaLabel="Recent writing">
+    <Container>
+      <h2 class="section-title font-heading">Recent Writing</h2>
+      <div class="writing-grid">
+        {recentPosts.map((post) => {
+          const heroSrc = getPostHero(post)
+          const hasHero = post.data.heroImage && post.data.heroImage !== '/placeholder-hero.png'
+          const firstTag = post.data.tags?.[0]
+          const readingTime = estimateReadingTime(post.body)
+          return (
+            <a href={`/blog/${post.slug}/`} class="writing-card group">
+              <div class="writing-card__image">
+                {hasHero ? (
+                  <img src={heroSrc} alt="" class="writing-card__img" loading="lazy" />
+                ) : (
+                  <div class="writing-card__placeholder" />
+                )}
+              </div>
+              <div class="writing-card__body">
+                {firstTag && (
+                  <span class="writing-card__tag">{firstTag}</span>
+                )}
+                <h3 class="writing-card__title font-heading">{post.data.title}</h3>
+                <div class="writing-card__meta">
+                  <FormattedDate date={post.data.pubDateTime} />
+                  {readingTime && (
+                    <>
+                      <span aria-hidden="true">&middot;</span>
+                      <span>{readingTime} min read</span>
+                    </>
+                  )}
+                </div>
+                <p class="writing-card__excerpt">{post.data.description}</p>
+              </div>
+            </a>
+          )
+        })}
+      </div>
+      <div class="section-cta">
+        <Button variant="ghost" href="/blog" size="sm">View all writing &rarr;</Button>
+      </div>
+    </Container>
+  </Section>
 
-  <!-- Curated Sections Band -->
-  <div class="w-full max-w-5xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {latestPost && <LatestArticle post={latestPost} />}
-      {recentTalks.length > 0 && <RecentTalks entries={recentTalks} />}
+  <!-- Featured Projects Section -->
+  <Section bg="default" ariaLabel="Featured projects">
+    <Container>
+      <h2 class="section-title font-heading">Featured Projects</h2>
       {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
-    </div>
+    </Container>
+  </Section>
+
+  <!-- Latest Notes Section -->
+  <Section bg="alt" ariaLabel="Latest notes">
+    <Container>
+      <h2 class="section-title font-heading">Latest Notes</h2>
+      {latestDayKey && sortedLatestDay.length > 0 && (
+        <LatestNotes
+          date={sortedLatestDay[0].data.pubDateTime}
+          dayUrl={latestDayUrl}
+          daySummary={latestDaySummary}
+          noteCount={sortedLatestDay.length}
+          previews={latestDayPreviews}
+        />
+      )}
+    </Container>
+  </Section>
+
+  <!-- Social Links -->
+  <div class="social-section">
+    <SocialLinks />
   </div>
-
-  <!-- Section Divider -->
-  <div class="section-divider max-w-5xl mx-auto"></div>
-
-  <!-- Latest Notes Strip -->
-  {latestDayKey && sortedLatestDay.length > 0 && (
-    <div class="w-full max-w-5xl mx-auto mb-10 md:mb-12">
-      <LatestNotes
-        date={sortedLatestDay[0].data.pubDateTime}
-        dayUrl={latestDayUrl}
-        daySummary={latestDaySummary}
-        noteCount={sortedLatestDay.length}
-        previews={latestDayPreviews}
-      />
-    </div>
-  )}
-
 </Layout>
 
+<style>
+  /* ============================================================
+     Hero Section
+     ============================================================ */
+  .hero-section {
+    position: relative;
+    background: var(--gradient-hero);
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .hero-section {
+      padding-top: 3.5rem;
+      padding-bottom: 4rem;
+    }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 2.75rem;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    margin: 0 0 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-subtitle {
+      font-size: 1.125rem;
+    }
+  }
+
+  .hero-bio {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    max-width: 520px;
+    margin: 0 0 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-bio {
+      font-size: 1rem;
+    }
+  }
+
+  /* Bento grid */
+  .hero-bento {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-bento {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ============================================================
+     Section Titles
+     ============================================================ */
+  .section-title {
+    font-size: 1.375rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-title {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  /* ============================================================
+     Recent Writing Grid
+     ============================================================ */
+  .writing-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .writing-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .writing-card {
+    display: block;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .writing-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
+  }
+
+  .writing-card__image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  .writing-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .writing-card:hover .writing-card__img {
+    transform: scale(1.05);
+  }
+
+  .writing-card__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-hero);
+  }
+
+  .writing-card__body {
+    padding: 1rem;
+  }
+
+  .writing-card__tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .writing-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .writing-card:hover .writing-card__title {
+    color: var(--color-primary);
+  }
+
+  .writing-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    margin-top: 0.375rem;
+  }
+
+  .writing-card__excerpt {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0.375rem 0 0;
+  }
+
+  /* ============================================================
+     Section CTA
+     ============================================================ */
+  .section-cta {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  /* ============================================================
+     Social Links Section
+     ============================================================ */
+  .social-section {
+    padding: 2.5rem 0;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .social-section {
+      padding: 3rem 0;
+    }
+  }
+</style>
