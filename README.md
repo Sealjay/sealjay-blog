@@ -1,42 +1,26 @@
 # sealjay-blog
-> Personal blog and portfolio site for [Chris Lloyd-Jones (Sealjay)](https://sealjay.com), deployed to Azure Static Web Apps.
 
-![GitHub issues](https://img.shields.io/github/issues/Sealjay/sealjay-blog)
-![GitHub](https://img.shields.io/github/license/Sealjay/sealjay-blog)
-![GitHub Repo stars](https://img.shields.io/github/stars/Sealjay/sealjay-blog?style=social)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
 [![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](https://astro.build/)
 [![Bun](https://img.shields.io/badge/Bun-000?logo=bun&logoColor=fff)](https://bun.sh/)
 [![Biome](https://img.shields.io/badge/Biome-60A5FA?logo=biome&logoColor=fff)](https://biomejs.dev/)
 [![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Microsoft%20Azure-0089D6?logo=msazure&logoColor=white)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/?WT.mc_id=AI-MVP-5004204)
 
-## Overview
-
-The source behind [sealjay.com](https://sealjay.com) - a personal site that brings together long-form blog posts, short-form notes, speaking engagements, and project showcases in one place. The site is built with [Astro](https://astro.build/) and deployed to [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/?WT.mc_id=AI-MVP-5004204).
+The source behind [sealjay.com](https://sealjay.com) — a personal site that brings together long-form blog posts, short-form notes, speaking engagements, and project showcases in one place. Built with [Astro](https://astro.build/) and deployed to [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/?WT.mc_id=AI-MVP-5004204).
 
 ## Tech stack
 
-- **Framework:** [Astro](https://astro.build/) v5 with MDX, React, and Tailwind CSS
+- **Framework:** [Astro](https://astro.build/) v5 with MDX and Tailwind CSS
 - **Package manager:** [Bun](https://bun.sh/) (not npm/yarn)
 - **Linting & formatting:** [Biome](https://biomejs.dev/) (not ESLint or Prettier)
 - **Language:** TypeScript
 - **Deployment:** Azure Static Web Apps
 
-## Features
-
-- **Content collections** - Blog posts, speaking engagements, short-form notes, projects, and acknowledgements, each with typed frontmatter schemas
-- **RSS feed** - Available at [`/rss.xml`](https://sealjay.com/rss.xml)
-- **Sitemap** - Auto-generated via `@astrojs/sitemap`
-- **Search** - Client-side fuzzy search powered by [Fuse.js](https://www.fusejs.io/) over a generated search index
-- **Dynamic OG images** - Category-themed Open Graph cards generated with [Satori](https://github.com/vercel/satori) and [resvg](https://github.com/nicbou/resvg-js)
-- **Webmentions** - Receives via [webmention.io](https://webmention.io/) and sends on deploy
-- **Content sync** - Automated weekly sync of Mastodon toots and [Securing Quest](https://securing.quest/) RSS posts
-- **Comments** - [Giscus](https://giscus.app/) powered by GitHub Discussions
-- **Embeds** - YouTube, tweets, GitHub Gists, and CodePen
-
 ## Getting started
 
-Make sure you have [Bun](https://bun.sh/) installed. All commands run from the `src/` directory:
+**Prerequisites:** [Bun](https://bun.sh/)
+
+All commands run from the `src/` directory:
 
 ```bash
 cd src
@@ -58,32 +42,36 @@ bun run format       # Format code
 
 ```bash
 bun run sync:str                                    # Sync posts from securing.quest RSS
-WEBMENTION_IO_TOKEN=xxx bun run sync:webmentions    # Sync webmentions
-MASTODON_TOKEN=xxx bun run sync:mastodon             # Sync public Mastodon toots to notes
+WEBMENTION_IO_TOKEN=xxx bun run sync:webmentions    # Token from webmention.io/settings
+MASTODON_TOKEN=xxx bun run sync:mastodon             # Token from Mastodon app settings
 MASTODON_TOKEN=xxx bun run sync:mastodon -- --dry-run  # Preview without writing
 ```
 
+## Features
+
+- **Content collections** — Blog posts, speaking engagements, short-form notes, projects, and acknowledgements, each with typed frontmatter schemas
+- **RSS feed** — Available at [`/rss.xml`](https://sealjay.com/rss.xml)
+- **Sitemap** — Auto-generated via `@astrojs/sitemap`
+- **Search** — Client-side fuzzy search powered by [Fuse.js](https://www.fusejs.io/) over a generated search index
+- **Dynamic OG images** — Category-themed Open Graph cards generated with [Satori](https://github.com/vercel/satori) and [resvg](https://github.com/nicbou/resvg-js)
+- **Webmentions** — Receives via [webmention.io](https://webmention.io/) and sends on deploy
+- **Content sync** — Automated weekly sync of Mastodon toots and [Securing Quest](https://securing.quest/) RSS posts
+- **Comments** — [Giscus](https://giscus.app/) powered by GitHub Discussions
+- **Embeds** — YouTube, tweets, GitHub Gists, and CodePen
+
 ## CI/CD
 
-Two GitHub Actions workflows automate deployment and content:
+Two GitHub Actions workflows handle deployment and content freshness automatically — you do not need to trigger these manually.
 
-- **`swa-deploy.yml`** - Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions
-- **`sync-content.yml`** - Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, and Mastodon toots
+- **`swa-deploy.yml`** — Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions.
+- **`sync-content.yml`** — Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, and Mastodon toots.
 
 ## Licensing
 
-### Source code
-The source code in this project is licensed under the [MIT Licence](./LICENCE). The initial concept for this site drew on the [Tailwind UI Spotlight](https://tailwindui.com/templates/spotlight) template. The layout, components, and feature set have since been substantially reworked - rebuilt in [Astro](https://astro.build/) with fediverse integration, webmention support, and new content types - but credit to [Tailwind Labs](https://tailwindcss.com/) for the original inspiration.
+Source code is licensed under the [MIT Licence](./LICENCE).
 
-### Blog content
-All content within the blog is copyright &copy; 2018-2026 Chris Lloyd-Jones, under the name Sealjay(R), except where using other people's work with permission.
+Blog content is copyright &copy; 2018–2026 Chris Lloyd-Jones, under the name Sealjay(R), a registered trademark. Content is licenced under [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/).
 
-Content is licenced under the [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/). You are free to share and adapt the content for any purpose, as long as you give appropriate credit, provide a link to the licence, and indicate if changes were made. If you remix, transform, or build upon the material, you must distribute your contributions under the same licence as the original.
+## Contributing & contact
 
-## Contact
-
-Feel free to contact me [on Mastodon](https://fosstodon.org/@sealjay). For bugs, please [raise an issue on GitHub](https://github.com/Sealjay/sealjay-blog/issues).
-
-## Contributing
-
-Bug reports are welcome via [GitHub Issues](https://github.com/Sealjay/sealjay-blog/issues), or feel free to message me [on Mastodon](https://fosstodon.org/@sealjay).
+Bug reports and suggestions are welcome via [GitHub Issues](https://github.com/Sealjay/sealjay-blog/issues). You can also reach me [on Mastodon](https://fosstodon.org/@sealjay).
