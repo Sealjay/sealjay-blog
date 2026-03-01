@@ -1,14 +1,14 @@
 ---
 type Props = {
-  title: string;
-  linkUrl: string;
-  imageUrl: string;
-};
+  title: string
+  linkUrl: string
+  imageUrl: string
+}
 
-const { title, linkUrl, imageUrl } = Astro.props;
+const { title, linkUrl, imageUrl } = Astro.props
 ---
 
-<div class="social-embed my-4 sm:my-6">
+<div class="social-embed">
   <a href={linkUrl} target="_blank" rel="noopener noreferrer" class="social-embed-link">
     <div class="social-embed-container">
       <div class="social-embed-content">
@@ -17,10 +17,10 @@ const { title, linkUrl, imageUrl } = Astro.props;
       </div>
       {imageUrl && (
         <div class="social-embed-image-container">
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            class="social-embed-image" 
+          <img
+            src={imageUrl}
+            alt={title}
+            class="social-embed-image"
             loading="lazy"
           />
         </div>
@@ -33,35 +33,36 @@ const { title, linkUrl, imageUrl } = Astro.props;
   .social-embed {
     width: 100%;
     max-width: 100%;
+    margin: 1rem 0;
   }
 
   .social-embed-link {
     text-decoration: none;
     color: inherit;
     display: block;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     overflow: hidden;
     transition: transform 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
-  
+
   .social-embed-link:hover {
     transform: translateY(-2px);
   }
-  
+
   .social-embed-link:focus {
-    outline: 2px solid rgba(45, 212, 191, 0.5);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   .social-embed-container {
     display: flex;
     flex-direction: column;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    background-color: #fff;
+    background-color: var(--color-surface);
   }
-  
+
   @media (min-width: 640px) {
     .social-embed-container {
       flex-direction: row;
@@ -78,7 +79,7 @@ const { title, linkUrl, imageUrl } = Astro.props;
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
-    color: #111827;
+    color: var(--color-text);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -87,7 +88,7 @@ const { title, linkUrl, imageUrl } = Astro.props;
 
   .social-embed-url {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
   }
 
   .social-embed-image-container {
@@ -95,7 +96,7 @@ const { title, linkUrl, imageUrl } = Astro.props;
     height: 180px;
     overflow: hidden;
   }
-  
+
   @media (min-width: 640px) {
     .social-embed-image-container {
       width: 180px;
@@ -108,19 +109,5 @@ const { title, linkUrl, imageUrl } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-  
-  /* Dark mode styles */
-  :global(html.dark) .social-embed-container {
-    background-color: #1f2937;
-    border-color: #374151;
-  }
-  
-  :global(html.dark) .social-embed-title {
-    color: #f3f4f6;
-  }
-  
-  :global(html.dark) .social-embed-url {
-    color: #9ca3af;
   }
 </style>

@@ -1,12 +1,12 @@
 ---
 type Props = {
-  url: string;
-};
+  url: string
+}
 
-const { url } = Astro.props;
+const { url } = Astro.props
 ---
 
-<div class="tweet-embed-container my-4 sm:my-6">
+<div class="tweet-embed-container">
   <blockquote
     class="twitter-tweet"
     data-conversation="none"
@@ -22,51 +22,51 @@ const { url } = Astro.props;
 <script>
   // Type declaration for Twitter/X widget API
   interface TwitterWidgets {
-    load: () => void;
+    load: () => void
   }
-  
+
   interface TwitterApi {
-    widgets: TwitterWidgets;
+    widgets: TwitterWidgets
   }
-  
+
   interface WindowWithTwitter extends Window {
-    twttr?: TwitterApi;
+    twttr?: TwitterApi
   }
-  
+
   // Create theme-aware X embeds (formerly Twitter)
   const setTwitterTheme = () => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const theme = isDarkMode ? 'dark' : 'light';
-    
-    document.querySelectorAll('.twitter-tweet').forEach(tweet => {
-      tweet.setAttribute('data-theme', theme);
-    });
-  };
-  
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark'
+    const theme = isDarkMode ? 'dark' : 'light'
+
+    document.querySelectorAll('.twitter-tweet').forEach((tweet) => {
+      tweet.setAttribute('data-theme', theme)
+    })
+  }
+
   // Handle theme changes and initial load
   document.addEventListener('DOMContentLoaded', () => {
     // Set initial theme
-    setTwitterTheme();
-    
-    const win = window as WindowWithTwitter;
-    
+    setTwitterTheme()
+
+    const win = window as WindowWithTwitter
+
     // Add X script dynamically (uses Twitter's platform)
-    const script = document.createElement('script');
-    script.src = "https://platform.twitter.com/widgets.js";
-    script.async = true;
-    script.charset = "utf-8";
-    document.body.appendChild(script);
-    
+    const script = document.createElement('script')
+    script.src = 'https://platform.twitter.com/widgets.js'
+    script.async = true
+    script.charset = 'utf-8'
+    document.body.appendChild(script)
+
     // Listen for theme changes
-    document.addEventListener('themeChanged', setTwitterTheme);
-    
+    document.addEventListener('themeChanged', setTwitterTheme)
+
     // Re-render posts when theme changes
     document.addEventListener('themeChanged', () => {
       if (win.twttr && win.twttr.widgets) {
-        win.twttr.widgets.load();
+        win.twttr.widgets.load()
       }
-    });
-  });
+    })
+  })
 </script>
 
 <style>
@@ -77,22 +77,24 @@ const { url } = Astro.props;
     max-width: 550px;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     overflow: hidden;
   }
-  
+
   .tweet-embed-link {
-    color: #000000; /* Updated from Twitter blue to X black */
+    color: var(--color-text);
     text-decoration: none;
     font-size: 0.875rem;
   }
-  
+
   /* Mobile optimizations */
   @media (max-width: 550px) {
     .tweet-embed-container {
       width: 100%;
       min-width: 200px;
     }
-    
+
     :global(.twitter-tweet) {
       width: 100% !important;
     }

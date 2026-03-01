@@ -18,55 +18,162 @@ interface Props {
 
 const { date, dayUrl, daySummary, noteCount, previews } = Astro.props
 const overflow = noteCount - previews.length
+
+/* Truncate content to 140 chars */
+function truncate(text: string, max = 140): string {
+  if (text.length <= max) return text
+  return `${text.slice(0, max).trimEnd()}\u2026`
+}
 ---
 
-<div class="rounded-xl bg-white/90 dark:bg-zinc-800/70 ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm">
-  <div class="flex items-center gap-3 mb-2">
-    <span class="shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-      Notes
+<div class="notes-card">
+  <div class="notes-header">
+    <span class="notes-badge">Notes</span>
+    <span class="notes-meta">
+      <FormattedDate date={date} /> &middot; {noteCount} {noteCount === 1 ? 'note' : 'notes'}
     </span>
-    <span class="text-xs text-zinc-500 dark:text-zinc-400">
-      Quick thoughts from Mastodon &middot; <FormattedDate date={date} /> &middot; {noteCount} {noteCount === 1 ? 'note' : 'notes'}
-    </span>
-    <a
-      href="/notes"
-      class="ml-auto text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium transition-colors flex items-center gap-0.5"
-    >
+    <a href="/notes" class="notes-view-all">
       View all notes
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" class="notes-view-all-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
     </a>
   </div>
 
   {daySummary && (
-    <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-2 italic">
-      {daySummary}
-    </p>
+    <p class="notes-summary">{daySummary}</p>
   )}
 
-  <div class="flex flex-col gap-0.5">
-    {previews.map((note) => (
-      <a
-        href={note.url}
-        class="flex items-center gap-2 rounded-lg px-2 py-1 -mx-1 hover:bg-zinc-50 dark:hover:bg-zinc-700/30 transition-colors"
-      >
-        <span class="text-zinc-400 dark:text-zinc-500 leading-5" aria-hidden="true">&#8226;</span>
-        <span class="flex-1 text-sm text-zinc-700 dark:text-zinc-300 truncate leading-5">
-          {note.description || note.title || 'Note'}
-        </span>
-        <span class="shrink-0 text-xs text-zinc-400 dark:text-zinc-500 tabular-nums leading-5">
-          {note.time}
-        </span>
-      </a>
-    ))}
+  <div class="notes-list">
+    {previews.map((note) => {
+      const content = note.description || note.title || 'Note'
+      return (
+        <a href={note.url} class="note-row">
+          <span class="note-content">{truncate(content)}</span>
+          <span class="note-time">{note.time}</span>
+        </a>
+      )
+    })}
     {overflow > 0 && (
-      <a
-        href={dayUrl}
-        class="px-2 py-1 -mx-1 text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
-      >
+      <a href={dayUrl} class="note-overflow">
         and {overflow} more &rarr;
       </a>
     )}
   </div>
 </div>
+
+<style>
+  .notes-card {
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+    padding: 1rem 1.25rem;
+  }
+
+  .notes-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.625rem;
+    flex-wrap: wrap;
+  }
+
+  .notes-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .notes-meta {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+
+  .notes-view-all {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .notes-view-all:hover {
+    color: var(--color-text);
+  }
+
+  .notes-view-all-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .notes-summary {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0 0 0.5rem;
+  }
+
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .note-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    margin: 0 -0.25rem;
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .note-row:hover {
+    background: var(--color-surface-hover);
+  }
+
+  .note-content {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+  }
+
+  .note-time {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+
+  .note-overflow {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    margin: 0 -0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .note-overflow:hover {
+    color: var(--color-text);
+  }
+</style>
