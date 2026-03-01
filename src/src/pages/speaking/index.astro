@@ -100,15 +100,16 @@ const eventsJsonLd = JSON.stringify({
       title="Speaking"
       subtitle="conference talks, videos, and podcasts on Microsoft AI and open source"
       center={false}
-    />
-    <p class="speaking-kit-toplink">
-      <a href="/speaking/kit" class="speaking-kit-toplink__anchor">
-        View my speaker kit
-        <svg xmlns="http://www.w3.org/2000/svg" class="speaking-kit-toplink__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-      </a>
-    </p>
+    >
+      <p class="speaking-kit-toplink">
+        <a href="/speaking/kit" class="speaking-kit-toplink__anchor">
+          View my speaker kit
+          <svg xmlns="http://www.w3.org/2000/svg" class="speaking-kit-toplink__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </p>
+    </PageHeader>
 
     {/* Upcoming Talks */}
     {upcomingTalks.length > 0 && (
@@ -231,7 +232,7 @@ const eventsJsonLd = JSON.stringify({
 <style>
   /* Top speaker kit link */
   .speaking-kit-toplink {
-    margin-bottom: 2rem;
+    margin: 0.75rem 0 0;
   }
 
   .speaking-kit-toplink__anchor {
