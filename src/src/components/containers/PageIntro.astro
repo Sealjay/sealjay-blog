@@ -1,6 +1,22 @@
 ---
+interface Props {
+  title?: string
+  class?: string
+}
+
+const { title, class: className } = Astro.props
 ---
 
-<p class="prose mt-2 text-sm text-gray-500 sm:text-base md:text-lg sm:max-w-xl sm:mx-auto lg:mx-0">
-  <slot/>
-</p>
+<div class:list={['mb-6 md:mb-8', className]}>
+  {title && (
+    <h1
+      class="font-heading text-display-mobile md:text-display mb-2"
+      style="color: var(--color-text)"
+    >
+      {title}
+    </h1>
+  )}
+  <div class="text-body-mobile md:text-body" style="color: var(--color-text-muted)">
+    <slot />
+  </div>
+</div>
