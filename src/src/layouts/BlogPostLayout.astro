@@ -6,10 +6,15 @@ import Giscus from "../components/embeds/Giscus.astro";
 import Webmentions from "../components/partials/Webmentions.astro";
 import RelatedPosts from "../components/partials/RelatedPosts.astro";
 import { getOGImagePath } from "../lib/og-image";
+import { getCollection } from "astro:content";
+import ShareButtons from "../components/partials/ShareButtons.astro";
+import AuthorCard from "../components/partials/AuthorCard.astro";
+import PostNavigation from "../components/partials/PostNavigation.astro";
+import TableOfContents from "../components/partials/TableOfContents.astro";
 
-type Props = CollectionEntry<"blog">["data"];
+type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[] };
 
-const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Compute slug from the URL pathname for OG image path
@@ -18,6 +23,19 @@ const ogImagePath = getOGImagePath(slug);
 // Only show custom hero images on the page — auto-generated OG images repeat the title/date and are redundant
 const hasCustomHero = heroImage && heroImage !== "/placeholder-hero.png";
 const displayHeroImage = hasCustomHero ? heroImage : null;
+
+// Compute prev/next posts
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf()
+);
+const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+const prevPost = currentIndex < allPosts.length - 1
+  ? { slug: allPosts[currentIndex + 1].slug, title: allPosts[currentIndex + 1].data.title }
+  : undefined;
+const nextPost = currentIndex > 0
+  ? { slug: allPosts[currentIndex - 1].slug, title: allPosts[currentIndex - 1].data.title }
+  : undefined;
+
 const articleJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Article",
@@ -180,13 +198,32 @@ const breadcrumbJsonLd = JSON.stringify({
       )
     })()}
 
+    <!-- Share buttons -->
+    <ShareButtons url={canonicalURL.href} title={title} />
+
     <!-- Separator -->
     <hr class="article-separator" />
 
-    <!-- Article body -->
-    <div class="e-content prose prose-lg">
-      <slot />
+    <!-- Mobile ToC -->
+    {headings && headings.length > 0 && (
+      <TableOfContents headings={headings} />
+    )}
+
+    <!-- Two-column grid: article + sidebar ToC -->
+    <div class="article-grid">
+      <div class="e-content prose prose-lg">
+        <slot />
+      </div>
+      {headings && headings.length > 0 && (
+        <TableOfContents headings={headings} />
+      )}
     </div>
+
+    <!-- Author -->
+    <AuthorCard />
+
+    <!-- Post navigation -->
+    <PostNavigation prevPost={prevPost} nextPost={nextPost} />
   </article>
 
   <!-- Below article: webmentions and comments -->
@@ -382,5 +419,18 @@ const breadcrumbJsonLd = JSON.stringify({
     height: 1px;
     background: var(--color-border);
     margin: 0 0 2rem;
+  }
+
+  /* Article grid for ToC sidebar */
+  .article-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .article-grid {
+      grid-template-columns: 1fr 14rem;
+    }
   }
 </style>

@@ -12,14 +12,14 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
 // was this post more than a year ago, and updated more than a year ago
 
 const isOld = post.data.pubDateTime < new Date(Date.now() - 31536000000) && (post.data.updatedDate === undefined || post.data.updatedDate < new Date(Date.now() - 31536000000));
 
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} headings={headings}>
 	{isOld ? <BlogPostOld /> : null}
 	<Content />
 </BlogPost>
