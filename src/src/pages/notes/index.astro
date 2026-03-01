@@ -46,7 +46,11 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
       <PageHeader
         title="Notes"
         subtitle="short thoughts, links, and observations"
-        center={true}
+        center={false}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Notes' },
+        ]}
       />
 
       {/* Timeline */}
@@ -74,7 +78,14 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
               {/* Notes for this day */}
               <div class="notes-day__items">
                 {dayNotes.map((note) => (
-                  <div id={note.slug} class="h-entry note-card scroll-mt-20">
+                  <div
+                    id={note.slug}
+                    class:list={[
+                      'h-entry note-card scroll-mt-20',
+                      note.data.isHighlight && 'note-card--highlight',
+                      note.data.inReplyTo && 'note-card--reply',
+                    ]}
+                  >
                     {/* Top row: time + highlight badge */}
                     <div class="note-card__meta">
                       <a
@@ -164,45 +175,59 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 </Layout>
 
 <style>
+  /* ── Layout ────────────────────────────────────────────────── */
   .notes-feed {
     max-width: 560px;
     margin: 0 auto;
+    padding-bottom: 3rem;
   }
 
+  /* ── Timeline ──────────────────────────────────────────────── */
+
+  /* Single variable for the timeline axis centre */
   .notes-timeline {
+    --timeline-x: 9px;
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 3rem;
   }
 
-  /* Vertical timeline line */
+  /* Vertical timeline line - gradient fades at both ends */
   .notes-timeline::before {
     content: '';
     position: absolute;
-    left: 9px;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    width: 1px;
-    background: var(--color-border-strong);
+    left: calc(var(--timeline-x) - 1px);
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-border-strong) 2rem,
+      var(--color-border-strong) calc(100% - 2rem),
+      transparent
+    );
   }
 
-  /* Day group */
+  /* ── Day group ─────────────────────────────────────────────── */
   .notes-day__header {
     position: relative;
     padding-left: 2.5rem;
     margin-bottom: 1rem;
   }
 
+  /* Day dot - hollow "journal marker" ring */
   .notes-day__dot {
     position: absolute;
-    left: 0;
+    left: calc(var(--timeline-x) - 6px);
     top: 0.25rem;
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
     border-radius: var(--radius-full);
-    background: var(--color-primary);
-    border: 2px solid var(--color-bg);
+    background: var(--color-bg);
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-bg);
   }
 
   .notes-day__date {
@@ -226,13 +251,12 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 
   .notes-day__summary {
     margin-top: 0.25rem;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    font-family: var(--font-heading);
     color: var(--color-text-subtle);
-    font-style: italic;
   }
 
   .notes-day__summary-label {
-    font-style: normal;
     font-weight: 500;
     color: var(--color-text-subtle);
   }
@@ -243,67 +267,67 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     gap: 0.75rem;
   }
 
-  /* Note card */
+  /* ── Note card (consolidated) ──────────────────────────────── */
   .note-card {
     position: relative;
-    padding-left: 2.5rem;
-  }
-
-  /* Timeline dot for each note */
-  .note-card::before {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 0.75rem;
-    width: 10px;
-    height: 10px;
-    border-radius: var(--radius-full);
-    background: var(--color-border-strong);
-  }
-
-  /* Use an inner wrapper for the card surface */
-  .note-card > *:first-child {
-    /* Card surface handled via wrapper below */
-  }
-
-  .note-card {
-    /* Add card surface styling to the note itself within padding */
-  }
-
-  /* Wrap note contents in card-like surface */
-  .note-card .note-card__meta,
-  .note-card .note-card__title,
-  .note-card .note-card__desc,
-  .note-card .note-card__tags {
-    /* Inherit from parent card style */
-  }
-
-  .note-card .note-card__meta:first-child {
-    padding-top: 0;
-  }
-
-  /* Apply card background via a pseudo-approach or direct inner div */
-  /* We'll style the content block directly */
-  .note-card {
+    padding: 1rem 1rem 1rem 2.5rem;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 1rem 1rem 1rem 2.5rem;
-    box-shadow: var(--color-card-glow);
-    transition: border-color var(--duration-normal) var(--ease-out),
-                box-shadow var(--duration-normal) var(--ease-out);
+    box-shadow:
+      0 1px 3px rgba(79, 70, 229, 0.04),
+      0 4px 16px rgba(79, 70, 229, 0.06);
+    transition:
+      border-color var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out),
+      transform var(--duration-normal) var(--ease-out);
   }
 
   .note-card:hover {
     border-color: var(--color-border-strong);
+    box-shadow:
+      0 2px 8px rgba(79, 70, 229, 0.08),
+      0 8px 24px rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
   }
 
+  /* Note dot - small filled circle on the timeline axis */
   .note-card::before {
-    /* Adjust dot position accounting for card padding */
-    left: -5px;
+    content: '';
+    position: absolute;
+    left: calc(-2.5rem + var(--timeline-x) - 3px + 1rem);
     top: 1rem;
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-border-strong);
+    transition: background var(--duration-fast) var(--ease-out);
   }
 
+  .note-card:hover::before {
+    background: var(--color-primary);
+  }
+
+  /* ── Card variants ─────────────────────────────────────────── */
+
+  /* Highlighted notes */
+  .note-card--highlight {
+    border-left: 3px solid var(--color-warm);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-warm) 3%, var(--color-surface)),
+      var(--color-surface) 60%
+    );
+  }
+
+  /* Reply notes */
+  .note-card--reply {
+    margin-left: 0.75rem;
+    background: var(--color-bg);
+    box-shadow: none;
+  }
+
+  /* ── Card inner elements ───────────────────────────────────── */
   .note-card__meta {
     display: flex;
     align-items: center;
@@ -313,7 +337,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 
   .note-card__time {
     font-family: var(--font-code);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--color-text-subtle);
     text-decoration: none;
     transition: color var(--duration-fast) var(--ease-out);
@@ -354,6 +378,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 0.25rem;
+    overflow-wrap: break-word;
   }
 
   .note-card__title-link {
@@ -371,6 +396,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     line-height: 1.6;
     color: var(--color-text-muted);
     margin: 0 0 0.75rem;
+    overflow-wrap: break-word;
   }
 
   .note-card__tags {
@@ -386,7 +412,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     border-radius: var(--radius-full);
     padding: 2px 8px;
     font-family: var(--font-heading);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     background: var(--color-bg-alt);
     color: var(--color-text-muted);
@@ -406,8 +432,9 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     color: var(--color-primary);
     border: 1px solid var(--color-border);
     text-decoration: none;
-    transition: background var(--duration-fast) var(--ease-out),
-                border-color var(--duration-fast) var(--ease-out);
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
   }
 
   .note-card__external-link:hover {
@@ -437,5 +464,48 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     text-align: center;
     color: var(--color-text-muted);
     padding: 3rem 0;
+  }
+
+  /* ── Animations (respect motion preferences) ───────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    /* Staggered card fade-in on page load */
+    .note-card {
+      opacity: 0;
+      animation: noteAppear 400ms var(--ease-out) forwards;
+    }
+
+    .notes-day__items .note-card:nth-child(1) { animation-delay: 0ms; }
+    .notes-day__items .note-card:nth-child(2) { animation-delay: 60ms; }
+    .notes-day__items .note-card:nth-child(3) { animation-delay: 120ms; }
+    .notes-day__items .note-card:nth-child(4) { animation-delay: 180ms; }
+    .notes-day__items .note-card:nth-child(5) { animation-delay: 240ms; }
+    .notes-day__items .note-card:nth-child(6) { animation-delay: 300ms; }
+    .notes-day__items .note-card:nth-child(7) { animation-delay: 360ms; }
+    .notes-day__items .note-card:nth-child(8) { animation-delay: 420ms; }
+
+    @keyframes noteAppear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Latest day dot pulse */
+    .notes-day:first-child .notes-day__dot {
+      animation: dotPulse 2s var(--ease-out) infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 3px rgba(79, 70, 229, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 8px rgba(79, 70, 229, 0);
+      }
+    }
   }
 </style>
