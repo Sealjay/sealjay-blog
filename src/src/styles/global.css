@@ -57,6 +57,22 @@
   --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
+  /* Tag category colours */
+  --color-cat-ai: #4F46E5;
+  --color-cat-ai-bg: rgba(79, 70, 229, 0.08);
+  --color-cat-green: #047857;
+  --color-cat-green-bg: rgba(4, 120, 87, 0.08);
+  --color-cat-security: #BE185D;
+  --color-cat-security-bg: rgba(190, 24, 93, 0.08);
+  --color-cat-events: #B45309;
+  --color-cat-events-bg: rgba(180, 83, 9, 0.08);
+  --color-cat-dev: #0E7490;
+  --color-cat-dev-bg: rgba(14, 116, 144, 0.08);
+  --color-cat-oss: #7C3AED;
+  --color-cat-oss-bg: rgba(124, 58, 237, 0.08);
+  --color-cat-impact: #0369A1;
+  --color-cat-impact-bg: rgba(3, 105, 161, 0.08);
+
   color-scheme: light;
   scrollbar-color: rgba(99, 102, 241, 0.15) transparent;
 }
@@ -83,6 +99,22 @@
   --color-card-glow: 0 0 40px rgba(129, 140, 248, 0.06);
   --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
   --gradient-hero: linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%);
+
+  /* Tag category colours */
+  --color-cat-ai: #818CF8;
+  --color-cat-ai-bg: rgba(129, 140, 248, 0.15);
+  --color-cat-green: #34D399;
+  --color-cat-green-bg: rgba(52, 211, 153, 0.15);
+  --color-cat-security: #FB7185;
+  --color-cat-security-bg: rgba(251, 113, 133, 0.15);
+  --color-cat-events: #FBBF24;
+  --color-cat-events-bg: rgba(251, 191, 36, 0.15);
+  --color-cat-dev: #22D3EE;
+  --color-cat-dev-bg: rgba(34, 211, 238, 0.15);
+  --color-cat-oss: #A78BFA;
+  --color-cat-oss-bg: rgba(167, 139, 250, 0.15);
+  --color-cat-impact: #38BDF8;
+  --color-cat-impact-bg: rgba(56, 189, 248, 0.15);
 
   color-scheme: dark;
   scrollbar-color: rgba(129, 140, 248, 0.2) transparent;

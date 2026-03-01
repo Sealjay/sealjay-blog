@@ -11,6 +11,7 @@ import ShareButtons from "../components/partials/ShareButtons.astro";
 import AuthorCard from "../components/partials/AuthorCard.astro";
 import PostNavigation from "../components/partials/PostNavigation.astro";
 import TableOfContents from "../components/partials/TableOfContents.astro";
+import { getTagStyle } from "../lib/tag-categories";
 
 type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[]; body?: string };
 
@@ -124,12 +125,12 @@ const breadcrumbJsonLd = JSON.stringify({
     {tags && tags.length > 0 && (
       <div class="article-tags" data-tag-count={tags.length}>
         {tags.slice(0, 3).map((tag: string) => (
-          <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag">{tag}</a>
+          <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag" style={getTagStyle(tag)}>{tag}</a>
         ))}
         {tags.length > 3 && (
           <>
             {tags.slice(3).map((tag: string) => (
-              <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag article-tag--collapsed">{tag}</a>
+              <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag article-tag--collapsed" style={getTagStyle(tag)}>{tag}</a>
             ))}
             <button class="article-tags-toggle" type="button" aria-expanded="false">
               +{tags.length - 3} more
@@ -247,9 +248,9 @@ const breadcrumbJsonLd = JSON.stringify({
   </article>
 
   <!-- Below article: webmentions and comments -->
-  <div class="mx-auto max-w-content px-5 md:px-10 mt-16 mb-8">
+  <div class="blog-footer mx-auto max-w-content px-5 md:px-10">
     <Webmentions />
-    <div class="section-divider"></div>
+    <div class="blog-footer__divider"></div>
     <Giscus />
   </div>
 
@@ -317,8 +318,8 @@ const breadcrumbJsonLd = JSON.stringify({
   .article-tag {
     display: inline-block;
     padding: 0.25rem 0.75rem;
-    background: var(--color-primary-muted);
-    color: var(--color-primary);
+    background: var(--tag-bg, var(--color-primary-muted));
+    color: var(--tag-color, var(--color-primary));
     border-radius: var(--radius-full);
     font-family: var(--font-heading);
     font-size: 0.6875rem;
@@ -331,7 +332,7 @@ const breadcrumbJsonLd = JSON.stringify({
   }
 
   .article-tag:hover {
-    background: var(--color-primary);
+    background: var(--tag-color, var(--color-primary));
     color: #fff;
   }
 
@@ -489,7 +490,7 @@ const breadcrumbJsonLd = JSON.stringify({
     border: 0;
     height: 1px;
     background: var(--color-border);
-    margin: 0 0 2rem;
+    margin: 0 0 1.5rem;
   }
 
   /* Article grid for ToC sidebar */
@@ -502,6 +503,29 @@ const breadcrumbJsonLd = JSON.stringify({
   @media (min-width: 1024px) {
     .article-grid {
       grid-template-columns: 1fr 14rem;
+    }
+  }
+
+  /* Blog footer: webmentions + comments below article */
+  .blog-footer {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .blog-footer__divider {
+    width: 100%;
+    height: 1px;
+    margin: 2rem 0;
+    background: linear-gradient(to right, transparent, var(--color-border-strong), transparent);
+  }
+
+  @media (min-width: 768px) {
+    .blog-footer {
+      margin-top: 3rem;
+    }
+
+    .blog-footer__divider {
+      margin: 2.5rem 0;
     }
   }
 </style>

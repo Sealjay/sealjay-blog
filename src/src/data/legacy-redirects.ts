@@ -20,7 +20,6 @@ export const legacyRedirectSlugs = [
   'creative-sector-embracing-the-use-of-ai',
   'd365-saturday-dublin-2018-ai-and-d365',
   'd365-saturday-london-2018-ai-and-d365',
-  'deploying-a-nextjs-application-to-azure',
   'enabling-a-future-ready-business-with-ai-and-ia',
   'enabling-https-on-a-uvicorn-python-application-deployed-to-azure',
   'ethical-and-productivity-implications-of-intelligent-code-creation',

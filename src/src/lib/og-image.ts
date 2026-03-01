@@ -1,5 +1,6 @@
 import { Resvg } from '@resvg/resvg-js'
 import satori from 'satori'
+import { TAG_TO_CATEGORY } from './tag-categories'
 
 // ---------------------------------------------------------------------------
 // Category definitions – deterministic mapping from tags to visual themes
@@ -64,46 +65,6 @@ const CATEGORIES: Record<string, CategoryTheme> = {
     accentMuted: '#6366f1',
     pattern: 'dots',
   },
-}
-
-/** Map individual tags to a category key */
-const TAG_TO_CATEGORY: Record<string, string> = {
-  AI: 'ai-cognitive',
-  'Machine Learning': 'ai-cognitive',
-  'Cognitive Services': 'ai-cognitive',
-  'Cognitive Search': 'ai-cognitive',
-  'Anomaly Detector': 'ai-cognitive',
-  'Text Analytics': 'ai-cognitive',
-  Agolo: 'ai-cognitive',
-
-  'Green Software': 'green-software',
-  Sustainability: 'green-software',
-
-  Security: 'security',
-  'Securing the Realm': 'security',
-  'ai-security': 'security',
-  appsec: 'security',
-  devsecops: 'security',
-
-  Event: 'events-media',
-  'External Media': 'events-media',
-
-  'How To': 'developer',
-  Snippets: 'developer',
-  CLI: 'developer',
-  Python: 'developer',
-  API: 'developer',
-  'Power Automate': 'developer',
-  PowerBI: 'developer',
-
-  'Open Source': 'open-source',
-
-  Impact: 'impact-future',
-  Futurology: 'impact-future',
-  Future: 'impact-future',
-  Governance: 'impact-future',
-  'Digital Twins': 'impact-future',
-  Microsoft: 'impact-future',
 }
 
 /** Priority order when a post has multiple tags from different categories */

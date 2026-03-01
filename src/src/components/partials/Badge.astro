@@ -12,6 +12,8 @@ interface Props {
   isFormerRole?: boolean
   /** Additional CSS classes */
   class?: string
+  /** Inline style for CSS custom properties (e.g. tag category colours) */
+  style?: string
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   url,
   isFormerRole = false,
   class: className,
+  style,
 } = Astro.props
 
 const displayText = label ?? text ?? ''
@@ -40,6 +43,7 @@ const linkProps = url ? { href: url } : {}
     url && 'badge--link',
     className,
   ]}
+  style={style}
 >
   {isFormerRole && !variantProp && <span class="badge__prefix">formerly</span>}
   {displayText}
@@ -62,9 +66,9 @@ const linkProps = url ? { href: url } : {}
   }
 
   .badge--default {
-    background: var(--color-primary-muted);
-    border: 1px solid var(--color-border-strong);
-    color: var(--color-primary);
+    background: var(--tag-bg, var(--color-primary-muted));
+    border: 1px solid color-mix(in srgb, var(--tag-color, var(--color-primary)) 25%, transparent);
+    color: var(--tag-color, var(--color-primary));
   }
 
   .badge--warm {

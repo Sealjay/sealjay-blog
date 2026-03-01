@@ -6,6 +6,7 @@ import FormattedDate from '../../../components/partials/FormattedDate.astro'
 import Badge from '../../../components/partials/Badge.astro'
 import { getCollection } from 'astro:content'
 import { getOGImagePath } from '../../../lib/og-image'
+import { getTagStyle } from '../../../lib/tag-categories'
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog')
@@ -67,6 +68,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
           <a
             href={`/blog/tag/${tagSlug}/`}
             class:list={['tag-pill', isActive && 'tag-pill--active']}
+            style={isActive ? getTagStyle(t) : undefined}
             aria-current={isActive ? 'page' : undefined}
           >
             {t}
@@ -104,7 +106,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
             </div>
             <div class="blog-card__body">
               {firstTag && (
-                <span class="blog-card__tag">{firstTag}</span>
+                <span class="blog-card__tag" style={getTagStyle(firstTag)}>{firstTag}</span>
               )}
               <h2 class="blog-card__title font-heading">{post.data.title}</h2>
               <div class="blog-card__meta">
@@ -177,14 +179,14 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
   }
 
   .tag-pill--active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
+    background: var(--tag-color, var(--color-primary));
+    border-color: var(--tag-color, var(--color-primary));
     color: #fff;
   }
 
   .tag-pill--active:hover {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
+    background: var(--tag-color, var(--color-primary));
+    border-color: var(--tag-color, var(--color-primary));
     color: #fff;
   }
 
@@ -271,8 +273,8 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
     align-items: center;
     width: fit-content;
     border-radius: var(--radius-full);
-    background: var(--color-primary-muted);
-    color: var(--color-primary);
+    background: var(--tag-bg, var(--color-primary-muted));
+    color: var(--tag-color, var(--color-primary));
     padding: 0.125rem 0.5rem;
     font-size: 0.6875rem;
     font-weight: 500;

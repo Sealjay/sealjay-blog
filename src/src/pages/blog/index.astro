@@ -6,6 +6,7 @@ import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Badge from '../../components/partials/Badge.astro'
 import { getCollection } from 'astro:content'
 import { getOGImagePath } from '../../lib/og-image'
+import { getTagStyle } from '../../lib/tag-categories'
 
 const posts = (await getCollection('blog')).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
@@ -78,7 +79,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
             </div>
             <div class="blog-card__body">
               {firstTag && (
-                <span class="blog-card__tag p-category">{firstTag}</span>
+                <span class="blog-card__tag p-category" style={getTagStyle(firstTag)}>{firstTag}</span>
               )}
               <h2 class="blog-card__title p-name font-heading">{post.data.title}</h2>
               <div class="blog-card__meta">
@@ -246,8 +247,8 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
     align-items: center;
     width: fit-content;
     border-radius: var(--radius-full);
-    background: var(--color-primary-muted);
-    color: var(--color-primary);
+    background: var(--tag-bg, var(--color-primary-muted));
+    color: var(--tag-color, var(--color-primary));
     padding: 0.125rem 0.5rem;
     font-size: 0.6875rem;
     font-weight: 500;

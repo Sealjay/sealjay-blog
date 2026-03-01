@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 import Badge from './Badge.astro'
 import FormattedDate from './FormattedDate.astro'
+import { getTagStyle } from '../../lib/tag-categories'
 
 interface Props {
   currentSlug: string
@@ -23,7 +24,7 @@ const related = allPosts
 ---
 
 {related.length > 0 && (
-  <section class="related-posts mx-auto max-w-content px-5 md:px-10 mb-8">
+  <section class="related-posts mx-auto max-w-content px-5 md:px-10 mb-6">
     <h2 class="related-posts__heading font-heading">Related</h2>
     <div class="related-posts__grid">
       {related.map((post) => (
@@ -31,7 +32,7 @@ const related = allPosts
           <span class="related-card__title">{post.data.title}</span>
           <div class="related-card__meta">
             {post.data.tags && post.data.tags[0] && (
-              <Badge label={post.data.tags[0]} />
+              <Badge label={post.data.tags[0]} style={getTagStyle(post.data.tags[0])} />
             )}
             <FormattedDate date={post.data.pubDateTime} />
           </div>
@@ -43,7 +44,9 @@ const related = allPosts
 
 <style>
   .related-posts {
-    margin-top: 3rem;
+    margin-top: 2rem;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .related-posts__heading {
