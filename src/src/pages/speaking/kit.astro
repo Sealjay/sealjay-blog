@@ -1,8 +1,12 @@
 ---
 import Layout from '../../layouts/BaseLayout.astro'
-import { getCollection } from 'astro:content'
-import FormattedDate from '../../components/partials/FormattedDate.astro'
+import Container from '../../components/containers/Container.astro'
+import PageHeader from '../../components/partials/PageHeader.astro'
+import Button from '../../components/partials/Button.astro'
 import Badge from '../../components/partials/Badge.astro'
+import SpeakerUl from '../../components/partials/SpeakerUl.astro'
+import FormattedDate from '../../components/partials/FormattedDate.astro'
+import { getCollection } from 'astro:content'
 import { speakerBio, topics, talkFormats, testimonials, logistics, contactCta, headshot } from '../../config/speakerKit'
 
 const featuredSpeaking = (await getCollection('speaking'))
@@ -17,150 +21,635 @@ const featuredSpeaking = (await getCollection('speaking'))
   updatedDate={new Date('15 February 2026')}
   heroImage={headshot}
 >
-  <!-- Hero -->
-  <section class="flex flex-col items-center text-center px-4 py-12 md:py-16">
-    <img
-      src={headshot}
-      alt="Chris Lloyd-Jones"
-      class="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover ring-4 ring-accent-200 dark:ring-accent-800 shadow-lg mb-6"
+  <Container>
+    <PageHeader
+      title="Speaker Kit"
+      center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Speaking', href: '/speaking' },
+        { label: 'Speaker Kit' },
+      ]}
     />
-    <h1 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Speaker Kit</h1>
-    <p class="max-w-2xl text-lg text-zinc-600 dark:text-zinc-400 mb-4">{speakerBio.short}</p>
-    <p class="max-w-3xl text-base text-zinc-500 dark:text-zinc-500">{speakerBio.long}</p>
-  </section>
 
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
-
-  <!-- Topics -->
-  <section class="px-4 py-12 md:py-16">
-    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Topics</h2>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {topics.map((topic) => (
-        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6 transition-shadow hover:shadow-md">
-          <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 dark:bg-accent-900/20">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent-600 dark:text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={topic.icon} />
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{topic.title}</h3>
-          <p class="text-sm text-zinc-600 dark:text-zinc-400">{topic.description}</p>
+    {/* Headshot section */}
+    <section class="kit-section">
+      <div class="kit-headshot-row">
+        <div class="kit-headshot-photo">
+          <img
+            src={headshot}
+            alt="Chris Lloyd-Jones"
+            class="kit-headshot-img"
+          />
         </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
-
-  <!-- Talk Formats -->
-  <section class="px-4 py-12 md:py-16">
-    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Talk Formats</h2>
-    <div class="mx-auto max-w-2xl space-y-4">
-      {talkFormats.map((format) => (
-        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-5 flex flex-col sm:flex-row sm:items-center gap-3">
-          <span class="inline-flex shrink-0 items-center rounded-full bg-accent-50 dark:bg-accent-900/20 px-3 py-1 text-xs font-semibold text-accent-700 dark:text-accent-300">
-            {format.duration}
-          </span>
-          <div>
-            <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{format.name}</h3>
-            <p class="text-sm text-zinc-600 dark:text-zinc-400">{format.description}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
-
-  <!-- Featured Appearances -->
-  {featuredSpeaking.length > 0 && (
-    <section class="px-4 py-12 md:py-16">
-      <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Featured Appearances</h2>
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {featuredSpeaking.map((slot) => (
-          <a
-            href={slot.data.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6 transition-shadow hover:shadow-md hover:ring-accent-300 dark:hover:ring-accent-600"
-          >
-            <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <div class="kit-headshot-info">
+          <h2 class="kit-section-heading font-heading">Headshot</h2>
+          <p class="kit-section-desc">High-resolution photo for event listings and promotional materials.</p>
+          <div class="kit-headshot-actions">
+            <Button variant="secondary" size="sm" href={headshot}>
+              <svg xmlns="http://www.w3.org/2000/svg" class="kit-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              <FormattedDate date={slot.data.date} />
+              Download photo
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="kit-divider" />
+
+    {/* Bio sections */}
+    <section class="kit-section">
+      <h2 class="kit-section-heading font-heading">Biography</h2>
+      <div class="kit-bio-blocks">
+        <div class="kit-bio-block">
+          <div class="kit-bio-block__header">
+            <h3 class="kit-bio-block__label font-heading">Short bio</h3>
+            <button class="kit-copy-btn" data-copy-target="bio-short" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="kit-copy-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <p class="kit-bio-block__text" id="bio-short">{speakerBio.short}</p>
+        </div>
+        <div class="kit-bio-block">
+          <div class="kit-bio-block__header">
+            <h3 class="kit-bio-block__label font-heading">Long bio</h3>
+            <button class="kit-copy-btn" data-copy-target="bio-long" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="kit-copy-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <p class="kit-bio-block__text" id="bio-long">{speakerBio.long}</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="kit-divider" />
+
+    {/* Topics */}
+    <section class="kit-section">
+      <h2 class="kit-section-heading font-heading">Topics</h2>
+      <div class="kit-topics-grid">
+        {topics.map((topic) => (
+          <div class="kit-topic-card">
+            <div class="kit-topic-card__icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" class="kit-topic-card__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={topic.icon} />
+              </svg>
             </div>
-            <Badge text={slot.data.eventType} />
-            <h3 class="mt-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
-              {slot.data.title}
-            </h3>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{slot.data.event}</p>
-          </a>
+            <h3 class="kit-topic-card__title font-heading">{topic.title}</h3>
+            <p class="kit-topic-card__desc">{topic.description}</p>
+          </div>
         ))}
       </div>
     </section>
-  )}
 
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+    <div class="kit-divider" />
 
-  <!-- Testimonials -->
-  {testimonials.length > 0 && (
-    <section class="px-4 py-12 md:py-16">
-      <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Testimonials</h2>
-      <div class="grid gap-6 sm:grid-cols-2">
-        {testimonials.map((t) => (
-          <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-6">
-            <svg class="h-8 w-8 text-accent-300 dark:text-accent-700 mb-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.69 11 13.178 11 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.69 21 13.178 21 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179z" />
-            </svg>
-            <blockquote class="text-zinc-700 dark:text-zinc-300 italic mb-4">{t.quote}</blockquote>
-            <div class="text-sm">
-              <p class="font-semibold text-zinc-900 dark:text-zinc-100">{t.author}</p>
-              <p class="text-zinc-500 dark:text-zinc-400">
-                {t.role}{t.event && <span> &mdash; {t.event}</span>}
-              </p>
+    {/* Talk Formats */}
+    <section class="kit-section">
+      <h2 class="kit-section-heading font-heading">Talk Formats</h2>
+      <div class="kit-formats-list">
+        {talkFormats.map((format) => (
+          <div class="kit-format-item">
+            <Badge label={format.duration} variant="default" />
+            <div class="kit-format-item__content">
+              <h3 class="kit-format-item__name font-heading">{format.name}</h3>
+              <p class="kit-format-item__desc">{format.description}</p>
             </div>
           </div>
         ))}
       </div>
     </section>
-  )}
 
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
+    <div class="kit-divider" />
 
-  <!-- Logistics -->
-  <section class="px-4 py-12 md:py-16">
-    <h2 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-8">Logistics</h2>
-    <div class="mx-auto max-w-2xl grid gap-4 sm:grid-cols-2">
-      {logistics.map((item) => (
-        <div class="rounded-xl ring-1 ring-zinc-200 dark:ring-zinc-700/60 bg-white dark:bg-zinc-800/50 p-5">
-          <p class="text-xs font-semibold uppercase tracking-wider text-accent-600 dark:text-accent-400 mb-1">{item.label}</p>
-          <p class="text-sm text-zinc-700 dark:text-zinc-300">{item.value}</p>
+    {/* Featured Appearances */}
+    {featuredSpeaking.length > 0 && (
+      <>
+        <section class="kit-section">
+          <h2 class="kit-section-heading font-heading">Featured Appearances</h2>
+          <div class="kit-featured-grid">
+            {featuredSpeaking.map((slot) => (
+              <a
+                href={slot.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="kit-featured-card"
+              >
+                <div class="kit-featured-card__meta">
+                  <FormattedDate date={slot.data.date} />
+                  <Badge label={slot.data.eventType} variant="subtle" />
+                </div>
+                <h3 class="kit-featured-card__title font-heading">{slot.data.title}</h3>
+                <p class="kit-featured-card__event">{slot.data.event}</p>
+                <span class="sr-only">(opens in new tab)</span>
+              </a>
+            ))}
+          </div>
+        </section>
+        <div class="kit-divider" />
+      </>
+    )}
+
+    {/* Testimonials */}
+    {testimonials.length > 0 && (
+      <>
+        <section class="kit-section">
+          <h2 class="kit-section-heading font-heading">Testimonials</h2>
+          <div class="kit-testimonials-grid">
+            {testimonials.map((t) => (
+              <div class="kit-testimonial">
+                <svg class="kit-testimonial__quote-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.69 11 13.178 11 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.69 21 13.178 21 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.18-.475-2.917-1.179z" />
+                </svg>
+                <blockquote class="kit-testimonial__text">{t.quote}</blockquote>
+                <div class="kit-testimonial__author">
+                  <p class="kit-testimonial__author-name">{t.author}</p>
+                  <p class="kit-testimonial__author-role">
+                    {t.role}{t.event && <span> &mdash; {t.event}</span>}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        <div class="kit-divider" />
+      </>
+    )}
+
+    {/* Technical requirements / Logistics */}
+    <section class="kit-section">
+      <h2 class="kit-section-heading font-heading">Logistics &amp; Requirements</h2>
+      <SpeakerUl>
+        {logistics.map((item) => (
+          <li class="kit-logistics-item">
+            <p class="kit-logistics-item__label">{item.label}</p>
+            <p class="kit-logistics-item__value">{item.value}</p>
+          </li>
+        ))}
+      </SpeakerUl>
+    </section>
+
+    <div class="kit-divider" />
+
+    {/* Contact CTA */}
+    <section class="kit-section">
+      <div class="kit-contact-cta">
+        <h2 class="kit-contact-cta__heading font-heading">{contactCta.heading}</h2>
+        <p class="kit-contact-cta__text">{contactCta.description}</p>
+        <div class="kit-contact-cta__links">
+          <Button variant="primary" size="md" href={contactCta.url}>
+            Connect on LinkedIn
+          </Button>
+          <Button variant="secondary" size="md" href="/speaking">
+            View all talks
+          </Button>
         </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- Divider -->
-  <div class="mx-8 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent"></div>
-
-  <!-- Contact CTA -->
-  <section class="px-4 py-12 md:py-16">
-    <div class="mx-auto max-w-2xl rounded-xl bg-accent-50 dark:bg-accent-900/20 ring-1 ring-accent-200 dark:ring-accent-800/40 p-8 text-center">
-      <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">{contactCta.heading}</h2>
-      <p class="text-zinc-600 dark:text-zinc-400 mb-6">{contactCta.description}</p>
-      <a
-        href={contactCta.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center rounded-lg bg-accent-600 hover:bg-accent-700 dark:bg-accent-500 dark:hover:bg-accent-400 px-6 py-3 text-sm font-semibold text-white dark:text-zinc-900 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
-      >
-        Connect on LinkedIn
-      </a>
-    </div>
-  </section>
+      </div>
+    </section>
+  </Container>
 </Layout>
+
+<style>
+  /* Section rhythm */
+  .kit-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .kit-section-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+  }
+
+  .kit-section-desc {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0 0 1rem 0;
+  }
+
+  .kit-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-border), transparent);
+    margin-bottom: 2.5rem;
+  }
+
+  /* Headshot */
+  .kit-headshot-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .kit-headshot-row {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  .kit-headshot-photo {
+    flex-shrink: 0;
+  }
+
+  .kit-headshot-img {
+    width: 10rem;
+    height: 10rem;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    border: 2px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+  }
+
+  .kit-headshot-info {
+    flex: 1;
+  }
+
+  .kit-headshot-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .kit-btn-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Bio blocks */
+  .kit-bio-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .kit-bio-block {
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 1rem 1.25rem;
+  }
+
+  .kit-bio-block__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .kit-bio-block__label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-subtle);
+    margin: 0;
+  }
+
+  .kit-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--color-primary);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .kit-copy-btn:hover {
+    background: var(--color-primary-muted);
+  }
+
+  .kit-copy-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .kit-bio-block__text {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Topics grid */
+  .kit-topics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .kit-topics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .kit-topics-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .kit-topic-card {
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+    padding: 1.25rem;
+    transition: border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .kit-topic-card:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
+  }
+
+  .kit-topic-card__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .kit-topic-card__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-primary);
+  }
+
+  .kit-topic-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.375rem 0;
+  }
+
+  .kit-topic-card__desc {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Talk formats */
+  .kit-formats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 42rem;
+  }
+
+  .kit-format-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 640px) {
+    .kit-format-item {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  .kit-format-item__content {
+    flex: 1;
+  }
+
+  .kit-format-item__name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.125rem 0;
+  }
+
+  .kit-format-item__desc {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Featured appearances */
+  .kit-featured-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .kit-featured-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .kit-featured-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .kit-featured-card {
+    display: block;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: transform var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .kit-featured-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
+  }
+
+  .kit-featured-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .kit-featured-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.25rem 0;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .kit-featured-card:hover .kit-featured-card__title {
+    color: var(--color-primary);
+  }
+
+  .kit-featured-card__event {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Testimonials */
+  .kit-testimonials-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .kit-testimonials-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .kit-testimonial {
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 1.25rem;
+  }
+
+  .kit-testimonial__quote-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-primary-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .kit-testimonial__text {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0 0 1rem 0;
+  }
+
+  .kit-testimonial__author-name {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .kit-testimonial__author-role {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Logistics */
+  .kit-logistics-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .kit-logistics-item__label {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .kit-logistics-item__value {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Contact CTA */
+  .kit-contact-cta {
+    text-align: center;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow);
+  }
+
+  .kit-contact-cta__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .kit-contact-cta__text {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0 0 1.5rem 0;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .kit-contact-cta__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+</style>
+
+<script>
+  function initCopyButtons() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.kit-copy-btn')
+    for (const btn of buttons) {
+      btn.addEventListener('click', async () => {
+        const targetId = btn.dataset.copyTarget
+        if (!targetId) return
+        const el = document.getElementById(targetId)
+        if (!el) return
+        try {
+          await navigator.clipboard.writeText(el.textContent ?? '')
+          const originalText = btn.innerHTML
+          btn.textContent = 'Copied!'
+          setTimeout(() => {
+            btn.innerHTML = originalText
+          }, 2000)
+        } catch {
+          // Fallback: do nothing
+        }
+      })
+    }
+  }
+
+  document.addEventListener('astro:page-load', initCopyButtons)
+  initCopyButtons()
+</script>
