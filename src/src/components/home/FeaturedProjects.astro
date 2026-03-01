@@ -17,12 +17,12 @@ interface Props {
 
 const { projects } = Astro.props
 
-/* Map status to a simple emoji/icon */
-const statusEmoji: Record<string, string> = {
-  Active: '\u{1F7E2}',
-  Maintained: '\u{1F535}',
-  Archived: '\u{26AA}',
-  Contribution: '\u{1F7E3}',
+/* Map status to dot colour */
+const statusColor: Record<string, string> = {
+  Active: 'var(--color-status-active, #22c55e)',
+  Maintained: 'var(--color-status-maintained, #3b82f6)',
+  Archived: 'var(--color-status-archived, #9ca3af)',
+  Contribution: 'var(--color-status-contribution, #a855f7)',
 }
 ---
 
@@ -31,7 +31,7 @@ const statusEmoji: Record<string, string> = {
     {projects.map((project) => {
       const projectUrl = project.data.repoUrl ?? project.data.demoUrl ?? '/projects'
       const isExternal = !!(project.data.repoUrl ?? project.data.demoUrl)
-      const emoji = statusEmoji[project.data.status] ?? '\u{1F4E6}'
+      const dotColor = statusColor[project.data.status] ?? 'var(--color-text-muted)'
       return (
         <a
           href={projectUrl}
@@ -39,7 +39,10 @@ const statusEmoji: Record<string, string> = {
           rel={isExternal ? 'noopener noreferrer' : undefined}
           class="project-card"
         >
-          <span class="project-emoji" aria-hidden="true">{emoji}</span>
+          <span class="project-status" style={`--dot-color: ${dotColor}`}>
+            <span class="project-status__dot" aria-hidden="true" />
+            {project.data.status}
+          </span>
           <h3 class="project-title font-heading">{project.data.title}</h3>
           <p class="project-desc">{project.data.description}</p>
           {isExternal && <span class="sr-only">(opens in new tab)</span>}
@@ -102,10 +105,24 @@ const statusEmoji: Record<string, string> = {
     border-color: var(--color-border-strong);
   }
 
-  .project-emoji {
-    display: block;
-    font-size: 1.25rem;
-    margin-bottom: 0.375rem;
+  .project-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-status__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--dot-color);
+    flex-shrink: 0;
   }
 
   .project-title {
