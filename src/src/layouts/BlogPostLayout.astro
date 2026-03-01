@@ -81,58 +81,68 @@ const breadcrumbJsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={articleJsonLd} />
   <script type="application/ld+json" set:html={breadcrumbJsonLd} />
   <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" />
-  <article class="h-entry max-w-3xl mx-auto my-6 md:my-10 text-zinc-800 dark:text-zinc-200 prose prose-lg dark:prose-invert">
+  <article class="h-entry mx-auto max-w-content px-5 md:px-10 my-8 md:my-14">
+    <!-- Hidden microformat markup -->
     <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
     <span class="p-author h-card" style="display:none">
       <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
     </span>
+
+    <!-- Tag badges -->
     {tags && tags.length > 0 && (
-      <span style="display:none">
+      <div class="article-tags">
         {tags.map((tag: string) => (
-          <span class="p-category">{tag}</span>
+          <span class="p-category article-tag">{tag}</span>
         ))}
-      </span>
+      </div>
     )}
-    <h1
-      class="p-name text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3"
-    >
+
+    <!-- Article title -->
+    <h1 class="p-name article-title">
       {title}
     </h1>
-    <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-      <span class="flex items-center gap-1.5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+
+    <!-- Meta row: date, reading time, author -->
+    <div class="article-meta">
+      <span class="article-meta-item">
+        <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span>Published <FormattedDate date={pubDateTime} class="dt-published" /></span>
+        <FormattedDate date={pubDateTime} class="dt-published" />
       </span>
-      
+
       {updatedDate && (
         <>
-          <span class="text-zinc-400 dark:text-zinc-600">•</span>
-          <span class="flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <span class="article-meta-sep">&middot;</span>
+          <span class="article-meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             <span>Updated <FormattedDate date={updatedDate} class="dt-updated" /></span>
           </span>
         </>
       )}
+
+      <span class="article-meta-sep">&middot;</span>
+      <span class="article-meta-item">by Chris Lloyd-Jones</span>
     </div>
-    
+
+    <!-- Hero image -->
     {displayHeroImage && (
-      <div class="relative w-full max-h-72 mb-8 overflow-hidden rounded-xl">
+      <div class="article-hero">
         <img
           src={displayHeroImage}
           alt=""
           width="1200"
-          height="630"
+          height="675"
           fetchpriority="high"
           decoding="async"
-          class="u-photo w-full h-full object-cover"
+          class="u-photo article-hero-img"
         />
       </div>
     )}
 
+    <!-- In-reply-to indicator -->
     {inReplyTo && (() => {
       let replyLabel: string
       try {
@@ -143,14 +153,14 @@ const breadcrumbJsonLd = JSON.stringify({
         replyLabel = inReplyTo
       }
       return (
-        <div class="not-prose mb-6 rounded-lg border border-accent-200 dark:border-accent-800/40 bg-accent-50/50 dark:bg-accent-900/20 px-4 py-3">
-          <div class="flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-accent-500 dark:text-accent-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <div class="article-reply-to">
+          <div class="article-reply-to-header">
+            <svg xmlns="http://www.w3.org/2000/svg" class="article-reply-to-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
             </svg>
-            <span class="text-xs font-medium uppercase tracking-wide text-accent-600 dark:text-accent-400">In reply to</span>
+            <span class="article-reply-to-label">In reply to</span>
           </div>
-          <a class="u-in-reply-to block mt-1 text-sm text-accent-700 dark:text-accent-300 hover:underline focus:underline focus:outline-none truncate" rel="in-reply-to noopener noreferrer" href={inReplyTo} target="_blank" title={inReplyTo}>
+          <a class="u-in-reply-to article-reply-to-link" rel="in-reply-to noopener noreferrer" href={inReplyTo} target="_blank" title={inReplyTo}>
             {replyLabel}
             <span class="sr-only"> (opens in new tab)</span>
           </a>
@@ -158,14 +168,160 @@ const breadcrumbJsonLd = JSON.stringify({
       )
     })()}
 
-    <div class="e-content prose-headings:font-semibold prose-headings:text-zinc-800 dark:prose-headings:text-zinc-100 prose-a:text-accent-600 prose-a:font-semibold dark:prose-a:text-accent-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
+    <!-- Article body -->
+    <div class="e-content prose prose-lg">
       <slot />
     </div>
   </article>
-  
-  <div class="max-w-3xl mx-auto mt-16 mb-8">
+
+  <!-- Below article: webmentions and comments -->
+  <div class="mx-auto max-w-content px-5 md:px-10 mt-16 mb-8">
     <Webmentions />
-    <div class="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent mb-8 mt-12"></div>
+    <div class="section-divider"></div>
     <Giscus />
   </div>
 </PageLayout>
+
+<style>
+  /* Tag badges */
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .article-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: capitalize;
+  }
+
+  /* Article title */
+  .article-title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    font-size: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .article-title {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .article-title {
+      font-size: 2.75rem;
+    }
+  }
+
+  /* Meta row */
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .article-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .article-meta-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-text-subtle);
+    flex-shrink: 0;
+  }
+
+  .article-meta-sep {
+    color: var(--color-text-subtle);
+  }
+
+  /* Hero image */
+  .article-hero {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .article-hero-img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* In-reply-to indicator */
+  .article-reply-to {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-primary-muted);
+  }
+
+  .article-reply-to-header {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .article-reply-to-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .article-reply-to-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+  }
+
+  .article-reply-to-link {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+
+  .article-reply-to-link:hover,
+  .article-reply-to-link:focus {
+    text-decoration: underline;
+  }
+
+  .article-reply-to-link:focus {
+    outline: none;
+  }
+</style>
