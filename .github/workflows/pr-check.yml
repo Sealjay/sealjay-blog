@@ -1,0 +1,45 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - '.github/workflows/pr-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    name: Lint and Build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            src/node_modules
+            ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('src/bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        working-directory: src
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        working-directory: src
+        run: bun run lint
+
+      - name: Build
+        working-directory: src
+        run: bun run build

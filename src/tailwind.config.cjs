@@ -222,7 +222,7 @@ module.exports = {
             fontSize: '0.875rem',
             fontWeight: '600',
             backgroundColor: 'var(--tw-prose-code-bg)',
-            borderRadius: '16px',
+            borderRadius: '4px',
             paddingLeft: '0.25rem',
             paddingRight: '0.25rem',
           },

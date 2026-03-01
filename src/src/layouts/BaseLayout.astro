@@ -10,7 +10,7 @@ const { title, description, pubDateTime, updatedDate, heroImage, image, ogType, 
   <head>
     <BaseHead title={title} description={description} image={image} ogType={ogType} pubDate={pubDateTime} tags={tags} noindex={noindex} />
   </head>
-  <body style="background: var(--color-bg); color: var(--color-text); font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+  <body class="min-h-screen flex flex-col">
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <Header />
     <main id="main-content" style="flex: 1;">

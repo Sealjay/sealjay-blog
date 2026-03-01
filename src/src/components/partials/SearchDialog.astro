@@ -11,6 +11,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
+    <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
   </button>
 
   <dialog
@@ -85,6 +86,30 @@
   .search-trigger:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  .search-shortcut {
+    display: none;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    .search-trigger {
+      gap: 6px;
+      width: auto;
+      padding: 0 12px;
+    }
+
+    .search-shortcut {
+      display: inline-flex;
+    }
   }
 
   /* Overlay */
@@ -245,6 +270,7 @@
     private initialState: HTMLElement | null = null
     private activeIndex = -1
     private searchTrackTimeout: ReturnType<typeof setTimeout> | null = null
+    private previouslyFocused: HTMLElement | null = null
 
     constructor() {
       super()
@@ -293,6 +319,28 @@
           this.selectCurrent()
         }
       })
+
+      // Focus trap within dialog
+      this.dialog?.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return
+        const focusable = this.dialog!.querySelectorAll<HTMLElement>(
+          'input, button, a[href], [tabindex]:not([tabindex="-1"])'
+        )
+        if (focusable.length === 0) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault()
+            last.focus()
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault()
+            first.focus()
+          }
+        }
+      })
     }
 
     async loadIndex() {
@@ -311,6 +359,7 @@
     }
 
     openDialog() {
+      this.previouslyFocused = document.activeElement as HTMLElement | null
       this.loadIndex()
       this.dialog?.showModal()
       this.input?.focus()
@@ -318,6 +367,8 @@
 
     closeDialog() {
       this.dialog?.close()
+      this.previouslyFocused?.focus()
+      this.previouslyFocused = null
     }
 
     resetSearch() {

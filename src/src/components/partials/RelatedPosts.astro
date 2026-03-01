@@ -1,0 +1,112 @@
+---
+import { getCollection } from 'astro:content'
+import Badge from './Badge.astro'
+import FormattedDate from './FormattedDate.astro'
+
+interface Props {
+  currentSlug: string
+  tags: string[]
+}
+
+const { currentSlug, tags } = Astro.props
+
+const allPosts = await getCollection('blog')
+
+const related = allPosts
+  .filter((post) => {
+    if (post.slug === currentSlug) return false
+    if (!post.data.tags || !tags.length) return false
+    return post.data.tags.some((t: string) => tags.includes(t))
+  })
+  .sort((a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf())
+  .slice(0, 3)
+---
+
+{related.length > 0 && (
+  <section class="related-posts mx-auto max-w-content px-5 md:px-10 mb-8">
+    <h2 class="related-posts__heading font-heading">Related</h2>
+    <div class="related-posts__grid">
+      {related.map((post) => (
+        <a href={`/blog/${post.slug}/`} class="related-card">
+          <span class="related-card__title">{post.data.title}</span>
+          <div class="related-card__meta">
+            {post.data.tags && post.data.tags[0] && (
+              <Badge label={post.data.tags[0]} />
+            )}
+            <FormattedDate date={post.data.pubDateTime} />
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    margin-top: 3rem;
+  }
+
+  .related-posts__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin: 0 0 1.25rem;
+  }
+
+  .related-posts__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .related-posts__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-posts__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .related-card:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-text) 6%, transparent);
+  }
+
+  .related-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .related-card__title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+
+  .related-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+</style>

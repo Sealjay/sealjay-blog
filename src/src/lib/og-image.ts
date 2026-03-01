@@ -568,7 +568,7 @@ function buildTemplate(input: OGTemplateInput) {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: displayTitle.length > 60 ? '36px' : displayTitle.length > 40 ? '42px' : '48px',
+                          fontSize: displayTitle.length > 80 ? '32px' : displayTitle.length > 50 ? '36px' : '40px',
                           fontWeight: 700,
                           fontFamily: 'Bricolage Grotesque',
                           color: '#E0E7FF',
@@ -598,6 +598,7 @@ function buildTemplate(input: OGTemplateInput) {
                                     fontFamily: 'Bricolage Grotesque',
                                     color: '#818CF8',
                                     backgroundColor: 'rgba(129, 140, 248, 0.15)',
+                                    border: '1px solid rgba(129, 140, 248, 0.25)',
                                     borderRadius: '9999px',
                                     padding: '4px 12px',
                                   },

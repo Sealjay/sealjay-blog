@@ -1,5 +1,4 @@
 @import './markdown.css';
-@import './prism.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,7 +25,9 @@
   --color-danger: #E11D48;
   --color-border: rgba(99, 102, 241, 0.1);
   --color-border-strong: rgba(99, 102, 241, 0.2);
+  --color-primary-hover: #6366F1;
   --color-card-glow: 0 2px 20px rgba(79, 70, 229, 0.06);
+  --color-card-glow-hover: 0 4px 20px rgba(79, 70, 229, 0.1);
   --gradient-hero: linear-gradient(160deg, #F8F9FC 0%, #EEF2FF 40%, #E8ECFE 70%, #F8F9FC 100%);
 
   /* Spacing scale */
@@ -51,7 +52,13 @@
   --duration-normal: 250ms;
   --duration-slow: 500ms;
 
+  /* Font stacks */
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
   color-scheme: light;
+  scrollbar-color: rgba(99, 102, 241, 0.15) transparent;
 }
 
 /* Dark mode overrides */
@@ -72,8 +79,15 @@
   --color-danger: #FB7185;
   --color-border: rgba(129, 140, 248, 0.12);
   --color-border-strong: rgba(129, 140, 248, 0.25);
+  --color-primary-hover: #6366F1;
   --color-card-glow: 0 0 40px rgba(129, 140, 248, 0.06);
+  --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
   --gradient-hero: linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%);
+
+  /* Font stacks */
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
   color-scheme: dark;
   scrollbar-color: rgba(129, 140, 248, 0.2) transparent;
@@ -104,7 +118,10 @@
     font-family: 'Bricolage Grotesque', system-ui, sans-serif;
     color: var(--color-text);
     font-weight: 600;
-    letter-spacing: -0.015em;
+  }
+
+  h1 {
+    font-weight: 700;
   }
 
   code, pre, kbd, samp {
@@ -193,7 +210,7 @@
 
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
+    box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
   }
 
   /* Button styles */

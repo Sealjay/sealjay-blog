@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 import Layout from '../layouts/BaseLayout.astro'
-import IndexWaves from '../components/partials/IndexWaves.astro'
+
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
 import Badge from '../components/partials/Badge.astro'
 import Button from '../components/partials/Button.astro'
@@ -12,7 +12,6 @@ import LatestNotes from '../components/home/LatestNotes.astro'
 import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
-import { getOGImagePath } from '../lib/og-image'
 import { currentRole } from '../config/personal'
 
 // --- Data fetching ---
@@ -68,62 +67,57 @@ const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
 }))
 
 // --- Expertise tags for hero ---
-const expertiseTags = ['AI Security', 'Green Software', 'Open Source', 'Azure MVP']
+const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI MVP']
 
-// --- Recent writing card helpers ---
-function getPostHero(post: typeof posts[0]) {
-  const hasHero = post.data.heroImage && post.data.heroImage !== '/placeholder-hero.png'
-  return hasHero ? post.data.heroImage! : getOGImagePath(post.slug)
-}
-
-function estimateReadingTime(body?: string) {
-  if (!body) return undefined
-  const wordCount = body.split(/\s+/).length
-  return wordCount > 0 ? Math.max(1, Math.ceil(wordCount / 200)) : undefined
-}
 ---
 
 <Layout
   title="Chris Lloyd-Jones | Sealjay"
-  description="Software engineer, open source & sustainability advocate based in London"
+  description="AI security, green software, and open source — Chris Lloyd-Jones (Sealjay), London"
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2023')}
   heroImage="/chris/portrait.jpg"
 >
   <!-- Hero Section -->
   <div class="hero-section">
-    <IndexWaves />
+    <!-- Ambient radial glow -->
+    <div class="hero-glow" aria-hidden="true" />
     <Container class="hero-content">
       <div class="h-card">
         <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
         <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
 
         <!-- Expertise tags -->
-        <div class="hero-tags">
+        <div class="hero-tags hero-anim" style="animation-delay: 0s;">
           {expertiseTags.map((tag) => (
             <Badge label={tag} variant="default" />
           ))}
         </div>
 
         <!-- Name -->
-        <h1 class="hero-title font-heading">
+        <h1 class="hero-title font-heading hero-anim" style="animation-delay: 0.08s;">
           <span class="p-name">Chris Lloyd-Jones</span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="hero-subtitle font-body">
+        <p class="hero-subtitle font-body hero-anim" style="animation-delay: 0.16s;">
           <span class="p-job-title">{currentRole.title}</span> &mdash; {currentRole.company}
         </p>
 
         <!-- Bio -->
-        <p class="hero-bio font-body p-note">
-          I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. A software engineer and 'open' enthusiast living in London, deeply embedded in the Open Source community and a passionate advocate for the thoughtful &amp; sustainable use of AI.
+        <p class="hero-bio font-body p-note hero-anim" style="animation-delay: 0.24s;">
+          I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. I bridge AI transformation with enterprise governance, sustainability, and open source &mdash; from green software to agentic AI. 6x Microsoft MVP, doctoral researcher in Green Software Engineering, and co-host of <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a>.
         </p>
 
         <!-- Bento grid: Latest Article + Next Speaking -->
-        <div class="hero-bento">
+        <div class="hero-bento hero-anim" style="animation-delay: 0.32s;">
           {latestPost && <LatestArticle post={latestPost} />}
           {nextTalk.length > 0 && <RecentTalks entries={nextTalk} />}
+        </div>
+
+        <!-- Code signature -->
+        <div class="hero-code-signature hero-anim" style="animation-delay: 0.40s;">
+          <code><span class="code-comment">// </span><span class="code-keyword">open</span>, sustainable, real</code>
         </div>
       </div>
     </Container>
@@ -133,37 +127,18 @@ function estimateReadingTime(body?: string) {
   <Section bg="alt" ariaLabel="Recent writing">
     <Container>
       <h2 class="section-title font-heading">Recent Writing</h2>
-      <div class="writing-grid">
+      <div class="writing-list">
         {recentPosts.map((post) => {
-          const heroSrc = getPostHero(post)
-          const hasHero = post.data.heroImage && post.data.heroImage !== '/placeholder-hero.png'
           const firstTag = post.data.tags?.[0]
-          const readingTime = estimateReadingTime(post.body)
           return (
-            <a href={`/blog/${post.slug}/`} class="writing-card group">
-              <div class="writing-card__image">
-                {hasHero ? (
-                  <img src={heroSrc} alt="" class="writing-card__img" loading="lazy" />
-                ) : (
-                  <div class="writing-card__placeholder" />
-                )}
-              </div>
-              <div class="writing-card__body">
+            <a href={`/blog/${post.slug}/`} class="writing-card">
+              <div class="writing-card__row">
                 {firstTag && (
                   <span class="writing-card__tag">{firstTag}</span>
                 )}
-                <h3 class="writing-card__title font-heading">{post.data.title}</h3>
-                <div class="writing-card__meta">
-                  <FormattedDate date={post.data.pubDateTime} />
-                  {readingTime && (
-                    <>
-                      <span aria-hidden="true">&middot;</span>
-                      <span>{readingTime} min read</span>
-                    </>
-                  )}
-                </div>
-                <p class="writing-card__excerpt">{post.data.description}</p>
+                <FormattedDate date={post.data.pubDateTime} class="writing-card__date" />
               </div>
+              <h3 class="writing-card__title font-heading">{post.data.title}</h3>
             </a>
           )
         })}
@@ -199,9 +174,11 @@ function estimateReadingTime(body?: string) {
   </Section>
 
   <!-- Social Links -->
-  <div class="social-section">
-    <SocialLinks />
-  </div>
+  <Section bg="default" ariaLabel="Social links">
+    <Container>
+      <SocialLinks />
+    </Container>
+  </Section>
 </Layout>
 
 <style>
@@ -220,6 +197,26 @@ function estimateReadingTime(body?: string) {
     .hero-section {
       padding-top: 3.5rem;
       padding-bottom: 4rem;
+    }
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
+    top: -150px;
+    right: -80px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .hero-glow {
+      width: 300px;
+      height: 300px;
+      top: -100px;
+      right: -100px;
     }
   }
 
@@ -271,6 +268,18 @@ function estimateReadingTime(body?: string) {
     margin: 0 0 2rem;
   }
 
+  .hero-bio :global(.hero-bio-link) {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .hero-bio :global(.hero-bio-link:hover) {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+
   @media (min-width: 768px) {
     .hero-bio {
       font-size: 1rem;
@@ -287,6 +296,62 @@ function estimateReadingTime(body?: string) {
   @media (min-width: 768px) {
     .hero-bento {
       grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ============================================================
+     Hero Code Signature
+     ============================================================ */
+  .hero-code-signature {
+    margin-top: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px 20px;
+    font-family: var(--font-code);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    max-width: 100%;
+  }
+
+  .hero-code-signature code {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-comment {
+    color: var(--color-text-subtle);
+  }
+
+  .code-keyword {
+    color: var(--color-warm);
+    font-weight: 600;
+  }
+
+  /* ============================================================
+     Hero Staggered Fade-in-up Animations
+     ============================================================ */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-anim {
+      opacity: 0;
+      animation: hero-fade-in-up 0.6s var(--ease-out) forwards;
+    }
+
+    @keyframes hero-fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-anim {
+      opacity: 1;
     }
   }
 
@@ -310,112 +375,76 @@ function estimateReadingTime(body?: string) {
   }
 
   /* ============================================================
-     Recent Writing Grid
+     Recent Writing — Compact Text-Only Cards
      ============================================================ */
-  .writing-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  @media (min-width: 768px) {
-    .writing-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .writing-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .writing-card {
     display: block;
-    border-radius: var(--radius-lg);
+    padding: 16px 18px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     box-shadow: var(--color-card-glow);
-    overflow: hidden;
     text-decoration: none;
-    transition: transform var(--duration-normal) var(--ease-out),
-                border-color var(--duration-normal) var(--ease-out),
-                box-shadow var(--duration-normal) var(--ease-out);
+    cursor: pointer;
+    transition: transform 0.2s var(--ease-out),
+                border-color 0.2s var(--ease-out),
+                box-shadow 0.2s var(--ease-out);
   }
 
   .writing-card:hover {
-    transform: translateY(-2px);
+    transform: translateX(4px);
     border-color: var(--color-border-strong);
-    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
   }
 
-  .writing-card__image {
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
+  .writing-card:focus-visible {
+    transform: translateX(4px);
+    border-color: var(--color-border-strong);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
-  .writing-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--duration-slow) var(--ease-out);
-  }
-
-  .writing-card:hover .writing-card__img {
-    transform: scale(1.05);
-  }
-
-  .writing-card__placeholder {
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-hero);
-  }
-
-  .writing-card__body {
-    padding: 1rem;
+  .writing-card__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
   }
 
   .writing-card__tag {
     display: inline-flex;
     align-items: center;
-    border-radius: var(--radius-full);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
     background: var(--color-primary-muted);
     color: var(--color-primary);
-    padding: 0.125rem 0.5rem;
-    font-size: 0.6875rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+  }
+
+  /* Override FormattedDate scoped styles when used as compact date */
+  .writing-card :global(.formatted-date.writing-card__date) {
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    line-height: 1;
   }
 
   .writing-card__title {
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 600;
     color: var(--color-text);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.35;
     margin: 0;
-    transition: color var(--duration-fast) var(--ease-out);
+    transition: color 0.2s var(--ease-out);
   }
 
   .writing-card:hover .writing-card__title {
     color: var(--color-primary);
-  }
-
-  .writing-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.75rem;
-    color: var(--color-text-subtle);
-    margin-top: 0.375rem;
-  }
-
-  .writing-card__excerpt {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin: 0.375rem 0 0;
   }
 
   /* ============================================================
@@ -426,17 +455,4 @@ function estimateReadingTime(body?: string) {
     text-align: center;
   }
 
-  /* ============================================================
-     Social Links Section
-     ============================================================ */
-  .social-section {
-    padding: 2.5rem 0;
-    text-align: center;
-  }
-
-  @media (min-width: 768px) {
-    .social-section {
-      padding: 3rem 0;
-    }
-  }
 </style>

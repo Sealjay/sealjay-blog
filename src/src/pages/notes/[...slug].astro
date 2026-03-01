@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
-import IndexLayout from '../../layouts/BaseLayout.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Giscus from '../../components/embeds/Giscus.astro'
@@ -83,7 +83,7 @@ const pageDescription = daySummary
   ?? 'Notes from Sealjay.'
 ---
 
-<IndexLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} description={pageDescription}>
   <Container>
     <div class="note-detail">
       <a href="/notes" class="note-detail__back">
@@ -232,7 +232,7 @@ const pageDescription = daySummary
       </div>
     </div>
   </Container>
-</IndexLayout>
+</BaseLayout>
 
 <style>
   .note-detail {

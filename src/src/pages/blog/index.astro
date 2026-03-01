@@ -66,19 +66,15 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
         return (
           <a href={`/blog/${post.slug}/`} class="h-entry u-url blog-card group">
             <div class="blog-card__image">
-              {hasHeroImage ? (
-                <img
-                  src={heroSrc}
-                  alt=""
-                  width="1200"
-                  height="630"
-                  loading="lazy"
-                  decoding="async"
-                  class="blog-card__img"
-                />
-              ) : (
-                <div class="blog-card__placeholder" />
-              )}
+              <img
+                src={heroSrc}
+                alt=""
+                width="1200"
+                height="630"
+                loading="lazy"
+                decoding="async"
+                class="blog-card__img"
+              />
             </div>
             <div class="blog-card__body">
               {firstTag && (
@@ -202,9 +198,9 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
   }
 
   .blog-card:hover {
-    transform: translateY(-2px);
+    transform: translateX(4px);
     border-color: var(--color-border-strong);
-    box-shadow: var(--color-card-glow), 0 4px 20px rgba(79, 70, 229, 0.1);
+    box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
   }
 
   .blog-card__image {

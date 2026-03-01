@@ -13,9 +13,23 @@ const bgStyle = bg === 'alt' ? 'background: var(--color-bg-alt)' : 'background: 
 
 <section
   style={bgStyle}
-  class:list={['py-6 md:py-10', className]}
+  class:list={['section-padding', className]}
   {...id ? { id } : {}}
   {...ariaLabel ? { 'aria-label': ariaLabel } : {}}
 >
   <slot />
 </section>
+
+<style>
+  .section-padding {
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-lg);
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: var(--space-xl);
+      padding-bottom: var(--space-xl);
+    }
+  }
+</style>

@@ -92,19 +92,15 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
         return (
           <a href={`/blog/${post.slug}/`} class="blog-card group">
             <div class="blog-card__image">
-              {hasHeroImage ? (
-                <img
-                  src={heroSrc}
-                  alt=""
-                  width="1200"
-                  height="630"
-                  loading="lazy"
-                  decoding="async"
-                  class="blog-card__img"
-                />
-              ) : (
-                <div class="blog-card__placeholder" />
-              )}
+              <img
+                src={heroSrc}
+                alt=""
+                width="1200"
+                height="630"
+                loading="lazy"
+                decoding="async"
+                class="blog-card__img"
+              />
             </div>
             <div class="blog-card__body">
               {firstTag && (
