@@ -1,10 +1,8 @@
 ---
 ---
 
-<div
-   class="py-3 sm:py-4 px-4 sm:px-5 flex items-center gap-3 sm:gap-4 bg-accent-50/80 rounded-xl border border-accent-200 text-accent-700 dark:bg-accent-900/20 dark:border-accent-800/30 dark:text-accent-300 max-w-xl mx-auto shadow-sm"
->
-  <div class="flex-shrink-0">
+<div class="old-post-banner">
+  <div class="old-post-banner__icon">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -13,16 +11,73 @@
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="w-6 h-6 sm:w-7 sm:h-7 text-accent-600 dark:text-accent-400"
+      aria-hidden="true"
     >
       <circle cx="12" cy="12" r="10"></circle>
       <line x1="12" y1="16" x2="12" y2="12"></line>
       <line x1="12" y1="8" x2="12" y2="8"></line>
     </svg>
   </div>
-  <p class="text-sm sm:text-base">
+  <p class="old-post-banner__text">
     <strong>Heads up!</strong> This information might be outdated since it was last
     updated over a year ago. Please double-check the information before relying on
     it.
   </p>
 </div>
+
+<style>
+  .old-post-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid color-mix(in srgb, var(--color-warm) 25%, transparent);
+    background: var(--color-warm-muted);
+    color: var(--color-text-muted);
+    box-shadow: var(--color-card-glow);
+  }
+
+  @media (min-width: 640px) {
+    .old-post-banner {
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+    }
+  }
+
+  .old-post-banner__icon {
+    flex-shrink: 0;
+  }
+
+  .old-post-banner__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-warm);
+  }
+
+  @media (min-width: 640px) {
+    .old-post-banner__icon svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  .old-post-banner__text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 640px) {
+    .old-post-banner__text {
+      font-size: 1rem;
+    }
+  }
+
+  .old-post-banner__text strong {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+</style>

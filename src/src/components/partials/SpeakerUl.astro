@@ -1,9 +1,36 @@
 ---
 ---
 
-<ul
-        role="list"
-        class="not-prose mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
->
-    <slot />
+<ul role="list" class="speaker-list">
+  <slot />
 </ul>
+
+<style>
+  .speaker-list {
+    list-style: none;
+    margin-top: 0.75rem;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    line-height: 1.75;
+  }
+
+  @media (min-width: 640px) {
+    .speaker-list {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .speaker-list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .speaker-list ::marker {
+    color: var(--color-primary);
+  }
+</style>

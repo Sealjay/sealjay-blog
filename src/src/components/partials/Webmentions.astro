@@ -59,28 +59,28 @@ const otherMentions = uniqueMentions.filter((m) =>
 const hasAny = uniqueMentions.length > 0
 ---
 
-{hasAny && (
-  <div class="webmentions mt-12 sm:mt-16">
-    <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-6 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-accent-500 dark:text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+{hasAny ? (
+  <div class="webmentions">
+    <h2 class="webmentions__heading">
+      <svg xmlns="http://www.w3.org/2000/svg" class="webmentions__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
       </svg>
       Webmentions
     </h2>
 
-    <div class="bg-white dark:bg-zinc-800/70 rounded-xl ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 p-4 sm:p-6 shadow-sm space-y-6">
+    <div class="webmentions__container">
       {likes.length > 0 && (
-        <div>
-          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+        <div class="webmentions__group">
+          <h3 class="webmentions__group-label">
             {likes.length} {likes.length === 1 ? 'Like' : 'Likes'}
           </h3>
-          <div class="flex flex-wrap gap-1">
+          <div class="webmentions__avatars">
             {likes.map((like) => (
-              <a href={like.author?.url || like.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={like.author?.name || 'Someone'} class="block">
+              <a href={like.author?.url || like.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={like.author?.name || 'Someone'} class="webmentions__avatar-link">
                 {like.author?.photo ? (
-                  <img src={like.author.photo} alt={like.author?.name || ''} class="w-8 h-8 rounded-full ring-2 ring-white dark:ring-zinc-800" loading="lazy" />
+                  <img src={like.author.photo} alt={like.author?.name || 'Someone who liked this'} class="webmentions__avatar webmentions__avatar--overlap" loading="lazy" />
                 ) : (
-                  <span class="w-8 h-8 rounded-full bg-accent-100 dark:bg-accent-900/40 flex items-center justify-center text-xs font-medium text-accent-700 dark:text-accent-300">
+                  <span class="webmentions__avatar-fallback webmentions__avatar--overlap">
                     {(like.author?.name || '?').charAt(0)}
                   </span>
                 )}
@@ -91,17 +91,17 @@ const hasAny = uniqueMentions.length > 0
       )}
 
       {reposts.length > 0 && (
-        <div>
-          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+        <div class="webmentions__group">
+          <h3 class="webmentions__group-label">
             {reposts.length} {reposts.length === 1 ? 'Repost' : 'Reposts'}
           </h3>
-          <div class="flex flex-wrap gap-1">
+          <div class="webmentions__avatars">
             {reposts.map((repost) => (
-              <a href={repost.author?.url || repost.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={repost.author?.name || 'Someone'} class="block">
+              <a href={repost.author?.url || repost.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={repost.author?.name || 'Someone'} class="webmentions__avatar-link">
                 {repost.author?.photo ? (
-                  <img src={repost.author.photo} alt={repost.author?.name || ''} class="w-8 h-8 rounded-full ring-2 ring-white dark:ring-zinc-800" loading="lazy" />
+                  <img src={repost.author.photo} alt={repost.author?.name || 'Someone who reposted this'} class="webmentions__avatar" loading="lazy" />
                 ) : (
-                  <span class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                  <span class="webmentions__avatar-fallback webmentions__avatar-fallback--repost">
                     {(repost.author?.name || '?').charAt(0)}
                   </span>
                 )}
@@ -112,39 +112,39 @@ const hasAny = uniqueMentions.length > 0
       )}
 
       {replies.length > 0 && (
-        <div>
-          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+        <div class="webmentions__group">
+          <h3 class="webmentions__group-label">
             {replies.length} {replies.length === 1 ? 'Reply' : 'Replies'}
           </h3>
-          <div class="flex flex-col gap-4">
+          <div class="webmentions__replies">
             {replies.map((reply) => (
-              <div class="flex gap-3">
-                <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="shrink-0">
+              <div class="webmentions__reply">
+                <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__reply-avatar-link">
                   {reply.author?.photo ? (
-                    <img src={reply.author.photo} alt={reply.author?.name || ''} class="w-10 h-10 rounded-full" loading="lazy" />
+                    <img src={reply.author.photo} alt={reply.author?.name || 'Anonymous commenter'} class="webmentions__reply-avatar" loading="lazy" />
                   ) : (
-                    <span class="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-sm font-medium text-zinc-600 dark:text-zinc-300">
+                    <span class="webmentions__reply-avatar-fallback">
                       {(reply.author?.name || '?').charAt(0)}
                     </span>
                   )}
                 </a>
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-baseline gap-2 mb-1">
-                    <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 hover:text-accent-600 dark:hover:text-accent-400">
+                <div class="webmentions__reply-content">
+                  <div class="webmentions__reply-meta">
+                    <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__reply-author">
                       {reply.author?.name || 'Anonymous'}
                     </a>
                     {reply.published && (
-                      <time class="text-xs text-zinc-400 dark:text-zinc-500" datetime={reply.published}>
+                      <time class="webmentions__reply-date" datetime={reply.published}>
                         {new Date(reply.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </time>
                     )}
                   </div>
                   {reply.content?.text && (
-                    <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    <p class="webmentions__reply-text">
                       {reply.content.text.length > 300 ? `${reply.content.text.slice(0, 300)}...` : reply.content.text}
                     </p>
                   )}
-                  <a href={reply.url || reply['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="text-xs text-accent-600 dark:text-accent-400 hover:underline mt-1 inline-block">
+                  <a href={reply.url || reply['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__reply-link">
                     View original
                   </a>
                 </div>
@@ -155,21 +155,21 @@ const hasAny = uniqueMentions.length > 0
       )}
 
       {otherMentions.length > 0 && (
-        <div>
-          <h3 class="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-3">
+        <div class="webmentions__group">
+          <h3 class="webmentions__group-label">
             {otherMentions.length} {otherMentions.length === 1 ? 'Mention' : 'Mentions'}
           </h3>
-          <ul class="space-y-2">
+          <ul class="webmentions__mention-list">
             {otherMentions.map((mention) => (
-              <li class="flex items-center gap-2">
+              <li class="webmentions__mention-item">
                 {mention.author?.photo ? (
-                  <img src={mention.author.photo} alt={mention.author?.name || ''} class="w-6 h-6 rounded-full" loading="lazy" />
+                  <img src={mention.author.photo} alt={mention.author?.name || 'Someone'} class="webmentions__mention-avatar" loading="lazy" />
                 ) : (
-                  <span class="w-6 h-6 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center text-xs text-zinc-500">
+                  <span class="webmentions__mention-avatar-fallback">
                     {(mention.author?.name || '?').charAt(0)}
                   </span>
                 )}
-                <a href={mention.url || mention['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-accent-600 dark:hover:text-accent-400 truncate">
+                <a href={mention.url || mention['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__mention-link">
                   {mention.author?.name || mention['wm-source']}
                 </a>
               </li>
@@ -179,4 +179,246 @@ const hasAny = uniqueMentions.length > 0
       )}
     </div>
   </div>
+) : (
+  <div class="webmentions__empty">
+    No webmentions yet.
+  </div>
 )}
+
+<style>
+  .webmentions {
+    margin-top: 3rem;
+  }
+
+  @media (min-width: 640px) {
+    .webmentions {
+      margin-top: 4rem;
+    }
+  }
+
+  .webmentions__heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (min-width: 640px) {
+    .webmentions__heading {
+      font-size: 1.5rem;
+    }
+  }
+
+  .webmentions__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+    color: var(--color-primary);
+  }
+
+  .webmentions__container {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .webmentions__container {
+      padding: 1.5rem;
+    }
+  }
+
+  .webmentions__group-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-subtle);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Likes - overlapping avatar circles */
+  .webmentions__avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .webmentions__avatar-link {
+    display: block;
+  }
+
+  .webmentions__avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-surface);
+  }
+
+  .webmentions__avatar--overlap {
+    margin-right: -0.375rem;
+  }
+
+  .webmentions__avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 2px solid var(--color-surface);
+  }
+
+  .webmentions__avatar-fallback--repost {
+    background: color-mix(in srgb, var(--color-success) 10%, transparent);
+    color: var(--color-success);
+  }
+
+  /* Replies as cards */
+  .webmentions__replies {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .webmentions__reply {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .webmentions__reply-avatar-link {
+    flex-shrink: 0;
+  }
+
+  .webmentions__reply-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+  }
+
+  .webmentions__reply-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-hover);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .webmentions__reply-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .webmentions__reply-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .webmentions__reply-author {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .webmentions__reply-author:hover {
+    color: var(--color-primary);
+  }
+
+  .webmentions__reply-date {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+
+  .webmentions__reply-text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .webmentions__reply-link {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    margin-top: 0.25rem;
+    display: inline-block;
+    transition: text-decoration var(--duration-fast) var(--ease-out);
+  }
+
+  .webmentions__reply-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Other mentions */
+  .webmentions__mention-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .webmentions__mention-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .webmentions__mention-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-full);
+  }
+
+  .webmentions__mention-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-hover);
+    color: var(--color-text-subtle);
+    font-size: 0.75rem;
+  }
+
+  .webmentions__mention-link {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .webmentions__mention-link:hover {
+    color: var(--color-primary);
+  }
+
+  /* Empty state */
+  .webmentions__empty {
+    margin-top: 3rem;
+    color: var(--color-text-subtle);
+    font-size: 0.875rem;
+  }
+</style>
