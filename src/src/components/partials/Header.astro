@@ -492,16 +492,19 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     // More dropdown
     const moreTrigger = document.getElementById('more-menu-trigger')
     const morePanel = document.getElementById('more-menu-panel')
+    const navList = document.querySelector('.nav-list')
 
     if (moreTrigger && morePanel) {
       function openMore() {
         moreTrigger!.setAttribute('aria-expanded', 'true')
         morePanel!.classList.add('open')
+        navList?.classList.add('nav-list--more-open')
       }
 
       function closeMore() {
         moreTrigger!.setAttribute('aria-expanded', 'false')
         morePanel!.classList.remove('open')
+        navList?.classList.remove('nav-list--more-open')
       }
 
       moreTrigger.addEventListener('click', (e) => {

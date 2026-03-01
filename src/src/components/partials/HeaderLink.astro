@@ -39,6 +39,12 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, '')
     background: var(--color-primary-muted);
   }
 
+  /* Hide active highlight when the "More" dropdown is open */
+  :global(.nav-list--more-open) .header-link[data-active]:not(:hover) {
+    color: var(--color-text-muted);
+    background: transparent;
+  }
+
   .header-link:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
