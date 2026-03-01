@@ -1,0 +1,173 @@
+{
+  "name": "indigo-ink-dark",
+  "type": "dark",
+  "colors": {
+    "editor.background": "#110E26",
+    "editor.foreground": "#E0E7FF"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment", "string.comment"],
+      "settings": {
+        "foreground": "#6670A0"
+      }
+    },
+    {
+      "scope": [
+        "keyword",
+        "keyword.control",
+        "keyword.operator.new",
+        "keyword.operator.expression",
+        "keyword.operator.cast",
+        "keyword.operator.sizeof",
+        "keyword.operator.alignof",
+        "keyword.operator.typeid",
+        "keyword.operator.logical",
+        "keyword.operator.wordlike",
+        "storage",
+        "storage.type",
+        "storage.modifier"
+      ],
+      "settings": {
+        "foreground": "#818CF8"
+      }
+    },
+    {
+      "scope": ["string", "string.quoted", "string.template", "string.regexp", "punctuation.definition.string"],
+      "settings": {
+        "foreground": "#F472B6"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.function",
+        "support.function",
+        "meta.function-call entity.name.function",
+        "meta.method-call entity.name.function"
+      ],
+      "settings": {
+        "foreground": "#34D399"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language", "constant.character", "constant.other", "support.constant"],
+      "settings": {
+        "foreground": "#A5B4FC"
+      }
+    },
+    {
+      "scope": ["variable", "variable.other", "variable.parameter", "entity.name"],
+      "settings": {
+        "foreground": "#E0E7FF"
+      }
+    },
+    {
+      "scope": [
+        "punctuation",
+        "keyword.operator",
+        "keyword.operator.assignment",
+        "keyword.operator.comparison",
+        "keyword.operator.arithmetic"
+      ],
+      "settings": {
+        "foreground": "#9BA3CF"
+      }
+    },
+    {
+      "scope": [
+        "entity.other.attribute-name",
+        "variable.other.property",
+        "support.type.property-name",
+        "meta.object-literal.key"
+      ],
+      "settings": {
+        "foreground": "#818CF8"
+      }
+    },
+    {
+      "scope": ["entity.name.tag", "support.class.component", "punctuation.definition.tag"],
+      "settings": {
+        "foreground": "#F472B6"
+      }
+    },
+    {
+      "scope": ["entity.other.attribute-name"],
+      "settings": {
+        "foreground": "#34D399"
+      }
+    },
+    {
+      "scope": ["string.regexp"],
+      "settings": {
+        "foreground": "#F472B6"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.type",
+        "entity.name.class",
+        "support.type",
+        "support.class",
+        "entity.other.inherited-class"
+      ],
+      "settings": {
+        "foreground": "#A5B4FC"
+      }
+    },
+    {
+      "scope": ["markup.inserted", "punctuation.definition.inserted"],
+      "settings": {
+        "foreground": "#34D399"
+      }
+    },
+    {
+      "scope": ["markup.deleted", "punctuation.definition.deleted"],
+      "settings": {
+        "foreground": "#FB7185"
+      }
+    },
+    {
+      "scope": [
+        "support.type.builtin",
+        "variable.language",
+        "variable.language.this",
+        "variable.language.self",
+        "variable.language.super"
+      ],
+      "settings": {
+        "foreground": "#818CF8"
+      }
+    },
+    {
+      "scope": [
+        "meta.import keyword",
+        "keyword.control.import",
+        "keyword.control.from",
+        "keyword.control.export",
+        "keyword.control.default"
+      ],
+      "settings": {
+        "foreground": "#818CF8"
+      }
+    },
+    {
+      "scope": ["markup.heading", "entity.name.section"],
+      "settings": {
+        "foreground": "#818CF8",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["markup.bold"],
+      "settings": {
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["markup.italic"],
+      "settings": {
+        "fontStyle": "italic"
+      }
+    }
+  ]
+}

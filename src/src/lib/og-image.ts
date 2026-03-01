@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import { join } from 'node:path'
 import { Resvg } from '@resvg/resvg-js'
 import satori from 'satori'
 
@@ -422,6 +419,9 @@ function buildTemplate(input: OGTemplateInput) {
   // Truncate title for display – max ~90 chars to fit comfortably
   const displayTitle = input.title.length > 90 ? `${input.title.substring(0, 87)}...` : input.title
 
+  // Build tag pills from the first few tags (max 4 to avoid overflow)
+  const displayTags = (input.tags ?? []).slice(0, 4)
+
   return {
     type: 'div',
     props: {
@@ -431,12 +431,12 @@ function buildTemplate(input: OGTemplateInput) {
         display: 'flex',
         position: 'relative',
         overflow: 'hidden',
-        // Deep indigo-to-slate gradient background
-        background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #020617 100%)',
-        fontFamily: 'Manrope, Inter, sans-serif',
+        // Indigo Ink hero gradient
+        background: 'linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%)',
+        fontFamily: 'Bricolage Grotesque, Source Serif 4, sans-serif',
       },
       children: [
-        // Subtle gradient overlay for depth
+        // Subtle radial overlay for depth, keyed to category accent
         {
           type: 'div',
           props: {
@@ -480,44 +480,79 @@ function buildTemplate(input: OGTemplateInput) {
               position: 'relative',
             },
             children: [
-              // Top: Site branding
+              // Top: Category badge + date
               {
                 type: 'div',
                 props: {
                   style: {
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    gap: '16px',
                   },
                   children: [
-                    // Small accent dot as logo stand-in
+                    // Category badge
                     {
                       type: 'div',
                       props: {
                         style: {
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          backgroundColor: category.accent,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '6px 16px',
+                          borderRadius: '9999px',
+                          backgroundColor: `${category.accent}22`,
+                          border: `1px solid ${category.accent}44`,
                         },
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                backgroundColor: category.accent,
+                              },
+                            },
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                fontFamily: 'Bricolage Grotesque',
+                                color: category.accent,
+                              },
+                              children: category.name,
+                            },
+                          },
+                        ],
                       },
                     },
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          fontSize: '18px',
-                          fontWeight: 600,
-                          color: '#a5b4fc',
-                          letterSpacing: '0.05em',
+                    // Date (text-muted)
+                    formattedDate
+                      ? {
+                          type: 'div',
+                          props: {
+                            style: {
+                              fontSize: '14px',
+                              fontFamily: 'Source Serif 4',
+                              color: '#9BA3CF',
+                            },
+                            children: formattedDate,
+                          },
+                        }
+                      : {
+                          type: 'div',
+                          props: {
+                            style: { display: 'none' },
+                          },
                         },
-                        children: 'sealjay.com',
-                      },
-                    },
                   ],
                 },
               },
-              // Middle: Title
+              // Middle: Title + tag pills
               {
                 type: 'div',
                 props: {
@@ -528,23 +563,56 @@ function buildTemplate(input: OGTemplateInput) {
                     maxWidth: '900px',
                   },
                   children: [
+                    // Title – Bricolage Grotesque, ~36px, colour #E0E7FF
                     {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: displayTitle.length > 60 ? '36px' : displayTitle.length > 40 ? '42px' : '48px',
+                          fontSize: displayTitle.length > 80 ? '32px' : displayTitle.length > 50 ? '36px' : '40px',
                           fontWeight: 700,
-                          color: '#f4f4f5',
+                          fontFamily: 'Bricolage Grotesque',
+                          color: '#E0E7FF',
                           lineHeight: 1.25,
                           letterSpacing: '-0.02em',
                         },
                         children: displayTitle,
                       },
                     },
+                    // Tag pills row
+                    ...(displayTags.length > 0
+                      ? [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                display: 'flex',
+                                flexWrap: 'wrap' as const,
+                                gap: '8px',
+                              },
+                              children: displayTags.map((tag) => ({
+                                type: 'div',
+                                props: {
+                                  style: {
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    fontFamily: 'Bricolage Grotesque',
+                                    color: '#818CF8',
+                                    backgroundColor: 'rgba(129, 140, 248, 0.15)',
+                                    border: '1px solid rgba(129, 140, 248, 0.25)',
+                                    borderRadius: '9999px',
+                                    padding: '4px 12px',
+                                  },
+                                  children: tag,
+                                },
+                              })),
+                            },
+                          },
+                        ]
+                      : []),
                   ],
                 },
               },
-              // Bottom: Category badge + date + author
+              // Bottom: Author + watermark
               {
                 type: 'div',
                 props: {
@@ -554,86 +622,30 @@ function buildTemplate(input: OGTemplateInput) {
                     justifyContent: 'space-between',
                   },
                   children: [
-                    // Left: category badge + date
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '16px',
-                        },
-                        children: [
-                          // Category badge
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '6px 16px',
-                                borderRadius: '9999px',
-                                backgroundColor: `${category.accent}22`,
-                                border: `1px solid ${category.accent}44`,
-                              },
-                              children: [
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      width: '8px',
-                                      height: '8px',
-                                      borderRadius: '50%',
-                                      backgroundColor: category.accent,
-                                    },
-                                  },
-                                },
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      fontSize: '14px',
-                                      fontWeight: 600,
-                                      color: category.accent,
-                                    },
-                                    children: category.name,
-                                  },
-                                },
-                              ],
-                            },
-                          },
-                          // Date
-                          formattedDate
-                            ? {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    fontSize: '14px',
-                                    color: '#a1a1aa',
-                                  },
-                                  children: formattedDate,
-                                },
-                              }
-                            : {
-                                type: 'div',
-                                props: {
-                                  style: { display: 'none' },
-                                },
-                              },
-                        ],
-                      },
-                    },
-                    // Right: author
+                    // Left: author name (text-muted)
                     {
                       type: 'div',
                       props: {
                         style: {
                           fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#71717a',
+                          fontWeight: 400,
+                          fontFamily: 'Source Serif 4',
+                          color: '#9BA3CF',
                         },
                         children: 'Chris Lloyd-Jones',
+                      },
+                    },
+                    // Right: sealjay.com watermark
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          fontFamily: 'Source Serif 4',
+                          color: '#6670A0',
+                        },
+                        children: 'sealjay.com',
                       },
                     },
                   ],
@@ -648,52 +660,59 @@ function buildTemplate(input: OGTemplateInput) {
 }
 
 // ---------------------------------------------------------------------------
-// Font loading – read from @fontsource npm packages (no network needed)
+// Font loading – fetch from Google Fonts API at build time
 // ---------------------------------------------------------------------------
 
-function resolveFontPath(pkg: string, fileName: string): string {
-  const require = createRequire(import.meta.url)
-  const pkgJson = require.resolve(`${pkg}/package.json`)
-  const pkgDir = pkgJson.replace(/\/package\.json$/, '')
-  return join(pkgDir, 'files', fileName)
+interface FontEntry {
+  name: string
+  data: ArrayBuffer
+  weight: number
+  style: string
 }
 
-function loadFonts(): { name: string; data: ArrayBuffer; weight: number; style: string }[] {
-  const fontFiles = [
-    {
-      name: 'Manrope',
-      weight: 700,
-      file: resolveFontPath('@fontsource/manrope', 'manrope-latin-700-normal.woff'),
+async function fetchGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
+  const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`
+  const cssResponse = await fetch(url, {
+    headers: {
+      // Use IE10 UA to get woff format (not woff2) - satori needs woff/ttf
+      'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
     },
-    {
-      name: 'Manrope',
-      weight: 600,
-      file: resolveFontPath('@fontsource/manrope', 'manrope-latin-600-normal.woff'),
-    },
-    {
-      name: 'Inter',
-      weight: 400,
-      file: resolveFontPath('@fontsource/inter', 'inter-latin-400-normal.woff'),
-    },
+  })
+  const css = await cssResponse.text()
+  // Extract the font file URL from the CSS @font-face src
+  const match = css.match(/src:\s*url\(([^)]+)\)/)
+  if (!match?.[1]) {
+    throw new Error(`Could not find font URL for ${family} weight ${weight}`)
+  }
+  const fontResponse = await fetch(match[1])
+  return fontResponse.arrayBuffer()
+}
+
+async function loadFonts(): Promise<FontEntry[]> {
+  const fontSpecs = [
+    { name: 'Bricolage Grotesque', weight: 700 },
+    { name: 'Bricolage Grotesque', weight: 600 },
+    { name: 'Source Serif 4', weight: 400 },
   ]
 
-  return fontFiles.map((font) => {
-    const data = readFileSync(font.file)
-    return {
-      name: font.name,
-      data: data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength),
-      weight: font.weight,
+  const fonts = await Promise.all(
+    fontSpecs.map(async (spec) => ({
+      name: spec.name,
+      data: await fetchGoogleFont(spec.name, spec.weight),
+      weight: spec.weight,
       style: 'normal' as const,
-    }
-  })
+    })),
+  )
+
+  return fonts
 }
 
 // Cache fonts in module scope so they're only loaded once per build
-let fontCache: ReturnType<typeof loadFonts> | null = null
+let fontCache: FontEntry[] | null = null
 
-function getFonts() {
+async function getFonts(): Promise<FontEntry[]> {
   if (!fontCache) {
-    fontCache = loadFonts()
+    fontCache = await loadFonts()
   }
   return fontCache
 }
@@ -703,7 +722,7 @@ function getFonts() {
 // ---------------------------------------------------------------------------
 
 export async function generateOGImage(input: OGTemplateInput): Promise<Buffer> {
-  const fonts = getFonts()
+  const fonts = await getFonts()
   const template = buildTemplate(input)
 
   const svg = await satori(template as any, {

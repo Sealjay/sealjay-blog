@@ -1,0 +1,173 @@
+{
+  "name": "indigo-ink-light",
+  "type": "light",
+  "colors": {
+    "editor.background": "#EEEEF8",
+    "editor.foreground": "#1E1B3A"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment", "string.comment"],
+      "settings": {
+        "foreground": "#7E7AAA"
+      }
+    },
+    {
+      "scope": [
+        "keyword",
+        "keyword.control",
+        "keyword.operator.new",
+        "keyword.operator.expression",
+        "keyword.operator.cast",
+        "keyword.operator.sizeof",
+        "keyword.operator.alignof",
+        "keyword.operator.typeid",
+        "keyword.operator.logical",
+        "keyword.operator.wordlike",
+        "storage",
+        "storage.type",
+        "storage.modifier"
+      ],
+      "settings": {
+        "foreground": "#4F46E5"
+      }
+    },
+    {
+      "scope": ["string", "string.quoted", "string.template", "string.regexp", "punctuation.definition.string"],
+      "settings": {
+        "foreground": "#DB2777"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.function",
+        "support.function",
+        "meta.function-call entity.name.function",
+        "meta.method-call entity.name.function"
+      ],
+      "settings": {
+        "foreground": "#059669"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language", "constant.character", "constant.other", "support.constant"],
+      "settings": {
+        "foreground": "#6366F1"
+      }
+    },
+    {
+      "scope": ["variable", "variable.other", "variable.parameter", "entity.name"],
+      "settings": {
+        "foreground": "#1E1B3A"
+      }
+    },
+    {
+      "scope": [
+        "punctuation",
+        "keyword.operator",
+        "keyword.operator.assignment",
+        "keyword.operator.comparison",
+        "keyword.operator.arithmetic"
+      ],
+      "settings": {
+        "foreground": "#4B4772"
+      }
+    },
+    {
+      "scope": [
+        "entity.other.attribute-name",
+        "variable.other.property",
+        "support.type.property-name",
+        "meta.object-literal.key"
+      ],
+      "settings": {
+        "foreground": "#4F46E5"
+      }
+    },
+    {
+      "scope": ["entity.name.tag", "support.class.component", "punctuation.definition.tag"],
+      "settings": {
+        "foreground": "#DB2777"
+      }
+    },
+    {
+      "scope": ["entity.other.attribute-name"],
+      "settings": {
+        "foreground": "#059669"
+      }
+    },
+    {
+      "scope": ["string.regexp"],
+      "settings": {
+        "foreground": "#DB2777"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.type",
+        "entity.name.class",
+        "support.type",
+        "support.class",
+        "entity.other.inherited-class"
+      ],
+      "settings": {
+        "foreground": "#6366F1"
+      }
+    },
+    {
+      "scope": ["markup.inserted", "punctuation.definition.inserted"],
+      "settings": {
+        "foreground": "#059669"
+      }
+    },
+    {
+      "scope": ["markup.deleted", "punctuation.definition.deleted"],
+      "settings": {
+        "foreground": "#E11D48"
+      }
+    },
+    {
+      "scope": [
+        "support.type.builtin",
+        "variable.language",
+        "variable.language.this",
+        "variable.language.self",
+        "variable.language.super"
+      ],
+      "settings": {
+        "foreground": "#4F46E5"
+      }
+    },
+    {
+      "scope": [
+        "meta.import keyword",
+        "keyword.control.import",
+        "keyword.control.from",
+        "keyword.control.export",
+        "keyword.control.default"
+      ],
+      "settings": {
+        "foreground": "#4F46E5"
+      }
+    },
+    {
+      "scope": ["markup.heading", "entity.name.section"],
+      "settings": {
+        "foreground": "#4F46E5",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["markup.bold"],
+      "settings": {
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["markup.italic"],
+      "settings": {
+        "fontStyle": "italic"
+      }
+    }
+  ]
+}

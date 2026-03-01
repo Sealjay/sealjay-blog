@@ -1,19 +1,57 @@
 ---
-const { href, text, class: className } = Astro.props;
+interface Props {
+  href: string
+  text: string
+  class?: string
+}
+
+const { href, text, class: className } = Astro.props
 ---
 
-<li class={`flex mt-4 ${className || ''}`}>
+<li class:list={['flex mt-4', className]}>
   <a
     href={href}
-    class="group flex items-center text-sm font-medium text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+    class="social-link-item"
     target="_blank"
     rel="noopener noreferrer"
   >
-    <div
-      class="h-6 w-6 flex-shrink-0 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300"
-    >
+    <div class="social-link-item__icon">
       <slot />
     </div>
     <span class="ml-3 sm:ml-4">{text}</span>
   </a>
 </li>
+
+<style>
+  .social-link-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding-block: 0.25rem;
+    border-radius: 0.375rem;
+    transition: color 150ms;
+  }
+
+  .social-link-item:hover {
+    color: var(--color-primary);
+  }
+
+  .social-link-item:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 50%, transparent);
+  }
+
+  .social-link-item__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition: color 150ms;
+  }
+
+  .social-link-item:hover .social-link-item__icon {
+    color: var(--color-primary);
+  }
+</style>

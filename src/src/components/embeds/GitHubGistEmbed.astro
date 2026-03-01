@@ -1,86 +1,94 @@
 ---
 type Props = {
-  id: string;
-};
+  id: string
+}
 
-const { id } = Astro.props;
+const { id } = Astro.props
 ---
 
-<div class="gist-embed-container my-4 sm:my-6">
+<div class="gist-embed-container">
   <script is:inline src={`https://gist.github.com/${id}.js`}></script>
 </div>
 
 <style is:global>
+  /* Gist container spacing */
+  .gist-embed-container {
+    margin: 1rem 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
   /* Make gists responsive on mobile */
   .gist-embed-container .gist {
     max-width: 100%;
     overflow-x: auto;
   }
-  
+
   /* Adjust gist table layout for mobile */
   .gist-embed-container .gist .gist-file {
-    border-radius: 0.375rem;
+    border-radius: var(--radius-md);
     margin-bottom: 0;
+    border-color: var(--color-border);
   }
-  
+
   /* Improve code readability on mobile */
   .gist-embed-container .gist-data {
     max-width: 100%;
-    border-radius: 0.375rem 0.375rem 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
-  
+
   /* Adjust font size for better mobile reading */
   .gist-embed-container .gist .highlight {
     font-size: 0.85rem;
   }
-  
-  /* Dark mode compatibility */
-  html.dark .gist-embed-container .gist .gist-file {
-    border-color: #3f3f46;
+
+  /* Dark mode compatibility using data-theme */
+  [data-theme='dark'] .gist-embed-container .gist .gist-file {
+    border-color: var(--color-border);
   }
-  
-  html.dark .gist-embed-container .gist .gist-data {
-    background-color: #1f2937;
+
+  [data-theme='dark'] .gist-embed-container .gist .gist-data {
+    background-color: var(--color-bg-alt);
   }
-  
-  html.dark .gist-embed-container .gist .highlight {
-    background-color: #1f2937;
-    color: #e4e4e7;
+
+  [data-theme='dark'] .gist-embed-container .gist .highlight {
+    background-color: var(--color-bg-alt);
+    color: var(--color-text);
   }
-  
-  html.dark .gist-embed-container .gist .blob-num,
-  html.dark .gist-embed-container .gist .blob-code-inner,
-  html.dark .gist-embed-container .gist .pl-s1,
-  html.dark .gist-embed-container .gist .pl-ent {
-    color: #e4e4e7;
+
+  [data-theme='dark'] .gist-embed-container .gist .blob-num,
+  [data-theme='dark'] .gist-embed-container .gist .blob-code-inner,
+  [data-theme='dark'] .gist-embed-container .gist .pl-s1,
+  [data-theme='dark'] .gist-embed-container .gist .pl-ent {
+    color: var(--color-text);
   }
-  
-  html.dark .gist-embed-container .gist .gist-meta {
-    background-color: #18212f;
-    color: #a1a1aa;
+
+  [data-theme='dark'] .gist-embed-container .gist .gist-meta {
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
   }
-  
-  html.dark .gist-embed-container .gist .gist-meta a {
-    color: #6ee7b7;
+
+  [data-theme='dark'] .gist-embed-container .gist .gist-meta a {
+    color: var(--color-primary);
   }
-  
+
   /* Line number color for both light and dark modes */
   .gist-embed-container .gist .blob-num {
     width: 4%;
     min-width: 30px;
     padding-right: 10px;
   }
-  
+
   /* Fix mobile horizontal scrolling */
   @media (max-width: 640px) {
     .gist-embed-container .gist .gist-file {
       margin: 0;
     }
-    
+
     .gist-embed-container .gist .highlight {
       font-size: 0.75rem;
     }
-    
+
     .gist-embed-container .gist .blob-num {
       padding-right: 6px;
     }

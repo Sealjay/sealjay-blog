@@ -1,90 +1,272 @@
-@import './prism.css';
 @import './markdown.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Modern base styles */
+/* ============================================================
+   Indigo Ink Design System - CSS Custom Properties
+   ============================================================ */
+
+:root {
+  /* Colour palette - light mode */
+  --color-bg: #F8F9FC;
+  --color-bg-alt: #EEEEF8;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F3F3FB;
+  --color-text: #1E1B3A;
+  --color-text-muted: #4B4772;
+  --color-text-subtle: #7E7AAA;
+  --color-primary: #4F46E5;
+  --color-primary-muted: rgba(79, 70, 229, 0.08);
+  --color-accent: #6366F1;
+  --color-warm: #DB2777;
+  --color-warm-muted: rgba(219, 39, 119, 0.08);
+  --color-success: #059669;
+  --color-danger: #E11D48;
+  --color-border: rgba(99, 102, 241, 0.1);
+  --color-border-strong: rgba(99, 102, 241, 0.2);
+  --color-primary-hover: #6366F1;
+  --color-card-glow: 0 2px 20px rgba(79, 70, 229, 0.06);
+  --color-card-glow-hover: 0 4px 20px rgba(79, 70, 229, 0.1);
+  --gradient-hero: linear-gradient(160deg, #F8F9FC 0%, #EEF2FF 40%, #E8ECFE 70%, #F8F9FC 100%);
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 500ms;
+
+  /* Font stacks */
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  color-scheme: light;
+  scrollbar-color: rgba(99, 102, 241, 0.15) transparent;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+  --color-bg: #0C0A1D;
+  --color-bg-alt: #110E26;
+  --color-surface: #17132E;
+  --color-surface-hover: #1E1A3A;
+  --color-text: #E0E7FF;
+  --color-text-muted: #9BA3CF;
+  --color-text-subtle: #6670A0;
+  --color-primary: #818CF8;
+  --color-primary-muted: rgba(129, 140, 248, 0.15);
+  --color-accent: #6366F1;
+  --color-warm: #F472B6;
+  --color-warm-muted: rgba(244, 114, 182, 0.15);
+  --color-success: #34D399;
+  --color-danger: #FB7185;
+  --color-border: rgba(129, 140, 248, 0.12);
+  --color-border-strong: rgba(129, 140, 248, 0.25);
+  --color-primary-hover: #6366F1;
+  --color-card-glow: 0 0 40px rgba(129, 140, 248, 0.06);
+  --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
+  --gradient-hero: linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%);
+
+  /* Font stacks */
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  color-scheme: dark;
+  scrollbar-color: rgba(129, 140, 248, 0.2) transparent;
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
     scroll-behavior: smooth;
   }
-  
-  /* Improved typography */
+
   body {
-    @apply text-zinc-600 bg-zinc-50 dark:bg-black dark:text-zinc-400 font-sans;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
-    text-rendering: optimizeLegibility;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-zinc-800 dark:text-zinc-100 font-semibold tracking-tight;
-    letter-spacing: -0.015em;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    color: var(--color-text);
+    font-weight: 600;
   }
-  
+
+  h1 {
+    font-weight: 700;
+  }
+
+  code, pre, kbd, samp {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
   /* Better touch targets for interactive elements */
-  button, 
-  a, 
-  [role="button"], 
-  input, 
-  label, 
-  select, 
+  button,
+  a,
+  [role="button"],
+  input,
+  label,
+  select,
   textarea {
-    @apply focus:outline-none focus:ring-2 focus:ring-accent-500/50;
     touch-action: manipulation;
   }
-  
+
+  /* Focus visible ring */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Remove default focus ring (use :focus-visible instead) */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
   /* Fix iOS input zooming */
-  input, 
-  select, 
+  input,
+  select,
   textarea {
-    @apply text-base;
     font-size: 16px;
   }
-  
+
   /* Fix image display on mobile */
   img {
     @apply max-w-full;
   }
 
-  /* Standardize section spacing */
+  /* Standardise section spacing */
   section {
     @apply py-10 md:py-16;
   }
 }
 
-/* Component styles */
+/* ============================================================
+   Selection colour
+   ============================================================ */
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: var(--color-text);
+}
+
+/* ============================================================
+   Skip link (accessibility)
+   ============================================================ */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+/* ============================================================
+   Component layer
+   ============================================================ */
 @layer components {
   /* Card hover effects */
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    transition: all var(--duration-normal) var(--ease-out);
+    box-shadow: var(--color-card-glow);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
   }
 
   /* Button styles */
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-weight: 500;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   .btn-primary {
-    @apply bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent);
   }
 
   .btn-secondary {
-    @apply bg-zinc-100 text-zinc-800 hover:bg-zinc-200 focus:ring-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
   }
 
   /* Section divider */
   .section-divider {
-    @apply w-full h-px my-12 md:my-16 bg-gradient-to-r from-transparent via-accent-300/70 dark:via-accent-700/30 to-transparent;
+    width: 100%;
+    height: 1px;
+    margin: 3rem 0;
+    background: linear-gradient(to right, transparent, var(--color-border-strong), transparent);
+  }
+
+  @media (min-width: 768px) {
+    .section-divider {
+      margin: 4rem 0;
+    }
   }
 }
 
-/* Responsive typography utilities */
+/* ============================================================
+   Utility layer
+   ============================================================ */
 @layer utilities {
   /* Fix for 100vh issues on mobile */
   .h-screen-safe {
@@ -92,11 +274,13 @@
     height: calc(var(--vh, 1vh) * 100);
   }
 
-  /* Gradient text */
+  /* Gradient text - indigo spectrum */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-600 to-accent-400 dark:from-accent-400 dark:to-accent-600;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(to right, var(--color-primary), var(--color-accent));
   }
-
 
   /* Consistent content width */
   .content-width {
@@ -104,7 +288,9 @@
   }
 }
 
-/* Respect reduced motion preferences */
+/* ============================================================
+   Reduced motion
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

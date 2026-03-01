@@ -1,189 +1,555 @@
 ---
-import { SITE_NAV, SITE_SECONDARY_NAV } from "../../consts";
-import Container from "../containers/Container.astro";
-import HeaderLink from "./HeaderLink.astro";
-import DarkModeToggle from "./DarkModeToggle.astro";
-import SearchDialog from "./SearchDialog.astro";
-const { pathname } = Astro.url;
+import { SITE_NAV, SITE_SECONDARY_NAV } from '../../consts'
+import HeaderLink from './HeaderLink.astro'
+import DarkModeToggle from './DarkModeToggle.astro'
+import SearchDialog from './SearchDialog.astro'
 ---
 
-<header class="relative py-4 sm:py-5">
-  <Container>
-    <mobile-nav style="display:contents">
-    <nav class="relative flex items-center justify-between">
-      <div class="flex items-center">
-        <a href="/" aria-label="Home" class="block group">
-          <div class="overflow-hidden rounded-full">
-            <img
-              src="/chris/avatar.jpg"
-              alt=""
-              sizes="(min-width: 640px) 2.5rem, 2.25rem"
-              class="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-zinc-100 object-cover dark:bg-zinc-800 ring-2 ring-accent-200 dark:ring-accent-500/20 transition-all duration-300 ease-out transform group-hover:scale-105"
-              loading="eager"
-            />
-          </div>
-        </a>
-      </div>
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo-link" aria-label="sealjay home">
+      <span class="logo-avatar-ring" aria-hidden="true">
+        <img src="/chris/avatar.jpg" alt="" class="logo-avatar" width="24" height="24" loading="eager" />
+      </span>
+      <span class="logo-wordmark">sealjay</span>
+    </a>
 
-      <div class="flex items-center justify-end">
-        <div class="hidden md:block">
-          <ul
-            class="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10"
-          >
-            {
-              SITE_NAV.map((navitem) => (
-                <li>
-                  <a
-                    href={navitem.path}
-                    class:list={[
-                      "px-4 py-2 rounded-full relative transition-all duration-200 ease-out inline-block",
-                      pathname === navitem.path || pathname === navitem.path.replace(/\/$/, "") 
-                        ? "text-white dark:text-white bg-accent-600 dark:bg-accent-500 shadow-sm" 
-                        : "text-zinc-700 dark:text-zinc-200 hover:text-accent-600 dark:hover:text-accent-400 hover:bg-zinc-100 dark:hover:bg-zinc-700/70"
-                    ]}
-                  >
-                    <span class="relative z-10">{navitem.name}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-
-        <div class="flex items-center gap-2 ml-3">
-          <SearchDialog />
-          <DarkModeToggle />
-        </div>
-
-        <button
-          type="button"
-          class="ml-1 md:hidden flex items-center justify-center rounded-full p-3 text-zinc-500 hover:bg-zinc-100 hover:text-accent-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
-          aria-label="Toggle menu"
-          id="mobile-menu-button"
-          aria-expanded="false"
-          aria-controls="mobile-menu"
-        >
-          <svg class="block h-6 w-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg class="hidden h-6 w-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </nav>
-
-    <!-- Mobile menu -->
-    <div class="hidden md:hidden absolute inset-x-0 top-full mt-4 z-50" id="mobile-menu" aria-label="Mobile navigation">
-      <div class="rounded-xl bg-white/95 p-3 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-lg dark:bg-zinc-800/95 dark:text-zinc-200 dark:ring-zinc-800">
-        <ul class="flex flex-col space-y-1">
+    <div class="header-right">
+      <nav role="navigation" aria-label="Main navigation" class="desktop-nav">
+        <ul class="nav-list">
           {
             SITE_NAV.map((navitem) => (
               <li>
-                <a
-                  href={navitem.path}
-                  class:list={[
-                    "block px-4 py-2.5 rounded-lg text-base font-medium transition-all duration-200",
-                    pathname === navitem.path || pathname === navitem.path.replace(/\/$/, "")
-                      ? "text-white bg-accent-600 dark:bg-accent-500"
-                      : "text-zinc-700 hover:bg-zinc-100 hover:text-accent-600 dark:text-zinc-200 dark:hover:bg-zinc-700/70 dark:hover:text-accent-400"
-                  ]}
-                >
-                  {navitem.name}
-                </a>
+                <HeaderLink href={navitem.path}>{navitem.name}</HeaderLink>
               </li>
             ))
           }
         </ul>
-        <div class="my-2 h-px bg-zinc-100 dark:bg-zinc-700/40"></div>
-        <ul class="flex flex-col space-y-1">
-          {
-            SITE_SECONDARY_NAV.map((navitem) => (
-              <li>
-                <a
-                  href={navitem.path}
-                  class:list={[
-                    "block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                    pathname === navitem.path || pathname === navitem.path.replace(/\/$/, "")
-                      ? "text-accent-600 dark:text-accent-400"
-                      : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-700/70 dark:hover:text-zinc-200"
-                  ]}
-                >
-                  {navitem.name}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+        <div class="more-dropdown">
+          <button
+            type="button"
+            class="more-trigger"
+            aria-haspopup="true"
+            aria-expanded="false"
+            id="more-menu-trigger"
+          >
+            More
+            <svg xmlns="http://www.w3.org/2000/svg" class="more-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="more-panel" id="more-menu-panel" role="menu">
+            {SITE_SECONDARY_NAV.map((item) => (
+              <a href={item.path} class="more-panel__link" role="menuitem">{item.name}</a>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <div class="header-actions">
+        <SearchDialog />
+        <DarkModeToggle />
       </div>
+
+      <button
+        type="button"
+        class="mobile-menu-btn"
+        aria-label="Toggle menu"
+        id="mobile-menu-button"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg class="menu-icon-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg class="menu-icon-close" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
-    </mobile-nav>
-  </Container>
+  </div>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-overlay" id="mobile-menu" aria-label="Mobile navigation">
+    <nav role="navigation" aria-label="Mobile navigation">
+      <ul class="mobile-nav-list">
+        {
+          SITE_NAV.map((navitem, index) => (
+            <li style={`--stagger: ${index}`}>
+              <a
+                href={navitem.path}
+                class:list={[
+                  'mobile-nav-link',
+                  { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
+                ]}
+              >
+                {navitem.name}
+              </a>
+            </li>
+          ))
+        }
+        {
+          SITE_SECONDARY_NAV.map((navitem, index) => (
+            <li style={`--stagger: ${SITE_NAV.length + index}`}>
+              <a
+                href={navitem.path}
+                class:list={[
+                  'mobile-nav-link mobile-nav-link--secondary',
+                  { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
+                ]}
+              >
+                {navitem.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
 </header>
 
-<script>
-  class MobileNav extends HTMLElement {
-    private controller = new AbortController()
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
 
-    constructor() {
-      super()
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 16px;
+    height: 60px;
+  }
 
-      const button = this.querySelector('#mobile-menu-button') as HTMLButtonElement | null
-      const menu = this.querySelector('#mobile-menu') as HTMLElement | null
-      const openIcon = this.querySelector('#menu-open-icon') as SVGElement | null
-      const closeIcon = this.querySelector('#menu-close-icon') as SVGElement | null
+  /* Logo */
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
 
-      if (!button || !menu || !openIcon || !closeIcon) return
+  .logo-avatar-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #818cf8);
+    padding: 2px;
+    flex-shrink: 0;
+  }
 
-      const { signal } = this.controller
+  .logo-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 
-      const closeMenu = () => {
-        button.setAttribute('aria-expanded', 'false')
-        menu.classList.add('hidden')
-        menu.classList.remove('animate-fade-in')
-        openIcon.classList.remove('hidden')
-        openIcon.classList.add('block')
-        closeIcon.classList.add('hidden')
-        closeIcon.classList.remove('block')
-      }
+  .logo-wordmark {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--color-text);
+  }
 
-      button.addEventListener('click', (e) => {
-        e.stopPropagation()
-        const expanded = button.getAttribute('aria-expanded') === 'true'
+  .logo-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
 
-        if (expanded) {
-          closeMenu()
-        } else {
-          menu.classList.remove('hidden')
-          menu.classList.add('animate-fade-in')
-          openIcon.classList.add('hidden')
-          openIcon.classList.remove('block')
-          closeIcon.classList.remove('hidden')
-          closeIcon.classList.add('block')
-          button.setAttribute('aria-expanded', 'true')
-        }
-      }, { signal })
+  /* Right side */
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
 
-      document.addEventListener('click', (event) => {
-        if (button.getAttribute('aria-expanded') === 'true' &&
-            !menu.contains(event.target as Node) &&
-            !button.contains(event.target as Node)) {
-          closeMenu()
-        }
-      }, { signal })
+  /* Desktop nav */
+  .desktop-nav {
+    display: none;
+  }
 
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
-          closeMenu()
-          button.focus()
-        }
-      }, { signal })
-    }
-
-    disconnectedCallback() {
-      this.controller.abort()
+  @media (min-width: 768px) {
+    .desktop-nav {
+      display: block;
     }
   }
 
-  customElements.define('mobile-nav', MobileNav)
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* More dropdown */
+  .more-dropdown {
+    position: relative;
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .more-dropdown {
+      display: block;
+    }
+  }
+
+  .more-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
+  }
+
+  .more-trigger:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .more-trigger[aria-expanded="true"] {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .more-trigger[aria-expanded="true"] .more-chevron {
+    transform: rotate(180deg);
+  }
+
+  .more-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 160px;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow), 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 50;
+  }
+
+  .more-panel.open {
+    display: block;
+  }
+
+  .more-panel__link {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
+  }
+
+  .more-panel__link:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-panel__link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  /* Secondary mobile nav items */
+  .mobile-nav-link--secondary {
+    font-size: 14px;
+    color: var(--color-text-subtle);
+  }
+
+  /* Header actions (search + dark mode) */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-left: 8px;
+  }
+
+  /* Mobile menu button */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+    margin-left: 2px;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-menu-btn {
+      display: none;
+    }
+  }
+
+  .mobile-menu-btn:hover {
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+  }
+
+  .mobile-menu-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .menu-icon-open,
+  .menu-icon-close {
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu-icon-close {
+    display: none;
+  }
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+    background: var(--color-bg);
+    padding: 16px;
+    padding-top: 76px;
+    overflow-y: auto;
+  }
+
+  .mobile-overlay.open {
+    display: block;
+  }
+
+  .mobile-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-overlay.open .mobile-nav-list li {
+    animation: stagger-fade-in 300ms var(--ease-out) both;
+    animation-delay: calc(var(--stagger, 0) * 60ms);
+  }
+
+  @keyframes stagger-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link--active {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .mobile-nav-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-overlay {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const mobileMenuButton = document.getElementById('mobile-menu-button')
+    const mobileMenu = document.getElementById('mobile-menu')
+    const menuOpenIcon = document.getElementById('menu-open-icon')
+    const menuCloseIcon = document.getElementById('menu-close-icon')
+
+    if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+      function openMenu() {
+        mobileMenuButton!.setAttribute('aria-expanded', 'true')
+        mobileMenu!.classList.add('open')
+        menuOpenIcon!.style.display = 'none'
+        menuCloseIcon!.style.display = 'block'
+        document.body.style.overflow = 'hidden'
+      }
+
+      function closeMenu() {
+        mobileMenuButton!.setAttribute('aria-expanded', 'false')
+        mobileMenu!.classList.remove('open')
+        menuOpenIcon!.style.display = 'block'
+        menuCloseIcon!.style.display = 'none'
+        document.body.style.overflow = ''
+      }
+
+      mobileMenuButton.addEventListener('click', () => {
+        const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true'
+        if (expanded) {
+          closeMenu()
+        } else {
+          openMenu()
+        }
+      })
+
+      // Close menu when clicking a link
+      const mobileLinks = mobileMenu.querySelectorAll('a')
+      for (const link of mobileLinks) {
+        link.addEventListener('click', () => closeMenu())
+      }
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (event) => {
+        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true'
+        if (
+          isExpanded &&
+          !mobileMenu.contains(event.target as Node) &&
+          !mobileMenuButton.contains(event.target as Node)
+        ) {
+          closeMenu()
+        }
+      })
+
+      // Close menu on Escape key
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && mobileMenuButton.getAttribute('aria-expanded') === 'true') {
+          closeMenu()
+          mobileMenuButton.focus()
+        }
+      })
+    }
+
+    // More dropdown
+    const moreTrigger = document.getElementById('more-menu-trigger')
+    const morePanel = document.getElementById('more-menu-panel')
+
+    if (moreTrigger && morePanel) {
+      function openMore() {
+        moreTrigger!.setAttribute('aria-expanded', 'true')
+        morePanel!.classList.add('open')
+      }
+
+      function closeMore() {
+        moreTrigger!.setAttribute('aria-expanded', 'false')
+        morePanel!.classList.remove('open')
+      }
+
+      moreTrigger.addEventListener('click', () => {
+        const expanded = moreTrigger.getAttribute('aria-expanded') === 'true'
+        if (expanded) {
+          closeMore()
+        } else {
+          openMore()
+        }
+      })
+
+      document.addEventListener('click', (event) => {
+        if (
+          moreTrigger.getAttribute('aria-expanded') === 'true' &&
+          !moreTrigger.contains(event.target as Node) &&
+          !morePanel.contains(event.target as Node)
+        ) {
+          closeMore()
+        }
+      })
+
+      moreTrigger.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          openMore()
+          const firstLink = morePanel.querySelector<HTMLAnchorElement>('.more-panel__link')
+          firstLink?.focus()
+        }
+      })
+
+      morePanel.addEventListener('keydown', (event) => {
+        const links = Array.from(morePanel.querySelectorAll<HTMLAnchorElement>('.more-panel__link'))
+        const currentIndex = links.indexOf(document.activeElement as HTMLAnchorElement)
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          const next = links[currentIndex + 1] || links[0]
+          next?.focus()
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          if (currentIndex <= 0) {
+            closeMore()
+            moreTrigger.focus()
+          } else {
+            links[currentIndex - 1]?.focus()
+          }
+        } else if (event.key === 'Escape') {
+          closeMore()
+          moreTrigger.focus()
+        }
+      })
+    }
+  })
 </script>

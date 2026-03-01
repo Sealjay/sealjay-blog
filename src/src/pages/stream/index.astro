@@ -1,5 +1,7 @@
 ---
-import Layout from '../../layouts/IndexLayout.astro'
+import Layout from '../../layouts/BaseLayout.astro'
+import Container from '../../components/containers/Container.astro'
+import PageHeader from '../../components/partials/PageHeader.astro'
 import { getCollection } from 'astro:content'
 import { format } from 'date-fns'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
@@ -129,14 +131,6 @@ const monthNames = [
 
 const latestDate = allItems.length > 0 ? allItems[0].date : new Date()
 
-const badgeClasses: Record<StreamItem['type'], string> = {
-  article: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  talk: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-  note: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  project: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
-  short: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
-}
-
 const badgeLabels: Record<StreamItem['type'], string> = {
   article: 'Article',
   talk: 'Speaking',
@@ -152,65 +146,31 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   pubDateTime={new Date('1 March 2023')}
   updatedDate={latestDate}
 >
-  <div class="mx-auto max-w-5xl">
-    <!-- Page Header -->
-    <div class="mb-10 md:mb-16">
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
-        <span class="text-gradient">Stream</span>
-      </h1>
-      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
-        Everything in one place.
-      </p>
+  <Container>
+    <PageHeader
+      title="Stream"
+      subtitle="Everything in one place."
+      center={false}
+    />
+
+    {/* Filter Pills */}
+    <div class="stream-filters" id="stream-filters">
+      <button data-filter="all" class="stream-filter-btn stream-filter-btn--active">All</button>
+      <button data-filter="article" class="stream-filter-btn">Articles</button>
+      <button data-filter="talk" class="stream-filter-btn">Speaking</button>
+      <button data-filter="note" class="stream-filter-btn">Notes</button>
+      <button data-filter="project" class="stream-filter-btn">Projects</button>
+      <button data-filter="short" class="stream-filter-btn">Shorts</button>
     </div>
 
-    <!-- Filter Pills -->
-    <div class="mb-8 flex flex-wrap gap-2" id="stream-filters">
-      <button
-        data-filter="all"
-        class="stream-filter-btn active inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900"
-      >
-        All
-      </button>
-      <button
-        data-filter="article"
-        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        Articles
-      </button>
-      <button
-        data-filter="talk"
-        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        Speaking
-      </button>
-      <button
-        data-filter="note"
-        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        Notes
-      </button>
-      <button
-        data-filter="project"
-        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        Projects
-      </button>
-      <button
-        data-filter="short"
-        class="stream-filter-btn inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        Shorts
-      </button>
-    </div>
-
-    <!-- Stream Items Grouped by Month -->
+    {/* Stream Items Grouped by Month */}
     {Object.entries(groupedItems).map(([monthYear, items]) => (
-      <div class="mb-12 md:mb-16 stream-month-group" data-month={monthYear}>
-        <h2 class="mb-6 text-xl sm:text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 flex items-center">
-          <span class="inline-block w-1 h-6 bg-accent-500 dark:bg-accent-400 mr-3 rounded-full" />
+      <div class="stream-month" data-month={monthYear}>
+        <h2 class="stream-month__heading font-heading">
+          <span class="stream-month__bar" />
           {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
         </h2>
-        <div class="flex flex-col gap-3">
+        <div class="stream-month__items">
           {items.map((item) => {
             const isExternal = item.type === 'talk' || item.type === 'project' || item.type === 'short'
 
@@ -218,36 +178,31 @@ const badgeLabels: Record<StreamItem['type'], string> = {
             if (item.type === 'note' && item.noteItems) {
               return (
                 <div
-                  class="stream-item rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm"
+                  class="stream-item stream-note-group"
                   data-type="note"
                 >
                   {/* Header: Note badge + date + link */}
-                  <div class="flex items-center gap-3 mb-2">
-                    <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses.note}`}>
+                  <div class="stream-note-group__header">
+                    <span class="stream-badge stream-badge--note">
+                      <span class="stream-badge__dot stream-badge__dot--note" />
                       {item.noteItems && item.noteItems.length > 1 ? 'Notes' : 'Note'}
                     </span>
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                    <span class="stream-item__date">
                       <FormattedDate date={item.date} />
                     </span>
-                    <a
-                      href={item.url}
-                      class="ml-auto text-xs text-accent-600 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 font-medium transition-colors flex items-center gap-0.5"
-                    >
+                    <a href={item.url} class="stream-note-group__view-all">
                       View all
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="stream-note-group__chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                       </svg>
                     </a>
                   </div>
                   {/* Individual notes as bullet list */}
-                  <div class="flex flex-col gap-0.5">
+                  <div class="stream-note-group__list">
                     {item.noteItems.map((note) => (
-                      <div class="flex items-start gap-2 rounded-lg px-2 py-1.5 -mx-1">
-                        <span class="text-zinc-400 dark:text-zinc-500 leading-5" aria-hidden="true">&#8226;</span>
-                        <a
-                          href={note.url}
-                          class="flex-1 text-sm text-zinc-700 dark:text-zinc-300 hover:text-accent-600 dark:hover:text-accent-400 transition-colors truncate leading-5"
-                        >
+                      <div class="stream-note-group__item">
+                        <span class="stream-note-group__bullet" aria-hidden="true">&#8226;</span>
+                        <a href={note.url} class="stream-note-group__link">
                           {note.description || note.title || 'Note'}
                         </a>
                         {note.hasExternalLink && note.externalUrl && (
@@ -255,17 +210,15 @@ const badgeLabels: Record<StreamItem['type'], string> = {
                             href={note.externalUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="shrink-0 text-accent-500 dark:text-accent-400 hover:text-accent-700 dark:hover:text-accent-300 transition-colors"
+                            class="stream-note-group__external"
                             title="External link"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stream-note-group__external-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
                           </a>
                         )}
-                        <span class="shrink-0 text-xs text-zinc-400 dark:text-zinc-500 tabular-nums leading-5">
-                          @ {note.time}
-                        </span>
+                        <span class="stream-note-group__time">@ {note.time}</span>
                       </div>
                     ))}
                   </div>
@@ -273,41 +226,38 @@ const badgeLabels: Record<StreamItem['type'], string> = {
               )
             }
 
-            {/* Other items: article, talk, project */}
+            {/* Other items: article, talk, project, short */}
             return (
               <a
                 href={item.url}
                 target={isExternal ? '_blank' : undefined}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
-                class="stream-item group flex items-center gap-4 rounded-xl bg-white/90 dark:bg-zinc-800/70 backdrop-blur ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+                class="stream-item stream-item--link group"
                 data-type={item.type}
               >
-                <!-- Type Badge -->
-                <span class={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClasses[item.type]}`}>
+                {/* Type Badge with coloured dot */}
+                <span class={`stream-badge stream-badge--${item.type}`}>
+                  <span class={`stream-badge__dot stream-badge__dot--${item.type}`} />
                   {badgeLabels[item.type]}
                 </span>
 
-                <!-- Date -->
-                <span class="shrink-0 text-xs text-zinc-500 dark:text-zinc-400 w-20 hidden sm:block">
+                {/* Date */}
+                <span class="stream-item__date stream-item__date--desktop">
                   <FormattedDate date={item.date} />
                 </span>
 
-                <!-- Title & Description -->
-                <div class="min-w-0 flex-1">
-                  <span class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">
-                    {item.title}
-                  </span>
+                {/* Title & Description */}
+                <div class="stream-item__content">
+                  <span class="stream-item__title">{item.title}</span>
                   {item.description && (
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-                      {item.description}
-                    </p>
+                    <p class="stream-item__desc">{item.description}</p>
                   )}
                 </div>
 
-                <!-- Arrow Icon -->
+                {/* Arrow Icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="shrink-0 h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:translate-x-0.5"
+                  class="stream-item__arrow"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -321,31 +271,20 @@ const badgeLabels: Record<StreamItem['type'], string> = {
         </div>
       </div>
     ))}
-  </div>
+  </Container>
 </Layout>
 
 <script>
   function initStreamFilters() {
     const buttons = document.querySelectorAll<HTMLButtonElement>('.stream-filter-btn')
     const items = document.querySelectorAll<HTMLElement>('.stream-item')
-    const monthGroups = document.querySelectorAll<HTMLElement>('.stream-month-group')
-
-    const activeClass = 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
-    const inactiveClass =
-      'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'
+    const monthGroups = document.querySelectorAll<HTMLElement>('.stream-month')
 
     function setFilter(filter: string) {
       // Update button styles
       for (const btn of buttons) {
         const isActive = btn.dataset.filter === filter
-        // Remove all variant classes first
-        for (const cls of [...activeClass.split(' '), ...inactiveClass.split(' ')]) {
-          btn.classList.remove(cls)
-        }
-        // Add the correct set
-        for (const cls of (isActive ? activeClass : inactiveClass).split(' ')) {
-          btn.classList.add(cls)
-        }
+        btn.classList.toggle('stream-filter-btn--active', isActive)
       }
 
       // Show/hide items
@@ -379,3 +318,347 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   document.addEventListener('astro:page-load', initStreamFilters)
   initStreamFilters()
 </script>
+
+<style>
+  /* Filter pills */
+  .stream-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stream-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-full);
+    padding: 0.375rem 1rem;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-filter-btn:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+
+  .stream-filter-btn--active {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+  }
+
+  .stream-filter-btn--active:hover {
+    color: #ffffff;
+    filter: brightness(1.1);
+  }
+
+  /* Month groups */
+  .stream-month {
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .stream-month {
+      margin-bottom: 4rem;
+    }
+  }
+
+  .stream-month__heading {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .stream-month__heading {
+      font-size: 1.5rem;
+    }
+  }
+
+  .stream-month__bar {
+    display: inline-block;
+    width: 4px;
+    height: 1.5rem;
+    background: var(--color-primary);
+    border-radius: var(--radius-full);
+    margin-right: 0.75rem;
+  }
+
+  .stream-month__items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Stream items */
+  .stream-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--color-card-glow);
+    padding: 0.75rem 1rem;
+  }
+
+  .stream-item--link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    transition: border-color var(--duration-normal) var(--ease-out),
+                transform var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .stream-item--link:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-1px);
+  }
+
+  /* Badges with coloured dots */
+  .stream-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: var(--radius-full);
+    padding: 3px 10px;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    line-height: 1;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .stream-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+
+  /* Article = primary indigo */
+  .stream-badge--article {
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  .stream-badge__dot--article {
+    background: var(--color-primary);
+  }
+
+  /* Note = warm rose */
+  .stream-badge--note {
+    background: var(--color-warm-muted);
+    color: var(--color-warm);
+    border: 1px solid color-mix(in srgb, var(--color-warm) 30%, transparent);
+  }
+
+  .stream-badge__dot--note {
+    background: var(--color-warm);
+  }
+
+  /* Short = success emerald */
+  .stream-badge--short {
+    background: color-mix(in srgb, var(--color-success) 8%, transparent);
+    color: var(--color-success);
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+  }
+
+  .stream-badge__dot--short {
+    background: var(--color-success);
+  }
+
+  /* Talk = warm */
+  .stream-badge--talk {
+    background: color-mix(in srgb, #F59E0B 8%, transparent);
+    color: #D97706;
+    border: 1px solid color-mix(in srgb, #F59E0B 30%, transparent);
+  }
+
+  [data-theme="dark"] .stream-badge--talk {
+    color: #FBBF24;
+  }
+
+  .stream-badge__dot--talk {
+    background: #F59E0B;
+  }
+
+  /* Project = accent */
+  .stream-badge--project {
+    background: color-mix(in srgb, #8B5CF6 8%, transparent);
+    color: #7C3AED;
+    border: 1px solid color-mix(in srgb, #8B5CF6 30%, transparent);
+  }
+
+  [data-theme="dark"] .stream-badge--project {
+    color: #A78BFA;
+  }
+
+  .stream-badge__dot--project {
+    background: #8B5CF6;
+  }
+
+  .stream-item__date {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+
+  .stream-item__date--desktop {
+    width: 5rem;
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .stream-item__date--desktop {
+      display: block;
+    }
+  }
+
+  .stream-item__content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .stream-item__title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-item--link:hover .stream-item__title {
+    color: var(--color-primary);
+  }
+
+  .stream-item__desc {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin: 0.125rem 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stream-item__arrow {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-text-subtle);
+    transition: transform var(--duration-normal) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-item--link:hover .stream-item__arrow {
+    transform: translateX(2px);
+    color: var(--color-primary);
+  }
+
+  /* Note group styling */
+  .stream-note-group__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .stream-note-group__view-all {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-note-group__view-all:hover {
+    color: var(--color-text);
+  }
+
+  .stream-note-group__chevron {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .stream-note-group__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .stream-note-group__item {
+    display: flex;
+    align-items: start;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .stream-note-group__bullet {
+    color: var(--color-text-subtle);
+    line-height: 1.25;
+  }
+
+  .stream-note-group__link {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-note-group__link:hover {
+    color: var(--color-primary);
+  }
+
+  .stream-note-group__external {
+    flex-shrink: 0;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .stream-note-group__external:hover {
+    color: var(--color-text);
+  }
+
+  .stream-note-group__external-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-top: 0.125rem;
+  }
+
+  .stream-note-group__time {
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    line-height: 1.25;
+  }
+
+  /* Hidden utility */
+  :global(.hidden) {
+    display: none !important;
+  }
+</style>

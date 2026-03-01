@@ -6,6 +6,8 @@ import tailwind from '@astrojs/tailwind'
 import { defineConfig } from 'astro/config'
 import { legacyRedirectSlugs } from './src/data/legacy-redirects'
 import rehypeMvpUrl from './src/plugins/rehype-mvp-url'
+import indigoDark from './src/styles/shiki-indigo-dark.json'
+import indigoLight from './src/styles/shiki-indigo-light.json'
 
 const siteUrl = 'https://sealjay.com'
 const redirectUrls = new Set(legacyRedirectSlugs.map((slug) => `${siteUrl}/${slug}/`))
@@ -151,6 +153,15 @@ const singlePostTagUrls = buildSinglePostTagUrls()
 export default defineConfig({
   site: siteUrl,
   compressHTML: true,
+  markdown: {
+    shikiConfig: {
+      themes: {
+        light: indigoLight,
+        dark: indigoDark,
+      },
+      defaultColor: false,
+    },
+  },
   integrations: [
     sitemap({
       filter: (page) => !redirectUrls.has(page) && !singlePostTagUrls.has(page),

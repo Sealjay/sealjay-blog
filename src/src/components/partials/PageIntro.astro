@@ -1,0 +1,60 @@
+---
+interface Props {
+  title?: string
+  class?: string
+}
+
+const { title, class: className } = Astro.props
+---
+
+<div class:list={['page-intro', className]}>
+  {title && (
+    <h1 class="page-intro__title">
+      {title}
+    </h1>
+  )}
+  <div class="page-intro__description">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .page-intro {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .page-intro {
+      margin-bottom: 2rem;
+    }
+  }
+
+  .page-intro__title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .page-intro__title {
+      font-size: 2.5rem;
+    }
+  }
+
+  .page-intro__description {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .page-intro__description {
+      font-size: 1.125rem;
+    }
+  }
+</style>

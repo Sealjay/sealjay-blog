@@ -13,76 +13,204 @@ interface Props {
   showFormerRoles?: boolean;
 }
 
-const { 
-  imageSrc, 
+const {
+  imageSrc,
   imageAlt,
   showBadges = true,
   showFormerRoles = true
 } = Astro.props;
 ---
 
-<div class="grid grid-cols-1 gap-y-12 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-0">
+<div class="profile-section">
   <!-- Image (Mobile: top, Desktop: right) -->
-  <div class="lg:order-last lg:col-span-2">
-    <div class="relative max-w-xs mx-auto lg:max-w-none">
-      <div class="aspect-square overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 shadow-xl ring-1 ring-zinc-100 dark:ring-zinc-700/30">
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-          class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-      </div>
-      <div class="absolute -bottom-6 -right-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100 dark:bg-accent-900/30"></div>
-      <div class="absolute -top-6 -left-6 -z-10 h-24 w-24 rounded-3xl bg-accent-100/70 dark:bg-accent-900/20"></div>
+  <div class="profile-section__image-col">
+    <div class="profile-section__image-wrapper">
+      <img
+        src={imageSrc}
+        alt={imageAlt}
+        class="profile-section__photo"
+      />
     </div>
-    
+
     <!-- Mobile Social Links -->
-    <div class="mt-12 lg:hidden">
-      <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
+    <div class="profile-section__social-mobile">
+      <h3 class="profile-section__social-heading">Connect with me</h3>
       <SocialLinks />
     </div>
   </div>
-  
-  <!-- Content (Mobile: bottom, Desktop: left) -->
-  <div class="lg:col-span-3">
-    <div class="prose prose-lg dark:prose-invert">
-      <div class="inline-flex items-center rounded-full bg-accent-100/80 dark:bg-accent-900/30 px-3 py-1 text-sm text-accent-700 dark:text-accent-300 mb-4">
-        <span class="font-medium">{currentRole.displayText}</span>
-      </div>
-      
-      <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100">
-        I'm Chris Lloyd-Jones, Sealjay.
-      </h2>
-      
-      <div class="mt-6 space-y-6 text-base md:text-lg text-zinc-600 dark:text-zinc-400">
-        <slot name="bio" />
-      </div>
-      
-      <div class="mt-8 flex flex-wrap gap-2">
-        <slot name="badges" />
-        
-        {showBadges && professionalBadges.map(badge => (
-          <Badge 
-            text={badge.text}
-            url={badge.url}
-            isFormerRole={badge.isFormerRole}
-          />
-        ))}
 
-        {showFormerRoles && formerRoles.map(role => (
-          <Badge 
-            text={role.text}
-            url={role.url}
-            isFormerRole={role.isFormerRole}
-          />
-        ))}
-      </div>
-      
-      <!-- Desktop Social Links -->
-      <div class="mt-12 hidden lg:block">
-        <h3 class="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Connect with me</h3>
-        <SocialLinks />
-      </div>
+  <!-- Content (Mobile: bottom, Desktop: left) -->
+  <div class="profile-section__content">
+    <div class="profile-section__role-badge">
+      <span>{currentRole.displayText}</span>
+    </div>
+
+    <h2 class="profile-section__name">
+      I'm Chris Lloyd-Jones, Sealjay.
+    </h2>
+
+    <div class="profile-section__bio">
+      <slot name="bio" />
+    </div>
+
+    <div class="profile-section__badges">
+      <slot name="badges" />
+
+      {showBadges && professionalBadges.map(badge => (
+        <Badge
+          text={badge.text}
+          url={badge.url}
+          isFormerRole={badge.isFormerRole}
+        />
+      ))}
+
+      {showFormerRoles && formerRoles.map(role => (
+        <Badge
+          text={role.text}
+          url={role.url}
+          isFormerRole={role.isFormerRole}
+        />
+      ))}
+    </div>
+
+    <!-- Desktop Social Links -->
+    <div class="profile-section__social-desktop">
+      <h3 class="profile-section__social-heading">Connect with me</h3>
+      <SocialLinks />
     </div>
   </div>
 </div>
+
+<style>
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .profile-section {
+      flex-direction: row;
+      gap: 40px;
+    }
+  }
+
+  .profile-section__image-col {
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .profile-section__image-col {
+      order: 1;
+      width: 280px;
+    }
+  }
+
+  .profile-section__image-wrapper {
+    max-width: 280px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .profile-section__image-wrapper {
+      max-width: none;
+    }
+  }
+
+  .profile-section__photo {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .profile-section__social-mobile {
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .profile-section__social-mobile {
+      display: none;
+    }
+  }
+
+  .profile-section__social-desktop {
+    display: none;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .profile-section__social-desktop {
+      display: block;
+    }
+  }
+
+  .profile-section__social-heading {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+  }
+
+  .profile-section__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-section__role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .profile-section__name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+  }
+
+  @media (min-width: 768px) {
+    .profile-section__name {
+      font-size: 1.875rem;
+    }
+  }
+
+  .profile-section__bio {
+    margin-top: 1.5rem;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .profile-section__bio {
+      font-size: 1.125rem;
+    }
+  }
+
+  .profile-section__bio :global(a) {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .profile-section__bio :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .profile-section__badges {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+</style>

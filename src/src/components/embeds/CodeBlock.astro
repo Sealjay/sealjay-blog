@@ -1,330 +1,132 @@
 ---
-import { Prism } from "@astrojs/prism";
+import { Code } from 'astro:components'
+import indigoDark from '../../styles/shiki-indigo-dark.json'
+import indigoLight from '../../styles/shiki-indigo-light.json'
 
-const { language, content } = Astro.props;
+interface Props {
+  code: string
+  lang: string
+  filename?: string
+}
+
+const { code, lang, filename } = Astro.props
 ---
 
-<Prism lang={language} code={content} />
+<div class="code-block-wrapper">
+  <div class="code-block-header">
+    <span class="code-lang-label">{lang}</span>
+    {filename && <span class="code-filename">{filename}</span>}
+    <button class="copy-btn" aria-label="Copy code to clipboard" type="button">
+      <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span class="copy-feedback">Copied!</span>
+    </button>
+  </div>
+  <Code code={code} lang={lang} themes={{ light: indigoLight, dark: indigoDark }} defaultColor={false} />
+</div>
 
-<style is:global>
-  /**
-  https://github.com/PrismJS/prism-themes/blob/master/themes/prism-coldark-dark.css
- * Coldark Theme for Prism.js
- * Theme variation: Dark
- * Tested with HTML, CSS, JS, JSON, PHP, YAML, Bash script
- * @author Armand Philippot <contact@armandphilippot.com>
- * @homepage https://github.com/ArmandPhilippot/coldark-prism
- * @license MIT
- */
-  code[class*="language-"],
-  pre[class*="language-"] {
-    color: #e3eaf2;
-    background: none;
-    font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    word-wrap: normal;
-    line-height: 1.5;
-    -moz-tab-size: 4;
-    -o-tab-size: 4;
-    tab-size: 4;
-    -webkit-hyphens: none;
-    -moz-hyphens: none;
-    -ms-hyphens: none;
-    hyphens: none;
+<style>
+  .code-block-wrapper {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    margin: 1rem 0;
   }
 
-  pre[class*="language-"]::-moz-selection,
-  pre[class*="language-"] ::-moz-selection,
-  code[class*="language-"]::-moz-selection,
-  code[class*="language-"] ::-moz-selection {
-    background: #3c526d;
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-border);
   }
 
-  pre[class*="language-"]::selection,
-  pre[class*="language-"] ::selection,
-  code[class*="language-"]::selection,
-  code[class*="language-"] ::selection {
-    background: #3c526d;
+  .code-lang-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-text-subtle);
+    font-family: var(--font-code, 'IBM Plex Mono', monospace);
   }
 
-  /* Code blocks */
-  pre[class*="language-"] {
-    padding: 1em;
-    margin: 0.5em 0;
-    overflow: auto;
+  .code-filename {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-family: var(--font-code, 'IBM Plex Mono', monospace);
   }
 
-  :not(pre) > code[class*="language-"],
-  pre[class*="language-"] {
-    background: #111b27;
+  .copy-btn {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: color 0.15s ease, background-color 0.15s ease;
   }
 
-  /* Inline code */
-  :not(pre) > code[class*="language-"] {
-    padding: 0.1em 0.3em;
-    border-radius: 0.3em;
-    white-space: normal;
+  .copy-btn:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-muted, rgba(99, 102, 241, 0.1));
   }
 
-  .token.comment,
-  .token.prolog,
-  .token.doctype,
-  .token.cdata {
-    color: #8da1b9;
+  .copy-feedback {
+    display: none;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-code, 'IBM Plex Mono', monospace);
   }
 
-  .token.punctuation {
-    color: #e3eaf2;
+  .copy-btn.copied .copy-icon {
+    display: none;
   }
 
-  .token.delimiter.important,
-  .token.selector .parent,
-  .token.tag,
-  .token.tag .token.punctuation {
-    color: #66cccc;
+  .copy-btn.copied .copy-feedback {
+    display: inline;
+    color: var(--color-primary);
   }
 
-  .token.attr-name,
-  .token.boolean,
-  .token.boolean.important,
-  .token.number,
-  .token.constant,
-  .token.selector .token.attribute {
-    color: #e6d37a;
-  }
-
-  .token.class-name,
-  .token.key,
-  .token.parameter,
-  .token.property,
-  .token.property-access,
-  .token.variable {
-    color: #6cb8e6;
-  }
-
-  .token.attr-value,
-  .token.inserted,
-  .token.color,
-  .token.selector .token.value,
-  .token.string,
-  .token.string .token.url-link {
-    color: #91d076;
-  }
-
-  .token.builtin,
-  .token.keyword-array,
-  .token.package,
-  .token.regex {
-    color: #f4adf4;
-  }
-
-  .token.function,
-  .token.selector .token.class,
-  .token.selector .token.id {
-    color: #c699e3;
-  }
-
-  .token.atrule .token.rule,
-  .token.combinator,
-  .token.keyword,
-  .token.operator,
-  .token.pseudo-class,
-  .token.pseudo-element,
-  .token.selector,
-  .token.unit {
-    color: #e9ae7e;
-  }
-
-  .token.deleted,
-  .token.important {
-    color: #cd6660;
-  }
-
-  .token.keyword-this,
-  .token.this {
-    color: #6cb8e6;
-  }
-
-  .token.important,
-  .token.keyword-this,
-  .token.this,
-  .token.bold {
-    font-weight: bold;
-  }
-
-  .token.delimiter.important {
-    font-weight: inherit;
-  }
-
-  .token.italic {
-    font-style: italic;
-  }
-
-  .token.entity {
-    cursor: help;
-  }
-
-  .language-markdown .token.title,
-  .language-markdown .token.title .token.punctuation {
-    color: #6cb8e6;
-    font-weight: bold;
-  }
-
-  .language-markdown .token.blockquote.punctuation {
-    color: #f4adf4;
-  }
-
-  .language-markdown .token.code {
-    color: #66cccc;
-  }
-
-  .language-markdown .token.hr.punctuation {
-    color: #6cb8e6;
-  }
-
-  .language-markdown .token.url .token.content {
-    color: #91d076;
-  }
-
-  .language-markdown .token.url-link {
-    color: #e6d37a;
-  }
-
-  .language-markdown .token.list.punctuation {
-    color: #f4adf4;
-  }
-
-  .language-markdown .token.table-header {
-    color: #e3eaf2;
-  }
-
-  .language-json .token.operator {
-    color: #e3eaf2;
-  }
-
-  .language-scss .token.variable {
-    color: #66cccc;
-  }
-
-  /* overrides color-values for the Show Invisibles plugin
- * https://prismjs.com/plugins/show-invisibles/
- */
-  .token.token.tab:not(:empty):before,
-  .token.token.cr:before,
-  .token.token.lf:before,
-  .token.token.space:before {
-    color: #8da1b9;
-  }
-
-  /* overrides color-values for the Toolbar plugin
- * https://prismjs.com/plugins/toolbar/
- */
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > a,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > button {
-    color: #111b27;
-    background: #6cb8e6;
-  }
-
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > a:hover,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > a:focus,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > button:hover,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > button:focus {
-    color: #111b27;
-    background: #6cb8e6da;
-    text-decoration: none;
-  }
-
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > span,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > span:hover,
-  div.code-toolbar > .toolbar.toolbar > .toolbar-item > span:focus {
-    color: #111b27;
-    background: #8da1b9;
-  }
-
-  /* overrides color-values for the Line Highlight plugin
- * http://prismjs.com/plugins/line-highlight/
- */
-  .line-highlight.line-highlight {
-    background: #3c526d5f;
-    background: linear-gradient(to right, #3c526d5f 70%, #3c526d55);
-  }
-
-  .line-highlight.line-highlight:before,
-  .line-highlight.line-highlight[data-end]:after {
-    background-color: #8da1b9;
-    color: #111b27;
-    box-shadow: 0 1px #3c526d;
-  }
-
-  pre[id].linkable-line-numbers.linkable-line-numbers
-    span.line-numbers-rows
-    > span:hover:before {
-    background-color: #8da1b918;
-  }
-
-  /* overrides color-values for the Line Numbers plugin
- * http://prismjs.com/plugins/line-numbers/
- */
-  .line-numbers.line-numbers .line-numbers-rows {
-    border-right: 1px solid #0b121b;
-    background: #0b121b7a;
-  }
-
-  .line-numbers .line-numbers-rows > span:before {
-    color: #8da1b9da;
-  }
-
-  /* overrides color-values for the Match Braces plugin
- * https://prismjs.com/plugins/match-braces/
- */
-  .rainbow-braces .token.token.punctuation.brace-level-1,
-  .rainbow-braces .token.token.punctuation.brace-level-5,
-  .rainbow-braces .token.token.punctuation.brace-level-9 {
-    color: #e6d37a;
-  }
-
-  .rainbow-braces .token.token.punctuation.brace-level-2,
-  .rainbow-braces .token.token.punctuation.brace-level-6,
-  .rainbow-braces .token.token.punctuation.brace-level-10 {
-    color: #f4adf4;
-  }
-
-  .rainbow-braces .token.token.punctuation.brace-level-3,
-  .rainbow-braces .token.token.punctuation.brace-level-7,
-  .rainbow-braces .token.token.punctuation.brace-level-11 {
-    color: #6cb8e6;
-  }
-
-  .rainbow-braces .token.token.punctuation.brace-level-4,
-  .rainbow-braces .token.token.punctuation.brace-level-8,
-  .rainbow-braces .token.token.punctuation.brace-level-12 {
-    color: #c699e3;
-  }
-
-  /* overrides color-values for the Diff Highlight plugin
- * https://prismjs.com/plugins/diff-highlight/
- */
-  pre.diff-highlight > code .token.token.deleted:not(.prefix),
-  pre > code.diff-highlight .token.token.deleted:not(.prefix) {
-    background-color: #cd66601f;
-  }
-
-  pre.diff-highlight > code .token.token.inserted:not(.prefix),
-  pre > code.diff-highlight .token.token.inserted:not(.prefix) {
-    background-color: #91d0761f;
-  }
-
-  /* overrides color-values for the Command Line plugin
- * https://prismjs.com/plugins/command-line/
- */
-  .command-line .command-line-prompt {
-    border-right: 1px solid #0b121b;
-  }
-
-  .command-line .command-line-prompt > span:before {
-    color: #8da1b9da;
+  .code-block-wrapper :global(pre.astro-code) {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    font-family: var(--font-code, 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace);
+    font-size: 0.875rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    padding: 1rem;
   }
 </style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const wrapper = btn.closest('.code-block-wrapper')
+        const codeEl = wrapper?.querySelector('pre code')
+        if (!codeEl) return
+
+        try {
+          await navigator.clipboard.writeText(codeEl.textContent ?? '')
+          btn.classList.add('copied')
+          setTimeout(() => btn.classList.remove('copied'), 2000)
+        } catch {
+          // Fallback: select text if clipboard API unavailable
+        }
+      })
+    })
+  })
+</script>

@@ -1,17 +1,17 @@
 ---
 type Props = {
-  url: string;
-  title: string;
-  height?: string;
-};
+  url: string
+  title: string
+  height?: string
+}
 
-const { url, title, height = "300" } = Astro.props;
+const { url, title, height = '300' } = Astro.props
 
 // Extract hash and user from URL if available
-const urlObj = new URL(url);
-const pathParts = urlObj.pathname.split('/').filter(Boolean);
-const user = pathParts[0];
-const hash = pathParts[pathParts.length - 1];
+const urlObj = new URL(url)
+const pathParts = urlObj.pathname.split('/').filter(Boolean)
+const user = pathParts[0]
+const hash = pathParts[pathParts.length - 1]
 ---
 
 <div class="codepen-container">
@@ -22,7 +22,7 @@ const hash = pathParts[pathParts.length - 1];
     data-default-tab="html,result"
     data-slug-hash={hash}
     data-user={user}
-    style={`height: ${height}px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.1); margin: 1em 0; padding: 1em; border-radius: 0.5rem;`}
+    style={`height: ${height}px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); margin: 1em 0; padding: 1em; border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text);`}
     data-pen-title={title}
   >
     <span><a href={url} target="_blank" rel="noopener">{title}</a></span>
@@ -36,14 +36,15 @@ const hash = pathParts[pathParts.length - 1];
     width: 100%;
     margin: 1.5rem 0;
     overflow: hidden;
+    border-radius: var(--radius-md);
   }
-  
+
   /* Make CodePen responsive on small screens */
   @media (max-width: 640px) {
     .codepen-container {
       margin: 1rem 0;
     }
-    
+
     .codepen {
       transform-origin: 0 0;
       transform: scale(0.95);

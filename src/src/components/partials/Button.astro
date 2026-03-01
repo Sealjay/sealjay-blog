@@ -1,39 +1,117 @@
 ---
-const variantStyles = {
-  primary:
-    "bg-accent-600 font-semibold text-white hover:bg-accent-700 active:bg-accent-800 active:text-white/90 dark:bg-accent-600 dark:hover:bg-accent-500 dark:active:bg-accent-700 dark:active:text-white/90 shadow-sm",
-  secondary:
-    "bg-zinc-100 font-medium text-zinc-900 hover:bg-zinc-200 active:bg-zinc-100 active:text-zinc-900/70 dark:bg-zinc-800/70 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-zinc-50 dark:active:bg-zinc-800 dark:active:text-zinc-50/70 border border-zinc-200/50 dark:border-zinc-700/50",
-  outline:
-    "bg-transparent font-medium text-accent-600 hover:bg-accent-50 active:bg-accent-100 dark:text-accent-400 dark:hover:bg-accent-900/20 dark:hover:text-accent-300 dark:active:bg-accent-900/30 border border-accent-200 dark:border-accent-800/40",
-  text:
-    "bg-transparent font-medium text-zinc-700 hover:text-accent-600 hover:bg-zinc-50 active:bg-zinc-100 dark:text-zinc-300 dark:hover:text-accent-400 dark:hover:bg-zinc-800/70",
-};
-
-const sizeStyles = {
-  sm: "text-xs py-1.5 px-2.5 rounded",
-  md: "text-sm py-2 px-3.5 rounded-md",
-  lg: "text-base py-2.5 px-5 rounded-lg",
-}
-
 interface Props {
-  variant?: "primary" | "secondary" | "outline" | "text";
-  size?: "sm" | "md" | "lg";
-  href: string;
-  class?: string;
+  /** Visual variant */
+  variant?: 'primary' | 'secondary' | 'ghost'
+  /** Size */
+  size?: 'sm' | 'md'
+  /** If provided, renders as <a> */
+  href?: string
+  /** Disabled state (only applies to <button>) */
+  disabled?: boolean
+  /** Button type attribute (only applies to <button>) */
+  type?: 'button' | 'submit' | 'reset'
+  /** Additional CSS classes */
+  class?: string
 }
 
-const { variant = "primary", size = "md", href, class: className } = Astro.props;
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  disabled = false,
+  type = 'button',
+  class: className,
+} = Astro.props
+
+const Tag = href ? 'a' : 'button'
+const tagProps = href
+  ? { href }
+  : { type, disabled: disabled || undefined }
 ---
 
-<a
-  href={href}
+<Tag
+  {...tagProps}
   class:list={[
-    "inline-flex items-center gap-2 justify-center font-medium transition-all duration-200 outline-offset-2 focus:outline-none focus:ring-2 focus:ring-accent-500/50",
-    variantStyles[variant],
-    sizeStyles[size],
+    'btn-component',
+    `btn--${variant}`,
+    `btn--${size}`,
+    disabled && 'btn--disabled',
     className,
   ]}
 >
   <slot />
-</a>
+</Tag>
+
+<style>
+  .btn-component {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-component:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Sizes */
+  .btn--md {
+    min-height: 44px;
+    padding: 8px 20px;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .btn--sm {
+    min-height: 36px;
+    padding: 6px 14px;
+    font-size: 0.8125rem;
+    line-height: 1.5rem;
+  }
+
+  /* Primary */
+  .btn--primary {
+    background: var(--color-primary);
+    color: #ffffff;
+    border: none;
+  }
+
+  .btn--primary:hover {
+    filter: brightness(1.1);
+  }
+
+  /* Secondary */
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+  }
+
+  .btn--secondary:hover {
+    background: var(--color-primary-muted);
+  }
+
+  /* Ghost */
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-primary);
+    border: none;
+  }
+
+  .btn--ghost:hover {
+    background: var(--color-primary-muted);
+  }
+
+  /* Disabled */
+  .btn--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+</style>

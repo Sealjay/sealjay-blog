@@ -1,13 +1,29 @@
 ---
-const { date, class: className } = Astro.props;
+interface Props {
+  date: Date
+  class?: string
+}
+
+const { date, class: className } = Astro.props
 ---
 
-<time datetime={date.toISOString()} class={className}>
+<time
+  datetime={date.toISOString()}
+  class:list={['formatted-date', className]}
+>
   {
-    date.toLocaleDateString("en-gb", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    date.toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     })
   }
 </time>
+
+<style>
+  .formatted-date {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+</style>

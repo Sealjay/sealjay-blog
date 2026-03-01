@@ -1,20 +1,20 @@
 ---
 ---
 
-<div class="giscus-wrapper mt-12 sm:mt-16">
-  <h2 class="text-xl sm:text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-6 flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-accent-500 dark:text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<section class="giscus-wrapper">
+  <h2 class="giscus-heading">
+    <svg xmlns="http://www.w3.org/2000/svg" class="giscus-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
     </svg>
     Discussion
   </h2>
-  
-  <div class="bg-white dark:bg-zinc-800/70 rounded-xl ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 p-4 sm:p-6 shadow-sm">
-    <p class="text-zinc-600 dark:text-zinc-400 mb-4">
+
+  <div class="giscus-card">
+    <p class="giscus-description">
       Have thoughts or questions? Join the conversation below.
     </p>
-    
-    <div class="giscus-container overflow-hidden">
+
+    <div class="giscus-container">
       <script
         is:inline
         src="https://giscus.app/client.js"
@@ -36,66 +36,119 @@
       ></script>
     </div>
   </div>
-</div>
+</section>
 
 <style>
+  .giscus-wrapper {
+    margin-top: 3rem;
+  }
+
+  .giscus-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (min-width: 640px) {
+    .giscus-heading {
+      font-size: 1.5rem;
+    }
+
+    .giscus-wrapper {
+      margin-top: 4rem;
+    }
+  }
+
+  .giscus-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.5rem;
+    color: var(--color-primary);
+  }
+
+  .giscus-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    padding: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .giscus-card {
+      padding: 1.5rem;
+    }
+  }
+
+  .giscus-description {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
   /* Ensure the giscus container adapts to mobile screens properly */
   .giscus-container {
     width: 100%;
+    overflow: hidden;
   }
-  
+
   /* Ensure giscus iframe is responsive */
   :global(.giscus-frame) {
     width: 100%;
     border: 0 !important;
   }
-  
-  /* Add dark mode theme toggle support */
-  :global(html.dark) .giscus-wrapper :global(.giscus-frame) {
-    border: 0;
-  }
 </style>
 
 <script>
-  // Handle theme changes for giscus
+  // Handle theme changes for giscus using data-theme attribute
   const setupGiscusThemeSync = () => {
+    const getTheme = () => {
+      return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark_dimmed' : 'light'
+    }
+
     const updateGiscusTheme = () => {
-      const isDarkMode = document.documentElement.classList.contains('dark');
-      const theme = isDarkMode ? 'dark_dimmed' : 'light';
-      
-      const iframe = document.querySelector('.giscus-frame');
-      if (iframe) {
-        iframe.contentWindow.postMessage({
-          giscus: {
-            setConfig: {
-              theme
+      const theme = getTheme()
+      const iframe = document.querySelector<HTMLIFrameElement>('.giscus-frame')
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage(
+          {
+            giscus: {
+              setConfig: {
+                theme,
+              },
+            },
+          },
+          'https://giscus.app',
+        )
+      }
+    }
+
+    // Watch for the giscus iframe to appear in the DOM
+    const bodyObserver = new MutationObserver(() => {
+      if (document.querySelector('.giscus-frame')) {
+        updateGiscusTheme()
+        bodyObserver.disconnect()
+
+        // Now watch for data-theme attribute changes on <html>
+        const themeObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+              updateGiscusTheme()
             }
           }
-        }, 'https://giscus.app');
+        })
+
+        themeObserver.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-theme'],
+        })
       }
-    };
-    
-    // Set initial theme after giscus loads
-    const observer = new MutationObserver((mutations) => {
-      if (document.querySelector('.giscus-frame')) {
-        updateGiscusTheme();
-        
-        // Keep observing to handle future theme changes
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-          themeToggle.addEventListener('click', () => {
-            // Give time for the theme to change
-            setTimeout(updateGiscusTheme, 200);
-          });
-        }
-        
-        observer.disconnect();
-      }
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-  };
-  
+    })
+
+    bodyObserver.observe(document.body, { childList: true, subtree: true })
+  }
+
   // Setup when the DOM is ready
-  document.addEventListener('DOMContentLoaded', setupGiscusThemeSync);
+  document.addEventListener('DOMContentLoaded', setupGiscusThemeSync)
 </script>

@@ -1,0 +1,436 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PageLayout from "./BaseLayout.astro";
+import FormattedDate from "../components/partials/FormattedDate.astro";
+import Giscus from "../components/embeds/Giscus.astro";
+import Webmentions from "../components/partials/Webmentions.astro";
+import RelatedPosts from "../components/partials/RelatedPosts.astro";
+import { getOGImagePath } from "../lib/og-image";
+import { getCollection } from "astro:content";
+import ShareButtons from "../components/partials/ShareButtons.astro";
+import AuthorCard from "../components/partials/AuthorCard.astro";
+import PostNavigation from "../components/partials/PostNavigation.astro";
+import TableOfContents from "../components/partials/TableOfContents.astro";
+
+type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[] };
+
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Compute slug from the URL pathname for OG image path
+const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
+const ogImagePath = getOGImagePath(slug);
+// Only show custom hero images on the page — auto-generated OG images repeat the title/date and are redundant
+const hasCustomHero = heroImage && heroImage !== "/placeholder-hero.png";
+const displayHeroImage = hasCustomHero ? heroImage : null;
+
+// Compute prev/next posts
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf()
+);
+const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+const prevPost = currentIndex < allPosts.length - 1
+  ? { slug: allPosts[currentIndex + 1].slug, title: allPosts[currentIndex + 1].data.title }
+  : undefined;
+const nextPost = currentIndex > 0
+  ? { slug: allPosts[currentIndex - 1].slug, title: allPosts[currentIndex - 1].data.title }
+  : undefined;
+
+const articleJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": new URL(ogImagePath, Astro.site).href,
+  "datePublished": pubDateTime?.toISOString(),
+  "dateModified": updatedDate?.toISOString() || pubDateTime?.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Chris Lloyd-Jones",
+    "url": "https://sealjay.com"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL.href
+  },
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/"
+});
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://sealjay.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://sealjay.com/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": title,
+      "item": canonicalURL.href
+    }
+  ]
+});
+---
+
+<PageLayout
+  title={title}
+  description={description}
+  pubDateTime={pubDateTime}
+  updatedDate={updatedDate}
+  heroImage={displayHeroImage}
+  image={ogImagePath}
+  ogType="article"
+  tags={tags}
+>
+  <script type="application/ld+json" set:html={articleJsonLd} />
+  <script type="application/ld+json" set:html={breadcrumbJsonLd} />
+  <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" />
+  <article class="h-entry mx-auto max-w-content px-5 md:px-10 my-8 md:my-14">
+    <!-- Hidden microformat markup -->
+    <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
+    <span class="p-author h-card" style="display:none">
+      <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
+    </span>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="/blog">Blog</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page">{title}</li>
+      </ol>
+    </nav>
+
+    <!-- Tag badges -->
+    {tags && tags.length > 0 && (
+      <div class="article-tags">
+        {tags.map((tag: string) => (
+          <span class="p-category article-tag">{tag}</span>
+        ))}
+      </div>
+    )}
+
+    <!-- Article title -->
+    <h1 class="p-name article-title">
+      {title}
+    </h1>
+
+    <!-- Meta row: date, reading time, author -->
+    <div class="article-meta">
+      <span class="article-meta-item">
+        <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <FormattedDate date={pubDateTime} class="dt-published" />
+      </span>
+
+      {updatedDate && (
+        <>
+          <span class="article-meta-sep">&middot;</span>
+          <span class="article-meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Updated <FormattedDate date={updatedDate} class="dt-updated" /></span>
+          </span>
+        </>
+      )}
+
+      <span class="article-meta-sep">&middot;</span>
+      <span class="article-meta-item">by Chris Lloyd-Jones</span>
+    </div>
+
+    <!-- Hero image -->
+    {displayHeroImage && (
+      <div class="article-hero">
+        <img
+          src={displayHeroImage}
+          alt=""
+          width="1200"
+          height="675"
+          fetchpriority="high"
+          decoding="async"
+          class="u-photo article-hero-img"
+        />
+      </div>
+    )}
+
+    <!-- In-reply-to indicator -->
+    {inReplyTo && (() => {
+      let replyLabel: string
+      try {
+        const parsed = new URL(inReplyTo)
+        const pathMatch = parsed.pathname.match(/^\/@([^/]+)/)
+        replyLabel = pathMatch ? `@${pathMatch[1]}@${parsed.hostname}` : parsed.hostname + parsed.pathname
+      } catch {
+        replyLabel = inReplyTo
+      }
+      return (
+        <div class="article-reply-to">
+          <div class="article-reply-to-header">
+            <svg xmlns="http://www.w3.org/2000/svg" class="article-reply-to-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+            </svg>
+            <span class="article-reply-to-label">In reply to</span>
+          </div>
+          <a class="u-in-reply-to article-reply-to-link" rel="in-reply-to noopener noreferrer" href={inReplyTo} target="_blank" title={inReplyTo}>
+            {replyLabel}
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+        </div>
+      )
+    })()}
+
+    <!-- Share buttons -->
+    <ShareButtons url={canonicalURL.href} title={title} />
+
+    <!-- Separator -->
+    <hr class="article-separator" />
+
+    <!-- Mobile ToC -->
+    {headings && headings.length > 0 && (
+      <TableOfContents headings={headings} />
+    )}
+
+    <!-- Two-column grid: article + sidebar ToC -->
+    <div class="article-grid">
+      <div class="e-content prose prose-lg">
+        <slot />
+      </div>
+      {headings && headings.length > 0 && (
+        <TableOfContents headings={headings} />
+      )}
+    </div>
+
+    <!-- Author -->
+    <AuthorCard />
+
+    <!-- Post navigation -->
+    <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+  </article>
+
+  <!-- Below article: webmentions and comments -->
+  <div class="mx-auto max-w-content px-5 md:px-10 mt-16 mb-8">
+    <Webmentions />
+    <div class="section-divider"></div>
+    <Giscus />
+  </div>
+
+  <!-- Related posts -->
+  <RelatedPosts currentSlug={slug} tags={tags ?? []} />
+</PageLayout>
+
+<style>
+  /* Breadcrumb */
+  .breadcrumb {
+    margin-bottom: 1rem;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Literata', Georgia, serif;
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .breadcrumb li a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .breadcrumb li a:hover {
+    color: var(--color-primary);
+  }
+
+  .breadcrumb li[aria-hidden='true'] {
+    color: var(--color-text-subtle);
+    user-select: none;
+  }
+
+  .breadcrumb li[aria-current='page'] {
+    color: var(--color-text);
+  }
+
+  /* Tag badges */
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .article-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: capitalize;
+  }
+
+  /* Article title */
+  .article-title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    font-size: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .article-title {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .article-title {
+      font-size: 2.75rem;
+    }
+  }
+
+  /* Meta row */
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .article-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .article-meta-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-text-subtle);
+    flex-shrink: 0;
+  }
+
+  .article-meta-sep {
+    color: var(--color-text-subtle);
+  }
+
+  /* Hero image */
+  .article-hero {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .article-hero-img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* In-reply-to indicator */
+  .article-reply-to {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-primary-muted);
+  }
+
+  .article-reply-to-header {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .article-reply-to-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .article-reply-to-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+  }
+
+  .article-reply-to-link {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+
+  .article-reply-to-link:hover,
+  .article-reply-to-link:focus {
+    text-decoration: underline;
+  }
+
+  /* Header/body separator */
+  .article-separator {
+    border: 0;
+    height: 1px;
+    background: var(--color-border);
+    margin: 0 0 2rem;
+  }
+
+  /* Article grid for ToC sidebar */
+  .article-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .article-grid {
+      grid-template-columns: 1fr 14rem;
+    }
+  }
+</style>

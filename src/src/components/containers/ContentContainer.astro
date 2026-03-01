@@ -1,11 +1,11 @@
 ---
 interface Props {
-  maxWidth?: string;
+  class?: string
 }
 
-const { maxWidth = "max-w-4xl" } = Astro.props;
+const { class: className } = Astro.props
 ---
 
-<div class={`mx-auto ${maxWidth}`}>
+<div class={`mx-auto max-w-content px-5 md:px-10 ${className || ''}`}>
   <slot />
 </div>

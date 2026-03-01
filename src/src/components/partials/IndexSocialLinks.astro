@@ -1,55 +1,82 @@
 ---
-import Bluesky from "../socialicons/Bluesky.astro";
-import GitHub from "../socialicons/GitHub.astro";
-import LinkedIn from "../socialicons/LinkedIn.astro";
-import Mastodon from "../socialicons/Mastodon.astro";
+import Bluesky from '../socialicons/Bluesky.astro'
+import GitHub from '../socialicons/GitHub.astro'
+import LinkedIn from '../socialicons/LinkedIn.astro'
+import Mastodon from '../socialicons/Mastodon.astro'
 ---
 
-<div class="flex flex-wrap gap-4">
-  <a href="https://github.com/sealjay"
-     data-social="GitHub"
-     class="social-link u-url group flex items-center gap-3 rounded-full bg-white/50 dark:bg-zinc-800/50 px-3.5 py-2.5 text-sm font-medium text-zinc-800 dark:text-zinc-300 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 transition-all duration-200 hover:shadow-md hover:ring-accent-200 dark:hover:ring-accent-800/40 hover:bg-white dark:hover:bg-zinc-800"
-     rel="me">
-    <span class="transform transition-transform duration-300 group-hover:-rotate-12">
-      <GitHub />
-    </span>
-    <span>GitHub</span>
+<nav aria-label="Social links" class="social-links">
+  <a
+    href="https://github.com/sealjay"
+    aria-label="GitHub profile"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="social-links__icon"
+    data-social="GitHub"
+  >
+    <GitHub size={24} />
   </a>
 
-  <a href="https://bsky.app/profile/sealjay.com"
-     data-social="Bluesky"
-     class="social-link u-url group flex items-center gap-3 rounded-full bg-white/50 dark:bg-zinc-800/50 px-3.5 py-2.5 text-sm font-medium text-zinc-800 dark:text-zinc-300 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 transition-all duration-200 hover:shadow-md hover:ring-accent-200 dark:hover:ring-accent-800/40 hover:bg-white dark:hover:bg-zinc-800"
-     rel="me">
-    <span class="transform transition-transform duration-300 group-hover:-rotate-12">
-      <Bluesky />
-    </span>
-    <span>Bluesky</span>
+  <a
+    href="https://uk.linkedin.com/in/chrislloydjones"
+    aria-label="LinkedIn profile"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="social-links__icon"
+    data-social="LinkedIn"
+  >
+    <LinkedIn size={24} />
   </a>
 
-  <a href="https://uk.linkedin.com/in/chrislloydjones"
-     data-social="LinkedIn"
-     class="social-link u-url group flex items-center gap-3 rounded-full bg-white/50 dark:bg-zinc-800/50 px-3.5 py-2.5 text-sm font-medium text-zinc-800 dark:text-zinc-300 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 transition-all duration-200 hover:shadow-md hover:ring-accent-200 dark:hover:ring-accent-800/40 hover:bg-white dark:hover:bg-zinc-800"
-     rel="me">
-    <span class="transform transition-transform duration-300 group-hover:-rotate-12">
-      <LinkedIn />
-    </span>
-    <span>LinkedIn</span>
+  <a
+    href="https://fosstodon.org/@sealjay"
+    aria-label="Mastodon profile"
+    target="_blank"
+    rel="me noopener noreferrer"
+    class="social-links__icon"
+    data-social="Mastodon"
+  >
+    <Mastodon size={24} />
   </a>
 
-  <a href="https://fosstodon.org/@sealjay"
-     data-social="Mastodon"
-     class="social-link u-url group flex items-center gap-3 rounded-full bg-white/50 dark:bg-zinc-800/50 px-3.5 py-2.5 text-sm font-medium text-zinc-800 dark:text-zinc-300 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-700/40 transition-all duration-200 hover:shadow-md hover:ring-accent-200 dark:hover:ring-accent-800/40 hover:bg-white dark:hover:bg-zinc-800"
-     rel="me">
-    <span class="transform transition-transform duration-300 group-hover:-rotate-12">
-      <Mastodon />
-    </span>
-    <span>Mastodon</span>
+  <a
+    href="https://bsky.app/profile/sealjay.com"
+    aria-label="Bluesky profile"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="social-links__icon"
+    data-social="Bluesky"
+  >
+    <Bluesky size={24} />
   </a>
-</div>
+</nav>
+
+<style>
+  .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .social-links__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: var(--color-text-muted);
+    transition: color 150ms;
+  }
+
+  .social-links__icon:hover {
+    color: var(--color-primary);
+  }
+</style>
 
 <script>
   function initSocialTracking() {
-    const links = document.querySelectorAll<HTMLAnchorElement>('.social-link')
+    const links = document.querySelectorAll<HTMLAnchorElement>('.social-links__icon')
     for (const link of links) {
       link.addEventListener('click', () => {
         if (typeof window.plausible !== 'undefined') {
