@@ -5,8 +5,8 @@ import PageHeader from '../../components/partials/PageHeader.astro'
 import { getCollection } from 'astro:content'
 import { format } from 'date-fns'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
-import { getShorts } from '../../lib/youtube'
-import { youtubeShorts } from '../../config/personal'
+import { getYouTubeSpeakingEntries, extractYouTubeId } from '../../lib/youtube'
+import { youtubeFeeds } from '../../config/personal'
 
 interface NoteDetail {
   description: string
@@ -18,21 +18,20 @@ interface NoteDetail {
 }
 
 interface StreamItem {
-  type: 'article' | 'talk' | 'note' | 'project' | 'short'
+  type: 'article' | 'talk' | 'note' | 'project'
   title: string
   description: string
   date: Date
   url: string
   tags: string[]
   noteItems?: NoteDetail[]
-  thumbnailUrl?: string
 }
 
 const blogEntries = await getCollection('blog')
 const speakingEntries = await getCollection('speaking')
 const noteEntries = await getCollection('note')
 const projectEntries = await getCollection('project')
-const shorts = await getShorts(youtubeShorts)
+const youtubeEntries = await getYouTubeSpeakingEntries(youtubeFeeds)
 
 const blogItems: StreamItem[] = blogEntries.map((entry) => ({
   type: 'article',
@@ -43,14 +42,33 @@ const blogItems: StreamItem[] = blogEntries.map((entry) => ({
   tags: entry.data.tags ?? [],
 }))
 
+// Build set of YouTube IDs that have MDX overrides
+const mdxYouTubeIds = new Set<string>()
+for (const entry of speakingEntries) {
+  const id = extractYouTubeId(entry.data.url)
+  if (id) mdxYouTubeIds.add(id)
+}
+
 const speakingItems: StreamItem[] = speakingEntries.map((entry) => ({
-  type: 'talk',
+  type: 'talk' as const,
   title: entry.data.title,
   description: `${entry.data.event} - ${entry.data.eventType}`,
   date: new Date(entry.data.date),
   url: entry.data.url,
   tags: [],
 }))
+
+// Add YouTube entries that don't have MDX overrides
+const youtubeItems: StreamItem[] = youtubeEntries
+  .filter((yt) => !mdxYouTubeIds.has(yt.youtubeId))
+  .map((yt) => ({
+    type: 'talk' as const,
+    title: yt.title,
+    description: `${yt.event} - ${yt.eventType}`,
+    date: yt.date,
+    url: yt.url,
+    tags: yt.tags,
+  }))
 
 // Group notes by day and emit one stream item per day
 const notesByDay = new Map<string, typeof noteEntries>()
@@ -94,17 +112,7 @@ const projectItems: StreamItem[] = projectEntries.map((entry) => ({
   tags: entry.data.tags ?? [],
 }))
 
-const shortItems: StreamItem[] = shorts.map((short) => ({
-  type: 'short',
-  title: short.title,
-  description: short.source,
-  date: short.published,
-  url: short.youtubeUrl,
-  tags: short.tags,
-  thumbnailUrl: short.thumbnailUrl,
-}))
-
-const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...noteGroupItems, ...projectItems, ...shortItems].sort(
+const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...youtubeItems, ...noteGroupItems, ...projectItems].sort(
   (a, b) => b.date.valueOf() - a.date.valueOf(),
 )
 
@@ -136,7 +144,6 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   talk: 'Speaking',
   note: 'Note',
   project: 'Project',
-  short: 'Short',
 }
 ---
 
@@ -160,7 +167,6 @@ const badgeLabels: Record<StreamItem['type'], string> = {
       <button data-filter="talk" class="stream-filter-btn">Speaking</button>
       <button data-filter="note" class="stream-filter-btn">Notes</button>
       <button data-filter="project" class="stream-filter-btn">Projects</button>
-      <button data-filter="short" class="stream-filter-btn">Shorts</button>
     </div>
 
     {/* Stream Items Grouped by Month */}
@@ -172,7 +178,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
         </h2>
         <div class="stream-month__items">
           {items.map((item) => {
-            const isExternal = item.type === 'talk' || item.type === 'project' || item.type === 'short'
+            const isExternal = item.type === 'talk' || item.type === 'project'
 
             {/* Notes: grouped bullet format under date header */}
             if (item.type === 'note' && item.noteItems) {
@@ -226,7 +232,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
               )
             }
 
-            {/* Other items: article, talk, project, short */}
+            {/* Other items: article, talk, project */}
             return (
               <a
                 href={item.url}
@@ -333,7 +339,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     align-items: center;
     border-radius: var(--radius-full);
     padding: 0.375rem 1rem;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 500;
     border: 1px solid var(--color-border);
@@ -433,7 +439,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     gap: 0.375rem;
     border-radius: var(--radius-full);
     padding: 3px 10px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     line-height: 1;
     font-weight: 500;
@@ -467,17 +473,6 @@ const badgeLabels: Record<StreamItem['type'], string> = {
 
   .stream-badge__dot--note {
     background: var(--color-warm);
-  }
-
-  /* Short = success emerald */
-  .stream-badge--short {
-    background: color-mix(in srgb, var(--color-success) 8%, transparent);
-    color: var(--color-success);
-    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
-  }
-
-  .stream-badge__dot--short {
-    background: var(--color-success);
   }
 
   /* Talk = warm */
@@ -533,7 +528,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   }
 
   .stream-item__title {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-text);
@@ -580,7 +575,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     display: flex;
     align-items: center;
     gap: 0.125rem;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--color-primary);
@@ -651,7 +646,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
 
   .stream-note-group__time {
     flex-shrink: 0;
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: var(--font-code);
     font-size: 0.75rem;
     color: var(--color-text-subtle);
     line-height: 1.25;
