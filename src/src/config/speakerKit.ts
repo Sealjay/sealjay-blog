@@ -24,15 +24,15 @@ export interface LogisticsItem {
 
 export const speakerBio = {
   short:
-    'Chris Lloyd-Jones (Sealjay) is a VP of AI Consulting Transformation at Kyndryl, six-time Microsoft MVP in AI, and doctoral researcher in Green Software Engineering. He speaks on open source, sustainability in tech, and the responsible adoption of AI.',
-  long: "With over a decade of experience bridging technology strategy and engineering, Chris brings a unique perspective to every stage. A former Head of AI at Avanade, Vice-Chair of the Green Software Foundation Steering Committee, and contributor to ISO/IEC 21031:2024, he combines deep technical knowledge with a passion for making technology more sustainable and accessible. Chris is co-host of Securing the Realm, a cybersecurity community initiative, and an OpenUK Ambassador recognised in the 2025/26 New Year's Honours.",
+    'Chris Lloyd-Jones (Sealjay) is VP of AI Consulting Transformation at Kyndryl, where he created the Forward Deployed Engineering capability \u2014 engineers embedded with clients to build, ship, and own outcomes, now scaling to 22,000 engineers. A six-time Microsoft MVP in AI, ISO/IEC 21031:2024 contributor, and doctoral researcher in Green Software Engineering, he co-hosts Securing the Realm (securing.quest) and speaks on agentic AI, open source, and governance that ships rather than stalls. // open, sustainable, real.',
+  long: 'Chris Lloyd-Jones (Sealjay) is VP of AI Consulting Transformation at Kyndryl, where he created the Forward Deployed Engineering capability \u2014 engineers embedded with clients to build, ship, and own outcomes rather than advise from a distance, now scaling to 22,000 engineers. He previously launched Avanade\u2019s AI platform and led their Platforms & Incubation practice. A six-time Microsoft MVP in Artificial Intelligence, he contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation, where he served as Steering Committee Vice-Chair, and is pursuing a doctorate in Green Software Engineering at the University of East London (2022\u20132027). With a background spanning law, engineering, and open source leadership, he treats regulation, liability, and compliance as design constraints rather than afterthoughts. He co-hosts Securing the Realm, a D&D-inspired podcast on AI governance and AI-driven development (securing.quest), has shared insights with the BBC, and was recognised in the OpenUK New Year\u2019s Honours 2025/26.',
 }
 
 export const topics: SpeakerTopic[] = [
   {
-    title: 'AI Strategy & Adoption',
+    title: 'Agentic AI & Adoption',
     description:
-      'Practical guidance on embedding AI across organisations responsibly, from proof-of-concept to production at scale.',
+      'Building and deploying AI agents that act autonomously \u2014 tool use, orchestration patterns, and taking agentic systems from prototype to production at scale.',
     icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
   },
   {
@@ -103,9 +103,14 @@ export const testimonials: Testimonial[] = [
 
 export const logistics: LogisticsItem[] = [
   { label: 'Based in', value: 'London, UK (available globally)' },
+  { label: 'Timezone', value: 'GMT/BST (UK)' },
   { label: 'Languages', value: 'English (native)' },
-  { label: 'AV requirements', value: 'Lapel mic preferred; own clicker' },
+  {
+    label: 'AV requirements',
+    value: 'Lapel mic preferred; minimal slides; prefer clicker to be provided unless demoing; uses own laptop',
+  },
   { label: 'Travel', value: 'Happy to travel for in-person events' },
+  { label: 'Recording', value: 'Happy to be recorded and for talks to be published online' },
 ]
 
 export const contactCta = {
@@ -115,4 +120,4 @@ export const contactCta = {
   url: 'https://uk.linkedin.com/in/chrislloydjones',
 }
 
-export const headshot = '/chris/portrait.jpg'
+export const headshot = '/chris/avatar.jpg'

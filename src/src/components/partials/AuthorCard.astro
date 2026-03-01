@@ -5,7 +5,7 @@
 <aside class="author-card" aria-label="About the author">
   <div class="author-card__avatar-wrap">
     <img
-      src="/chris/portrait.jpg"
+      src="/chris/avatar.jpg"
       alt="Chris Lloyd-Jones"
       width="64"
       height="64"
@@ -18,7 +18,7 @@
     <span class="author-card__name">Chris Lloyd-Jones</span>
     <span class="author-card__title">VP, AI Consulting Transformation at Kyndryl</span>
     <p class="author-card__bio">
-      6x Microsoft AI MVP. Doctoral researcher in Green Software Engineering at UEL. Co-host of <a href="https://securing.quest/" target="_blank" rel="noopener noreferrer">Securing the Realm</a>. // open, sustainable, real
+      6x Microsoft AI MVP. Background in law, engineering, and open source. Doctoral researcher in Green Software at UEL. OpenUK Honours 2025/26. Co-hosts <a href="https://securing.quest/" target="_blank" rel="noopener noreferrer">Securing the Realm</a>. // open, sustainable, real
     </p>
     <div class="author-card__links">
       <a href="https://github.com/sealjay" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
@@ -69,7 +69,7 @@
   }
 
   .author-card__name {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     font-size: 1rem;
     color: var(--color-text);
@@ -98,8 +98,28 @@
 
   .author-card__links {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.25rem;
     margin-top: 0.5rem;
+  }
+
+  .author-card__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .author-card__links a:hover {
+    background: var(--color-primary-muted);
+  }
+
+  .author-card__links a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   .author-card__icon {
@@ -109,7 +129,7 @@
     transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .author-card__icon:hover {
+  .author-card__links a:hover .author-card__icon {
     color: var(--color-primary);
   }
 
