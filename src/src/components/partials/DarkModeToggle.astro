@@ -61,7 +61,7 @@
         mode === "dark" ? "#0C0A1D" : "#F8F9FC";
     }
 
-    localStorage.setItem("theme", mode);
+    sessionStorage.setItem("theme", mode);
   }
 
   function updateIcons(mode: "light" | "dark") {
@@ -88,7 +88,7 @@
 
       // Resolve current mode from localStorage or system preference
       let currentMode: "light" | "dark";
-      const stored = localStorage.getItem("theme");
+      const stored = sessionStorage.getItem("theme");
       if (
         stored === "dark" ||
         (!stored &&
