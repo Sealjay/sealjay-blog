@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content'
-import { getYouTubeSpeakingEntries, extractYouTubeId } from '../lib/youtube'
 import { youtubeFeeds } from '../config/personal'
+import { extractYouTubeId, getYouTubeSpeakingEntries } from '../lib/youtube'
 
 export async function GET() {
   const blogs = await getCollection('blog')

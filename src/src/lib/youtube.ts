@@ -59,13 +59,10 @@ function parseVideoEntries(xml: string): Array<{
     entries.push({
       youtubeId,
       title: decodeEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''),
-      description: decodeEntities(
-        block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? '',
-      ),
+      description: decodeEntities(block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? ''),
       published: block.match(/<published>(.*?)<\/published>/)?.[1] ?? '',
       thumbnailUrl:
-        block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ??
-        `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
+        block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ?? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
     })
   }
 
@@ -88,9 +85,7 @@ async function fetchFeed(url: string, label: string): Promise<string> {
 }
 
 /** Fetch all YouTube channel videos and classify as Short or Podcast */
-export async function getYouTubeSpeakingEntries(
-  feeds: YouTubeFeedConfig[],
-): Promise<YouTubeSpeakingEntry[]> {
+export async function getYouTubeSpeakingEntries(feeds: YouTubeFeedConfig[]): Promise<YouTubeSpeakingEntry[]> {
   if (cached) return cached
 
   const allEntries: YouTubeSpeakingEntry[] = []
@@ -98,10 +93,7 @@ export async function getYouTubeSpeakingEntries(
   for (const feed of feeds) {
     // Fetch channel feed and shorts playlist in parallel
     const [channelXml, shortsXml] = await Promise.all([
-      fetchFeed(
-        `https://www.youtube.com/feeds/videos.xml?channel_id=${feed.channelId}`,
-        `channel ${feed.channelId}`,
-      ),
+      fetchFeed(`https://www.youtube.com/feeds/videos.xml?channel_id=${feed.channelId}`, `channel ${feed.channelId}`),
       feed.shortsPlaylistId
         ? fetchFeed(
             `https://www.youtube.com/feeds/videos.xml?playlist_id=${feed.shortsPlaylistId}`,
@@ -124,13 +116,7 @@ export async function getYouTubeSpeakingEntries(
     for (const video of parseVideoEntries(channelXml)) {
       const isShort = shortIds.has(video.youtubeId)
       const hashtags = extractHashtags(video.description)
-      const tags = [
-        ...new Set([
-          ...feed.defaultTags,
-          ...(isShort ? ['Shorts'] : ['Podcast']),
-          ...hashtags,
-        ]),
-      ]
+      const tags = [...new Set([...feed.defaultTags, ...(isShort ? ['Shorts'] : ['Podcast']), ...hashtags])]
 
       allEntries.push({
         title: video.title,
