@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import { join } from 'node:path'
 import { Resvg } from '@resvg/resvg-js'
 import satori from 'satori'
 
@@ -433,7 +430,7 @@ function buildTemplate(input: OGTemplateInput) {
         overflow: 'hidden',
         // Deep indigo-to-slate gradient background
         background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #020617 100%)',
-        fontFamily: 'Manrope, Inter, sans-serif',
+        fontFamily: 'Bricolage Grotesque, Source Serif 4, sans-serif',
       },
       children: [
         // Subtle gradient overlay for depth
@@ -648,52 +645,59 @@ function buildTemplate(input: OGTemplateInput) {
 }
 
 // ---------------------------------------------------------------------------
-// Font loading – read from @fontsource npm packages (no network needed)
+// Font loading – fetch from Google Fonts API at build time
 // ---------------------------------------------------------------------------
 
-function resolveFontPath(pkg: string, fileName: string): string {
-  const require = createRequire(import.meta.url)
-  const pkgJson = require.resolve(`${pkg}/package.json`)
-  const pkgDir = pkgJson.replace(/\/package\.json$/, '')
-  return join(pkgDir, 'files', fileName)
+interface FontEntry {
+  name: string
+  data: ArrayBuffer
+  weight: number
+  style: string
 }
 
-function loadFonts(): { name: string; data: ArrayBuffer; weight: number; style: string }[] {
-  const fontFiles = [
-    {
-      name: 'Manrope',
-      weight: 700,
-      file: resolveFontPath('@fontsource/manrope', 'manrope-latin-700-normal.woff'),
+async function fetchGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
+  const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`
+  const cssResponse = await fetch(url, {
+    headers: {
+      // Use IE10 UA to get woff format (not woff2) - satori needs woff/ttf
+      'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
     },
-    {
-      name: 'Manrope',
-      weight: 600,
-      file: resolveFontPath('@fontsource/manrope', 'manrope-latin-600-normal.woff'),
-    },
-    {
-      name: 'Inter',
-      weight: 400,
-      file: resolveFontPath('@fontsource/inter', 'inter-latin-400-normal.woff'),
-    },
+  })
+  const css = await cssResponse.text()
+  // Extract the font file URL from the CSS @font-face src
+  const match = css.match(/src:\s*url\(([^)]+)\)/)
+  if (!match?.[1]) {
+    throw new Error(`Could not find font URL for ${family} weight ${weight}`)
+  }
+  const fontResponse = await fetch(match[1])
+  return fontResponse.arrayBuffer()
+}
+
+async function loadFonts(): Promise<FontEntry[]> {
+  const fontSpecs = [
+    { name: 'Bricolage Grotesque', weight: 700 },
+    { name: 'Bricolage Grotesque', weight: 600 },
+    { name: 'Source Serif 4', weight: 400 },
   ]
 
-  return fontFiles.map((font) => {
-    const data = readFileSync(font.file)
-    return {
-      name: font.name,
-      data: data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength),
-      weight: font.weight,
+  const fonts = await Promise.all(
+    fontSpecs.map(async (spec) => ({
+      name: spec.name,
+      data: await fetchGoogleFont(spec.name, spec.weight),
+      weight: spec.weight,
       style: 'normal' as const,
-    }
-  })
+    })),
+  )
+
+  return fonts
 }
 
 // Cache fonts in module scope so they're only loaded once per build
-let fontCache: ReturnType<typeof loadFonts> | null = null
+let fontCache: FontEntry[] | null = null
 
-function getFonts() {
+async function getFonts(): Promise<FontEntry[]> {
   if (!fontCache) {
-    fontCache = loadFonts()
+    fontCache = await loadFonts()
   }
   return fontCache
 }
@@ -703,7 +707,7 @@ function getFonts() {
 // ---------------------------------------------------------------------------
 
 export async function generateOGImage(input: OGTemplateInput): Promise<Buffer> {
-  const fonts = getFonts()
+  const fonts = await getFonts()
   const template = buildTemplate(input)
 
   const svg = await satori(template as any, {

@@ -30,8 +30,6 @@
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
     "@astrojs/tailwind": "^5.1.5",
-    "@fontsource/inter": "^5.2.8",
-    "@fontsource/manrope": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "astro": "^5.18.0",
