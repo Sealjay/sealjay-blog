@@ -155,7 +155,13 @@ const {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Left-align social icons within profile section */
+  .profile-section__social-desktop :global(.social-links),
+  .profile-section__social-mobile :global(.social-links) {
+    justify-content: flex-start;
   }
 
   .profile-section__content {
