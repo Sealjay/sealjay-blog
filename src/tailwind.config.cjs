@@ -180,7 +180,7 @@ module.exports = {
           h2: {
             fontSize: '1.5rem',
             lineHeight: '1.75rem',
-            marginTop: '5rem',
+            marginTop: '3.5rem',
             marginBottom: '1.5rem',
           },
           h3: {
