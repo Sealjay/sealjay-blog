@@ -1,25 +1,46 @@
 ---
-import type { HTMLAttributes } from "astro/types";
+import type { HTMLAttributes } from 'astro/types'
 
-type Props = HTMLAttributes<"a">;
+type Props = HTMLAttributes<'a'>
 
-const { href } = Astro.props;
+const { href } = Astro.props
 
-const { pathname } = Astro.url;
-const isActive = href === pathname || href === pathname.replace(/\/$/, "");
+const { pathname } = Astro.url
+const isActive = href === pathname || href === pathname.replace(/\/$/, '')
 ---
 
 <a
   href={href}
-  class:list={[
-    "relative block px-2 py-2 sm:px-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-500/50 rounded-md",
-    { "text-accent-600 dark:text-accent-400 font-medium": isActive },
-    { "hover:text-accent-600 dark:hover:text-accent-400": !isActive },
-  ]}
-  aria-current={isActive ? "page" : undefined}
+  class="header-link"
+  aria-current={isActive ? 'page' : undefined}
+  data-active={isActive ? '' : undefined}
 >
   <slot />
-  {isActive && (
-    <span class="absolute inset-x-1 -bottom-px h-px bg-gradient-to-r from-accent-500/0 via-accent-500/60 to-accent-500/0 dark:from-accent-400/0 dark:via-accent-400/60 dark:to-accent-400/0"></span>
-  )}
 </a>
+
+<style>
+  .header-link {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: 6px 12px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-out);
+    text-decoration: none;
+  }
+
+  .header-link:hover,
+  .header-link[data-active] {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .header-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+</style>
