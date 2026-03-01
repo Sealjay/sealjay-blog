@@ -165,12 +165,12 @@ module.exports = {
           color: 'var(--tw-prose-body)',
           lineHeight: '1.75',
           '> *': {
-            marginTop: '2.5rem',
-            marginBottom: '2.5rem',
+            marginTop: '1.25rem',
+            marginBottom: '1.25rem',
           },
           p: {
-            marginTop: '2rem',
-            marginBottom: '2rem',
+            marginTop: '1.25rem',
+            marginBottom: '1.25rem',
           },
 
           // Headings
@@ -181,14 +181,14 @@ module.exports = {
           h2: {
             fontSize: '1.5rem',
             lineHeight: '1.75rem',
-            marginTop: '2.5rem',
-            marginBottom: '1.5rem',
+            marginTop: '2rem',
+            marginBottom: '0.75rem',
           },
           h3: {
             fontSize: '1.125rem',
             lineHeight: '1.75rem',
-            marginTop: '4rem',
-            marginBottom: '1rem',
+            marginTop: '2rem',
+            marginBottom: '0.5rem',
           },
           ':is(h2, h3) + *': {
             marginTop: 0,
@@ -262,8 +262,8 @@ module.exports = {
             paddingLeft: '1.5rem',
           },
           li: {
-            marginTop: '1.5rem',
-            marginBottom: '1.5rem',
+            marginTop: '0.5rem',
+            marginBottom: '0.5rem',
             paddingLeft: '0.875rem',
           },
           'li::marker': {

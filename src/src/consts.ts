@@ -7,7 +7,7 @@ export const SITE_DESCRIPTION =
 
 export const SITE_NAV = [
   { name: 'About', path: '/about' },
-  { name: 'Blog', path: '/blog' },
+  { name: 'Writing', path: '/blog' },
   { name: 'Speaking', path: '/speaking' },
   { name: 'Projects', path: '/projects' },
   { name: 'Notes', path: '/notes' },

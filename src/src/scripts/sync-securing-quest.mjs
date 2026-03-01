@@ -19,6 +19,33 @@ const SITE_BASE = 'https://securing.quest'
 /** Titles to skip when syncing */
 const EXCLUDED_TITLES = ['Welcome to the Library']
 
+/** Override map for tags with non-standard capitalisation. */
+const TAG_OVERRIDES = {
+  ai: 'AI',
+  api: 'API',
+  cli: 'CLI',
+  mcp: 'MCP',
+  ml: 'ML',
+  iso: 'ISO',
+  apim: 'APIM',
+  appsec: 'AppSec',
+  devsecops: 'DevSecOps',
+  mlops: 'MLOps',
+  openai: 'OpenAI',
+}
+
+/** Convert a slug-style tag to a Title Case display label. */
+function normaliseTag(tag) {
+  return tag
+    .split('-')
+    .map((word) => {
+      const override = TAG_OVERRIDES[word.toLowerCase()]
+      if (override) return override
+      return word.charAt(0).toUpperCase() + word.slice(1)
+    })
+    .join(' ')
+}
+
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const BLOG_DIR = join(__dirname, '..', 'content', 'blog')
 
@@ -256,7 +283,9 @@ function generateMDX(item) {
   const slug = slugFromLink(item.link)
   const fullUrl = item.link.startsWith('http') ? item.link : `${SITE_BASE}${item.link}`
   const cleanDescription = stripHtml(item.description)
-  const tags = ['External Media', 'Securing the Realm', ...item.categories].filter((v, i, a) => a.indexOf(v) === i)
+  const tags = ['External Media', 'Securing the Realm', ...item.categories.map(normaliseTag)].filter(
+    (v, i, a) => a.indexOf(v) === i,
+  )
 
   const frontmatter = [
     '---',

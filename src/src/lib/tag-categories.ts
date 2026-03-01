@@ -8,12 +8,12 @@ export const TAG_TO_CATEGORY: Record<string, string> = {
   'Anomaly Detector': 'ai-cognitive',
   'Text Analytics': 'ai-cognitive',
   Agolo: 'ai-cognitive',
-  'enterprise-ai': 'ai-cognitive',
-  'microsoft-foundry': 'ai-cognitive',
-  'azure-ai-foundry': 'ai-cognitive',
-  'ai-agents': 'ai-cognitive',
+  'Enterprise AI': 'ai-cognitive',
+  'Microsoft Foundry': 'ai-cognitive',
+  'Azure AI Foundry': 'ai-cognitive',
+  'AI Agents': 'ai-cognitive',
   'Bing Search': 'ai-cognitive',
-  mlops: 'ai-cognitive',
+  MLOps: 'ai-cognitive',
 
   // Green Software
   'Green Software': 'green-software',
@@ -22,15 +22,15 @@ export const TAG_TO_CATEGORY: Record<string, string> = {
   // Security
   Security: 'security',
   'Securing the Realm': 'security',
-  'ai-security': 'security',
-  appsec: 'security',
-  devsecops: 'security',
-  'prompt-injection': 'security',
-  'agent-security': 'security',
-  'supply-chain-security': 'security',
-  'runtime-protection': 'security',
-  'model-security': 'security',
-  'iso-27034': 'security',
+  'AI Security': 'security',
+  AppSec: 'security',
+  DevSecOps: 'security',
+  'Prompt Injection': 'security',
+  'Agent Security': 'security',
+  'Supply Chain Security': 'security',
+  'Runtime Protection': 'security',
+  'Model Security': 'security',
+  'ISO 27034': 'security',
 
   // Events & Media
   Event: 'events-media',
@@ -44,9 +44,9 @@ export const TAG_TO_CATEGORY: Record<string, string> = {
   API: 'developer',
   'Power Automate': 'developer',
   PowerBI: 'developer',
-  'mcp-servers': 'developer',
-  'azure-apim': 'developer',
-  'api-management': 'developer',
+  'MCP Servers': 'developer',
+  'Azure APIM': 'developer',
+  'API Management': 'developer',
 
   // Open Source
   'Open Source': 'open-source',
@@ -59,7 +59,7 @@ export const TAG_TO_CATEGORY: Record<string, string> = {
   'Digital Twins': 'impact-future',
   Microsoft: 'impact-future',
   Azure: 'impact-future',
-  'ai-governance': 'impact-future',
+  'AI Governance': 'impact-future',
 }
 
 /** CSS variable suffix for each category */
