@@ -1,27 +1,128 @@
 ---
-interface Props {
-  title: string;
-  subtitle?: string;
-  center?: boolean;
-  titleClasses?: string;
+interface BreadcrumbItem {
+  label: string
+  href?: string
 }
 
-const { 
-  title, 
-  subtitle, 
-  center = true, 
-  titleClasses = "text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4"
-} = Astro.props;
+interface Props {
+  title: string
+  subtitle?: string
+  breadcrumbs?: BreadcrumbItem[]
+  center?: boolean
+  class?: string
+}
+
+const {
+  title,
+  subtitle,
+  breadcrumbs,
+  center = true,
+  class: className,
+} = Astro.props
 ---
 
-<div class={`mb-10 ${center ? 'text-center' : ''}`}>
-  <h1 class={titleClasses}>
+<div class:list={['page-header', center && 'page-header--center', className]}>
+  {breadcrumbs && breadcrumbs.length > 0 && (
+    <nav aria-label="Breadcrumb" class="page-header__breadcrumbs">
+      <ol>
+        {breadcrumbs.map((crumb, index) => (
+          <li>
+            {index > 0 && <span class="page-header__separator" aria-hidden="true">/</span>}
+            {crumb.href && index < breadcrumbs.length - 1 ? (
+              <a href={crumb.href} class="page-header__crumb-link">{crumb.label}</a>
+            ) : (
+              <span class="page-header__crumb-current" aria-current={index === breadcrumbs.length - 1 ? 'page' : undefined}>{crumb.label}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )}
+
+  <h1 class="page-header__title">
     <slot name="title-prefix" />{title}<slot name="title-suffix" />
   </h1>
-  {subtitle && 
-    <p class="text-lg text-zinc-600 dark:text-zinc-400">
-      {subtitle}
-    </p>
-  }
+
+  {subtitle && (
+    <p class="page-header__subtitle">{subtitle}</p>
+  )}
+
   <slot />
 </div>
+
+<style>
+  .page-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .page-header--center {
+    text-align: center;
+  }
+
+  .page-header__breadcrumbs {
+    margin-bottom: 1rem;
+  }
+
+  .page-header__breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .page-header__breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .page-header__separator {
+    color: var(--color-text-subtle);
+    user-select: none;
+  }
+
+  .page-header__crumb-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .page-header__crumb-link:hover {
+    color: var(--color-primary);
+  }
+
+  .page-header__crumb-current {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .page-header__title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 2rem;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .page-header__title {
+      font-size: 2.75rem;
+    }
+  }
+
+  .page-header__subtitle {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+</style>
