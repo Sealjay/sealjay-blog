@@ -1,21 +1,49 @@
 ---
 ---
 
-<mode-toggle class="flex">
+<mode-toggle>
   <button
-    class="justify-self-end relative bg-zinc-100 dark:bg-zinc-700 inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-200 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-zinc-900"
+    id="theme-toggle"
     role="switch"
     aria-checked="false"
-    aria-label="Dark mode"
-    id="theme-toggle"
+    aria-label="Switch to dark mode"
+    style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: var(--radius-sm, 8px);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+      color: var(--color-text-muted);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    "
   >
-    <span
-      id="mode-circle"
-      class="invisible inline-block h-4 w-4 transform rounded-full bg-accent-500 shadow-md transition-transform duration-300 ease-in-out dark:bg-accent-400 translate-x-1 dark:translate-x-6"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 scale-75 text-white dark:text-zinc-900" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" class="dark:hidden" />
-        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" class="hidden dark:block" />
+    <span id="icon-sun" style="
+      position: absolute;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </span>
+    <span id="icon-moon" style="
+      position: absolute;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
     </span>
   </button>
@@ -23,90 +51,120 @@
 
 <script>
   function updateHTMLTheme(mode: "light" | "dark") {
+    document.documentElement.setAttribute("data-theme", mode);
+
     const themeColorMetaTag = document.head.querySelector(
-      'meta[name="theme-color"]'
+      'meta[name="theme-color"]',
     );
+    if (themeColorMetaTag) {
+      (themeColorMetaTag as HTMLMetaElement).content =
+        mode === "dark" ? "#0C0A1D" : "#F8F9FC";
+    }
+
+    localStorage.setItem("theme", mode);
+  }
+
+  function updateIcons(mode: "light" | "dark") {
+    const sunIcon = document.getElementById("icon-sun");
+    const moonIcon = document.getElementById("icon-moon");
+    if (!sunIcon || !moonIcon) return;
 
     if (mode === "dark") {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-      if (themeColorMetaTag) {
-        // @ts-ignore
-        themeColorMetaTag.content = "#000000";
-      }
-      
-      // Save preference to localStorage
-      localStorage.setItem("theme", "dark");
+      sunIcon.style.opacity = "0";
+      sunIcon.style.transform = "rotate(-90deg) scale(0.5)";
+      moonIcon.style.opacity = "1";
+      moonIcon.style.transform = "rotate(0deg) scale(1)";
     } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-      if (themeColorMetaTag) {
-        // @ts-ignore
-        themeColorMetaTag.content = "#ffffff";
-      }
-      
-      // Save preference to localStorage
-      localStorage.setItem("theme", "light");
+      sunIcon.style.opacity = "1";
+      sunIcon.style.transform = "rotate(0deg) scale(1)";
+      moonIcon.style.opacity = "0";
+      moonIcon.style.transform = "rotate(90deg) scale(0.5)";
     }
   }
-  
+
   class ModeToggle extends HTMLElement {
     constructor() {
       super();
-      
-      // Get user preference from localStorage or system preference
+
+      // Resolve current mode from localStorage or system preference
       let currentMode: "light" | "dark";
-      
-      if (localStorage.getItem("theme") === "dark" || 
-         (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      const stored = localStorage.getItem("theme");
+      if (
+        stored === "dark" ||
+        (!stored &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
         currentMode = "dark";
-        updateHTMLTheme("dark");
       } else {
         currentMode = "light";
-        updateHTMLTheme("light");
       }
 
-      const toggle = this.querySelector("button");
-      const iconElem = toggle?.querySelector("#mode-circle");
+      updateHTMLTheme(currentMode);
 
-      if (iconElem) {
-        // set the toggle mode based on current mode
-        if (currentMode === "dark") {
-          iconElem.classList.add("translate-x-6");
-          iconElem.classList.remove("translate-x-1");
-          toggle?.setAttribute("aria-checked", "true");
-        } else {
-          iconElem.classList.add("translate-x-1");
-          iconElem.classList.remove("translate-x-6");
-          toggle?.setAttribute("aria-checked", "false");
-        }
+      const toggle = this.querySelector<HTMLButtonElement>("#theme-toggle");
+      if (!toggle) return;
 
-        // we load the toggle invisible to prevent flash
-        // remove visibility class after setting initial dark/light class
-        iconElem.classList.remove("invisible");
-
-        // Each time the button is clicked, update the theme
-        toggle?.addEventListener("click", () => {
-          if (currentMode === "dark") {
-            const modeToSwitch = "light";
-            iconElem.classList.remove("translate-x-6");
-            iconElem.classList.add("translate-x-1");
-            updateHTMLTheme(modeToSwitch);
-            toggle?.setAttribute("aria-checked", "false");
-            currentMode = modeToSwitch;
-          } else {
-            const modeToSwitch = "dark";
-            iconElem.classList.remove("translate-x-1");
-            iconElem.classList.add("translate-x-6");
-            updateHTMLTheme(modeToSwitch);
-            toggle?.setAttribute("aria-checked", "true");
-            currentMode = modeToSwitch;
-          }
-          if (typeof window.plausible !== "undefined") {
-            window.plausible("Dark Mode Toggle", { props: { theme: currentMode } });
-          }
+      // Set initial icon visibility (no transition on first paint)
+      const sunIcon = this.querySelector<HTMLElement>("#icon-sun");
+      const moonIcon = this.querySelector<HTMLElement>("#icon-moon");
+      if (sunIcon && moonIcon) {
+        // Disable transitions for initial state to prevent flash
+        sunIcon.style.transition = "none";
+        moonIcon.style.transition = "none";
+        updateIcons(currentMode);
+        // Re-enable transitions after paint
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            sunIcon.style.transition =
+              "opacity 0.3s ease, transform 0.3s ease";
+            moonIcon.style.transition =
+              "opacity 0.3s ease, transform 0.3s ease";
+          });
         });
       }
+
+      // Set initial ARIA state
+      if (currentMode === "dark") {
+        toggle.setAttribute("aria-checked", "true");
+        toggle.setAttribute("aria-label", "Switch to light mode");
+      } else {
+        toggle.setAttribute("aria-checked", "false");
+        toggle.setAttribute("aria-label", "Switch to dark mode");
+      }
+
+      // Hover styles
+      toggle.addEventListener("mouseenter", () => {
+        toggle.style.backgroundColor = "var(--color-primary-muted)";
+        toggle.style.color = "var(--color-primary)";
+      });
+      toggle.addEventListener("mouseleave", () => {
+        toggle.style.backgroundColor = "transparent";
+        toggle.style.color = "var(--color-text-muted)";
+      });
+
+      // Click handler
+      toggle.addEventListener("click", () => {
+        currentMode = currentMode === "dark" ? "light" : "dark";
+        updateHTMLTheme(currentMode);
+        updateIcons(currentMode);
+
+        toggle.setAttribute(
+          "aria-checked",
+          currentMode === "dark" ? "true" : "false",
+        );
+        toggle.setAttribute(
+          "aria-label",
+          currentMode === "dark"
+            ? "Switch to light mode"
+            : "Switch to dark mode",
+        );
+
+        if (typeof window.plausible !== "undefined") {
+          window.plausible("Dark Mode Toggle", {
+            props: { theme: currentMode },
+          });
+        }
+      });
     }
   }
 
