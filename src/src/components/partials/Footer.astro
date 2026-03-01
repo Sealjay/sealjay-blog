@@ -1,40 +1,181 @@
 ---
-import { SITE_NAV, SITE_SECONDARY_NAV, SITE_FOOTER_NAV } from "../../consts";
-import Container from "../containers/Container.astro";
+import { SITE_NAV, SITE_SECONDARY_NAV, SITE_FOOTER_NAV } from '../../consts'
+
+const navLinks = [
+  { name: 'Blog', path: '/blog' },
+  { name: 'Speaking', path: '/speaking' },
+  { name: 'Projects', path: '/projects' },
+  { name: 'Notes', path: '/notes' },
+  { name: 'About', path: '/about' },
+]
+
+const socialLinks = [
+  { name: 'GitHub', url: 'https://github.com/sealjay' },
+  { name: 'LinkedIn', url: 'https://uk.linkedin.com/in/chrislloydjones' },
+  { name: 'Mastodon', url: 'https://fosstodon.org/@sealjay', rel: 'me' },
+  { name: 'Bluesky', url: 'https://bsky.app/profile/sealjay.com' },
+]
+
+const feedLinks = SITE_FOOTER_NAV.filter((item) => item.name === 'RSS' || item.name === 'JSON Feed')
+
+const moreLinks = [
+  ...SITE_SECONDARY_NAV,
+  ...SITE_FOOTER_NAV.filter((item) => item.name === 'Privacy'),
+]
 ---
 
-<footer class="mt-16 sm:mt-24">
-  <Container>
-    <div class="border-t border-zinc-100 pt-8 pb-10 dark:border-zinc-700/40">
-      <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
-        <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-          {
-            SITE_NAV.map((navitem) => (
+<footer role="contentinfo" class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="/" class="footer-wordmark">sealjay</a>
+      <p class="footer-copyright">
+        &copy; 2018&ndash;{new Date().getFullYear()} Chris Lloyd-Jones
+      </p>
+      <p class="footer-built">
+        Built with Astro, hosted on Azure Static Web Apps
+      </p>
+    </div>
+
+    <div class="footer-right">
+      <div class="footer-link-group">
+        <h3 class="footer-group-title">Navigate</h3>
+        <ul class="footer-link-list">
+          {navLinks.map((link) => (
+            <li><a href={link.path} class="footer-link">{link.name}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-link-group">
+        <h3 class="footer-group-title">Social</h3>
+        <ul class="footer-link-list">
+          {socialLinks.map((link) => (
+            <li>
               <a
-                href={navitem.path}
-                class="transition hover:text-accent-600 dark:hover:text-accent-400 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
+                href={link.url}
+                class="footer-link"
+                target="_blank"
+                rel={link.rel ? `${link.rel} noopener noreferrer` : 'noopener noreferrer'}
               >
-                {navitem.name}
+                {link.name}
               </a>
-            ))
-          }
-          <span class="hidden sm:inline text-zinc-300 dark:text-zinc-600" aria-hidden="true">|</span>
-          {
-            [...SITE_SECONDARY_NAV, ...SITE_FOOTER_NAV].map((navitem) => (
-              <a
-                href={navitem.path}
-                class="transition text-zinc-500 dark:text-zinc-400 hover:text-accent-600 dark:hover:text-accent-400 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500/50"
-              >
-                {navitem.name}
-              </a>
-            ))
-          }
-        </div>
-        <p class="text-sm text-center sm:text-right text-zinc-500 dark:text-zinc-400 mt-3 sm:mt-0 px-2 sm:px-0">
-          &copy; 2018-{new Date().getFullYear()} Chris Lloyd-Jones, aka Sealjay&#174;.
-          <span class="block sm:inline mt-1 sm:mt-0">All rights reserved.</span>
-        </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-link-group">
+        <h3 class="footer-group-title">Feeds</h3>
+        <ul class="footer-link-list">
+          {feedLinks.map((link) => (
+            <li><a href={link.path} class="footer-link">{link.name}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-link-group">
+        <h3 class="footer-group-title">More</h3>
+        <ul class="footer-link-list">
+          {moreLinks.map((link) => (
+            <li><a href={link.path} class="footer-link">{link.name}</a></li>
+          ))}
+        </ul>
       </div>
     </div>
-  </Container>
+  </div>
 </footer>
+
+<style>
+  .site-footer {
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    padding: 24px 20px;
+  }
+
+  @media (min-width: 640px) {
+    .site-footer {
+      padding: 32px 24px;
+    }
+  }
+
+  .footer-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+  }
+
+  /* Left column */
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .footer-wordmark {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    line-height: 1.3;
+  }
+
+  .footer-copyright,
+  .footer-built {
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Right column - link groups */
+  .footer-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .footer-link-group {
+    min-width: 7rem;
+  }
+
+  .footer-group-title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+  }
+
+  .footer-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .footer-link {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+    line-height: 1.6;
+  }
+
+  .footer-link:hover {
+    color: var(--color-primary);
+  }
+</style>
