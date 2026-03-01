@@ -100,6 +100,10 @@ const eventsJsonLd = JSON.stringify({
       title="Speaking"
       subtitle="conference talks, videos, and podcasts on Microsoft AI and open source"
       center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Speaking' },
+      ]}
     >
       <p class="speaking-kit-toplink">
         <a href="/speaking/kit" class="speaking-kit-toplink__anchor">
@@ -258,7 +262,7 @@ const eventsJsonLd = JSON.stringify({
 
   /* Upcoming section */
   .speaking-upcoming {
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
     padding: 1.5rem;
     border-radius: var(--radius-lg);
     background: var(--color-warm-muted);
@@ -379,7 +383,7 @@ const eventsJsonLd = JSON.stringify({
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 
   .speaking-filter-btn {
@@ -413,11 +417,11 @@ const eventsJsonLd = JSON.stringify({
 
   /* Past talks */
   .speaking-past {
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
   }
 
   .speaking-year-group {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
 
   .speaking-year-heading {
@@ -541,6 +545,7 @@ const eventsJsonLd = JSON.stringify({
     border: 1px solid var(--color-border);
     box-shadow: var(--color-card-glow);
     margin-top: 1rem;
+    margin-bottom: 3rem;
   }
 
   @media (min-width: 640px) {

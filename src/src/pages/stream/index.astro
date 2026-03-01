@@ -158,6 +158,10 @@ const badgeLabels: Record<StreamItem['type'], string> = {
       title="Stream"
       subtitle="every article, talk, note, and project in one feed"
       center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Stream' },
+      ]}
     />
 
     {/* Filter Pills */}
@@ -372,7 +376,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
 
   @media (min-width: 768px) {
     .stream-month {
-      margin-bottom: 4rem;
+      margin-bottom: 3rem;
     }
   }
 

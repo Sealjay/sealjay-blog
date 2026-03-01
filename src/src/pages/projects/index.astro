@@ -41,6 +41,10 @@ const latestProject = sortedProjects.reduce((prev, current) =>
       title="Projects"
       subtitle="open source, standards, and side projects"
       center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Projects' },
+      ]}
     />
 
     {/* Featured Projects */}
@@ -422,6 +426,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
   /* Other projects section */
   .projects-other {
     margin-top: 1rem;
+    padding-bottom: 3rem;
   }
 
   .projects-other__heading {

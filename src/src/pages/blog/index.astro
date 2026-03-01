@@ -38,6 +38,10 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
       title="Writing"
       subtitle="on AI, open source, sustainability, and more"
       center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Writing' },
+      ]}
     />
 
     {/* Tag filter bar */}
@@ -332,6 +336,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
     gap: 0.75rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
+    padding-bottom: 3rem;
     border-top: 1px solid var(--color-border);
   }
 

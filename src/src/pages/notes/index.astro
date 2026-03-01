@@ -42,17 +42,17 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
   updatedDate={lastNoteDate}
 >
   <Container>
-    <div class="notes-feed">
-      <PageHeader
-        title="Notes"
-        subtitle="short thoughts, links, and observations"
-        center={false}
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Notes' },
-        ]}
-      />
+    <PageHeader
+      title="Notes"
+      subtitle="short thoughts, links, and observations"
+      center={false}
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Notes' },
+      ]}
+    />
 
+    <div class="notes-feed">
       {/* Timeline */}
       <div class="h-feed notes-timeline">
         {[...notesByDate.entries()].map(([dateKey, dayNotes]) => {
@@ -98,12 +98,18 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                         <span class="note-card__highlight-badge">Highlight</span>
                       )}
                       {note.data.inReplyTo && (
-                        <span class="note-card__reply-indicator" title={`Reply to ${note.data.inReplyTo}`}>
+                        <a
+                          href={note.data.inReplyTo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="note-card__reply-indicator"
+                          title={`Reply to ${note.data.inReplyTo}`}
+                        >
                           <svg xmlns="http://www.w3.org/2000/svg" class="note-card__reply-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                           </svg>
-                          <span aria-label="This note is a reply">reply</span>
-                        </span>
+                          <span>reply</span>
+                        </a>
                       )}
                     </div>
 
@@ -177,7 +183,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 <style>
   /* ── Layout ────────────────────────────────────────────────── */
   .notes-feed {
-    max-width: 560px;
+    max-width: 48rem; /* 768px — readable text column, wider than old 560px */
     margin: 0 auto;
     padding-bottom: 3rem;
   }
@@ -274,9 +280,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    box-shadow:
-      0 1px 3px rgba(79, 70, 229, 0.04),
-      0 4px 16px rgba(79, 70, 229, 0.06);
+    box-shadow: var(--color-card-glow);
     transition:
       border-color var(--duration-normal) var(--ease-out),
       box-shadow var(--duration-normal) var(--ease-out),
@@ -285,9 +289,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 
   .note-card:hover {
     border-color: var(--color-border-strong);
-    box-shadow:
-      0 2px 8px rgba(79, 70, 229, 0.08),
-      0 8px 24px rgba(79, 70, 229, 0.1);
+    box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
     transform: translateY(-1px);
   }
 
@@ -295,7 +297,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
   .note-card::before {
     content: '';
     position: absolute;
-    left: calc(-2.5rem + var(--timeline-x) - 3px + 1rem);
+    left: calc(var(--timeline-x) - 3px);
     top: 1rem;
     width: 6px;
     height: 6px;
@@ -313,6 +315,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
   /* Highlighted notes */
   .note-card--highlight {
     border-left: 3px solid var(--color-warm);
+    padding-left: calc(2.5rem - 3px);
     background: linear-gradient(
       135deg,
       color-mix(in srgb, var(--color-warm) 3%, var(--color-surface)),
@@ -366,6 +369,12 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     gap: 0.25rem;
     font-size: 0.75rem;
     color: var(--color-text-subtle);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .note-card__reply-indicator:hover {
+    color: var(--color-primary);
   }
 
   .note-card__reply-icon {
@@ -501,10 +510,10 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 
     @keyframes dotPulse {
       0%, 100% {
-        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 3px rgba(79, 70, 229, 0.3);
+        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 3px var(--color-primary-muted);
       }
       50% {
-        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 8px rgba(79, 70, 229, 0);
+        box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 8px transparent;
       }
     }
   }
