@@ -1,14 +1,16 @@
 ---
 // Author bio aligned with docs/platform-profiles.md
+import { Image } from 'astro:assets'
+import avatarSrc from '../../assets/chris/avatar.jpg'
 ---
 
 <aside class="author-card" aria-label="About the author">
   <div class="author-card__avatar-wrap">
-    <img
-      src="/chris/avatar.jpg"
+    <Image
+      src={avatarSrc}
       alt="Chris Lloyd-Jones"
-      width="64"
-      height="64"
+      width={64}
+      height={64}
       loading="lazy"
       decoding="async"
       class="author-card__avatar"

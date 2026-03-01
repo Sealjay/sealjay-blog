@@ -259,15 +259,9 @@ const breadcrumbJsonLd = JSON.stringify({
 </PageLayout>
 
 <style>
-  /* Article wrapper: wider on desktop to accommodate ToC sidebar */
+  /* Article wrapper: matches Container max-w-layout (1120px) */
   .article-wrapper {
-    max-width: 960px;
-  }
-
-  @media (min-width: 1024px) {
-    .article-wrapper {
-      max-width: 1040px;
-    }
+    max-width: 1120px;
   }
 
   /* Breadcrumb */
@@ -509,7 +503,7 @@ const breadcrumbJsonLd = JSON.stringify({
 
   @media (min-width: 1024px) {
     .article-grid {
-      grid-template-columns: 1fr 15rem;
+      grid-template-columns: minmax(0, 720px) 15rem;
     }
   }
 
