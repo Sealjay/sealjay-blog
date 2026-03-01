@@ -1,51 +1,83 @@
 ---
-// Modern color palette with accent colors
-const colors = {
-  accent: {
-    light: '#e0e7ff', // accent-100
-    medium: '#a5b4fc', // accent-300
-    dark: '#6366f1',   // accent-500
-  },
-  zinc: {
-    light: '#f4f4f5',  // zinc-100
-    medium: '#e4e4e7', // zinc-200
-    dark: '#d4d4d8',   // zinc-300
-  }
-};
+// Decorative animated SVG wave background for the homepage hero.
+// Uses CSS custom properties from the Indigo Ink design system.
+// Purely decorative — hidden from assistive technology.
 ---
 
-<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-  <div class="w-full h-full relative opacity-20 dark:opacity-15">
-    {/* First wave - lightest accent */}
-    <svg class="absolute w-full h-full animate-[wave1_20s_ease-in-out_infinite]" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path 
-        fill={colors.accent.light} 
-        fill-opacity="0.4"
-        d="M0,160L34.3,165.3C68.6,171,137,181,206,165.3C274.3,149,343,107,411,96C480,85,549,107,617,128C685.7,149,754,171,823,165.3C891.4,160,960,128,1029,117.3C1097.1,107,1166,117,1234,122.7C1302.9,128,1371,128,1406,128L1440,128L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z">
-      </path>
-    </svg>
-    
-    {/* Second wave - medium accent */}
-    <svg class="absolute w-full h-full animate-[wave2_25s_ease-in-out_infinite]" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path 
-        fill={colors.accent.medium} 
-        fill-opacity="0.15"
-        d="M0,224L34.3,213.3C68.6,203,137,181,206,186.7C274.3,192,343,224,411,229.3C480,235,549,213,617,186.7C685.7,160,754,128,823,138.7C891.4,149,960,203,1029,213.3C1097.1,224,1166,192,1234,170.7C1302.9,149,1371,139,1406,133.3L1440,128L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z">
-      </path>
-    </svg>
+<div class="index-waves" aria-hidden="true">
+  {/* First wave — primary colour, gentle drift */}
+  <svg class="index-waves__svg index-waves__svg--1" viewBox="0 0 2880 320" preserveAspectRatio="none">
+    <path
+      d="M0,160L34.3,165.3C68.6,171,137,181,206,165.3C274.3,149,343,107,411,96C480,85,549,107,617,128C685.7,149,754,171,823,165.3C891.4,160,960,128,1029,117.3C1097.1,107,1166,117,1234,122.7C1302.9,128,1371,128,1406,128L1440,128L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"
+    />
+    <path
+      d="M1440,160L1474.3,165.3C1508.6,171,1577,181,1646,165.3C1714.3,149,1783,107,1851,96C1920,85,1989,107,2057,128C2125.7,149,2194,171,2263,165.3C2331.4,160,2400,128,2469,117.3C2537.1,107,2606,117,2674,122.7C2742.9,128,2811,128,2846,128L2880,128L2880,320L2845.7,320C2811.4,320,2743,320,2674,320C2605.7,320,2537,320,2469,320C2400,320,2331,320,2263,320C2194.3,320,2126,320,2057,320C1988.6,320,1920,320,1851,320C1782.9,320,1714,320,1646,320C1577.1,320,1509,320,1474,320L1440,320Z"
+    />
+  </svg>
 
-  </div>
+  {/* Second wave — accent colour, offset timing */}
+  <svg class="index-waves__svg index-waves__svg--2" viewBox="0 0 2880 320" preserveAspectRatio="none">
+    <path
+      d="M0,224L34.3,213.3C68.6,203,137,181,206,186.7C274.3,192,343,224,411,229.3C480,235,549,213,617,186.7C685.7,160,754,128,823,138.7C891.4,149,960,203,1029,213.3C1097.1,224,1166,192,1234,170.7C1302.9,149,1371,139,1406,133.3L1440,128L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"
+    />
+    <path
+      d="M1440,224L1474.3,213.3C1508.6,203,1577,181,1646,186.7C1714.3,192,1783,224,1851,229.3C1920,235,1989,213,2057,186.7C2125.7,160,2194,128,2263,138.7C2331.4,149,2400,203,2469,213.3C2537.1,224,2606,192,2674,170.7C2742.9,149,2811,139,2846,133.3L2880,128L2880,320L2845.7,320C2811.4,320,2743,320,2674,320C2605.7,320,2537,320,2469,320C2400,320,2331,320,2263,320C2194.3,320,2126,320,2057,320C1988.6,320,1920,320,1851,320C1782.9,320,1714,320,1646,320C1577.1,320,1509,320,1474,320L1440,320Z"
+    />
+  </svg>
 </div>
 
 <style>
-  @keyframes wave1 {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+  .index-waves {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
   }
-  
-  @keyframes wave2 {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+
+  .index-waves__svg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
   }
-  
+
+  .index-waves__svg--1 {
+    fill: var(--color-primary);
+    opacity: 0.07;
+    animation: wave-drift-1 25s linear infinite;
+  }
+
+  .index-waves__svg--2 {
+    fill: var(--color-accent);
+    opacity: 0.05;
+    animation: wave-drift-2 30s linear infinite;
+  }
+
+  @keyframes wave-drift-1 {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes wave-drift-2 {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .index-waves__svg {
+      animation-play-state: paused;
+    }
+  }
 </style>
