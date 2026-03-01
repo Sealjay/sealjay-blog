@@ -38,7 +38,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
   <Container>
     <PageHeader
       title="Projects"
-      subtitle="A selection of projects, contributions, and open source work - from international standards and foundation leadership to hands-on engineering."
+      subtitle="open source, standards, and side projects"
       center={false}
     />
 
@@ -288,7 +288,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     gap: 0.25rem;
     border-radius: var(--radius-full);
     padding: 0.25rem 0.625rem;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 600;
     background: var(--color-warm-muted);
@@ -343,7 +343,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     align-items: center;
     border-radius: var(--radius-full);
     padding: 2px 8px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 500;
     background: var(--color-bg-alt);
@@ -379,7 +379,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 500;
     text-decoration: none;

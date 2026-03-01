@@ -26,21 +26,21 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
 ---
 
 <BaseLayout
-  title="Writing on topics from software to society"
-  description="Writing on topics from software to society"
+  title="Writing on AI, open source, sustainability, and more"
+  description="Writing on AI, open source, sustainability, and more"
   pubDateTime={new Date('1 March 2023')}
   updatedDate={lastPostDate}
 >
   <Container>
     <PageHeader
       title="Writing"
-      subtitle="on topics from software to society"
+      subtitle="on AI, open source, sustainability, and more"
       center={false}
     />
 
     {/* Tag filter bar */}
     <nav class="tag-filter-bar" aria-label="Filter by tag">
-      <a href="/blog" class="tag-pill tag-pill--active">All</a>
+      <a href="/blog" class="tag-pill tag-pill--active" aria-current="page">All</a>
       {allTags.map((tag) => {
         const tagSlug = tag.toLowerCase().replace(/\s+/g, '-')
         return (
@@ -105,6 +105,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
   /* Tag filter bar */
   .tag-filter-bar {
     display: flex;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
@@ -132,7 +133,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
     flex-shrink: 0;
     border-radius: var(--radius-full);
     padding: 0.375rem 0.875rem;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.8125rem;
     font-weight: 500;
     text-decoration: none;
@@ -198,7 +199,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
   }
 
   .blog-card:hover {
-    transform: translateX(4px);
+    transform: translateY(-2px);
     border-color: var(--color-border-strong);
     box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
   }

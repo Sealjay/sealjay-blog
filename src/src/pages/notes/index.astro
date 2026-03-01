@@ -45,7 +45,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     <div class="notes-feed">
       <PageHeader
         title="Notes"
-        subtitle="Quick thoughts, links, and things I find interesting."
+        subtitle="short thoughts, links, and observations"
         center={true}
       />
 
@@ -312,7 +312,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
   }
 
   .note-card__time {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: var(--font-code);
     font-size: 0.75rem;
     color: var(--color-text-subtle);
     text-decoration: none;
@@ -328,7 +328,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     align-items: center;
     border-radius: var(--radius-full);
     padding: 2px 8px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 500;
     background: var(--color-warm-muted);
@@ -385,7 +385,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     align-items: center;
     border-radius: var(--radius-full);
     padding: 2px 8px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 500;
     background: var(--color-bg-alt);
@@ -399,7 +399,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     gap: 0.25rem;
     border-radius: var(--radius-full);
     padding: 2px 8px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 500;
     background: var(--color-bg-alt);
