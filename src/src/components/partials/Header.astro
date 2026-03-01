@@ -1,15 +1,17 @@
 ---
+import { Image } from 'astro:assets'
 import { SITE_NAV, SITE_SECONDARY_NAV } from '../../consts'
 import HeaderLink from './HeaderLink.astro'
 import DarkModeToggle from './DarkModeToggle.astro'
 import SearchDialog from './SearchDialog.astro'
+import avatarSrc from '../../assets/chris/avatar.jpg'
 ---
 
 <header class="site-header">
   <div class="header-inner">
     <a href="/" class="logo-link" aria-label="sealjay home">
       <span class="logo-avatar-ring" aria-hidden="true">
-        <img src="/chris/avatar.jpg" alt="" class="logo-avatar" width="24" height="24" loading="eager" />
+        <Image src={avatarSrc} alt="" class="logo-avatar" width={24} height={24} loading="eager" />
       </span>
       <span class="logo-wordmark">sealjay</span>
     </a>
