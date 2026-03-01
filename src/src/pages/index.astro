@@ -39,7 +39,7 @@ const featuredProjects = (() => {
   return [...featured, ...remaining].slice(0, 3)
 })()
 
-// --- Notes day-group data ---
+// --- Notes multi-day group data ---
 const notesByDay = new Map<string, typeof notes>()
 for (const n of notes) {
   const key = new Date(n.data.pubDateTime).toISOString().slice(0, 10)
@@ -48,23 +48,57 @@ for (const n of notes) {
 }
 
 const sortedDayKeys = [...notesByDay.keys()].sort((a, b) => b.localeCompare(a))
-const latestDayKey = sortedDayKeys[0]
-const latestDayNotes = latestDayKey ? notesByDay.get(latestDayKey)! : []
-const sortedLatestDay = [...latestDayNotes].sort(
-  (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
-)
-const latestDaySummary = sortedLatestDay.find((n) => n.data.daySummary)?.data.daySummary
-const latestDayUrl = latestDayKey ? `/notes/${latestDayKey}/` : '/notes'
-const latestDayPreviews = sortedLatestDay.slice(0, 3).map((n) => ({
-  description: n.data.description,
-  title: n.data.title,
-  time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }),
-  url: `/notes/${latestDayKey}/#${n.slug}`,
-}))
+
+// Collect notes from multiple recent days — fill to >=5 previews, max 3 days
+const MAX_DAYS = 3
+const MIN_PREVIEWS = 5
+const PREVIEWS_PER_DAY = 3
+
+interface DayGroup {
+  dateKey: string
+  date: Date
+  daySummary?: string
+  totalCount: number
+  dayUrl: string
+  previews: { description?: string; title?: string; time: string; url: string }[]
+}
+
+const dayGroups: DayGroup[] = []
+let totalPreviews = 0
+
+for (const dayKey of sortedDayKeys) {
+  if (dayGroups.length >= MAX_DAYS && totalPreviews >= MIN_PREVIEWS) break
+  if (dayGroups.length >= MAX_DAYS) break
+
+  const dayNotes = [...notesByDay.get(dayKey)!].sort(
+    (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
+  )
+  const daySummary = dayNotes.find((n) => n.data.daySummary)?.data.daySummary
+  const previews = dayNotes.slice(0, PREVIEWS_PER_DAY).map((n) => ({
+    description: n.data.description,
+    title: n.data.title,
+    time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }),
+    url: `/notes/${dayKey}/#${n.slug}`,
+  }))
+
+  dayGroups.push({
+    dateKey: dayKey,
+    date: new Date(`${dayKey}T00:00:00Z`),
+    daySummary,
+    totalCount: dayNotes.length,
+    dayUrl: `/notes/${dayKey}/`,
+    previews,
+  })
+  totalPreviews += previews.length
+}
+
+const totalNoteCount = dayGroups.reduce((sum, g) => sum + g.totalCount, 0)
+const hasMoreContent = sortedDayKeys.length > dayGroups.length
+  || dayGroups.some((g) => g.totalCount > g.previews.length)
 
 // --- Expertise tags for hero ---
 const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI MVP']
@@ -163,13 +197,11 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   <Section bg="alt" ariaLabel="Latest notes">
     <Container>
       <h2 class="section-title font-heading">Latest Notes</h2>
-      {latestDayKey && sortedLatestDay.length > 0 && (
+      {dayGroups.length > 0 && (
         <LatestNotes
-          date={sortedLatestDay[0].data.pubDateTime}
-          dayUrl={latestDayUrl}
-          daySummary={latestDaySummary}
-          noteCount={sortedLatestDay.length}
-          previews={latestDayPreviews}
+          dayGroups={dayGroups}
+          totalNoteCount={totalNoteCount}
+          hasMoreContent={hasMoreContent}
         />
       )}
     </Container>

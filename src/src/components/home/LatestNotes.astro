@@ -1,6 +1,4 @@
 ---
-import FormattedDate from '../partials/FormattedDate.astro'
-
 interface NotePreview {
   description?: string
   title?: string
@@ -8,29 +6,84 @@ interface NotePreview {
   url: string
 }
 
-interface Props {
+interface DayGroup {
+  dateKey: string
   date: Date
-  dayUrl: string
   daySummary?: string
-  noteCount: number
+  totalCount: number
+  dayUrl: string
   previews: NotePreview[]
 }
 
-const { date, dayUrl, daySummary, noteCount, previews } = Astro.props
-const overflow = noteCount - previews.length
+interface Props {
+  dayGroups: DayGroup[]
+  totalNoteCount: number
+  hasMoreContent?: boolean
+}
+
+const { dayGroups, totalNoteCount, hasMoreContent = false } = Astro.props
 
 /* Truncate content to 140 chars */
 function truncate(text: string, max = 140): string {
   if (text.length <= max) return text
   return `${text.slice(0, max).trimEnd()}\u2026`
 }
+
+/* Format a date as "1 Mar" or "26 Feb" */
+function shortDate(date: Date): string {
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+}
+
+/* Format the header date range */
+function dateRangeLabel(groups: DayGroup[]): string {
+  if (groups.length === 0) return ''
+  const newest = groups[0].date
+  if (groups.length === 1) {
+    return newest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+  }
+  const oldest = groups[groups.length - 1].date
+  const newestYear = newest.toLocaleDateString('en-GB', { year: 'numeric', timeZone: 'UTC' })
+  const oldestFmt = oldest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  const newestFmt = newest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  return `${oldestFmt} \u2013 ${newestFmt} ${newestYear}`
+}
+
+/* First day group's summary (most recent day) */
+const leadSummary = dayGroups[0]?.daySummary
+
+/* Build a flat list of scroll items: separators + cards + overflow indicators */
+interface ScrollSeparator { type: 'separator'; label: string; dayUrl: string }
+interface ScrollCard { type: 'card'; note: NotePreview; index: number }
+interface ScrollOverflow { type: 'overflow'; count: number; dayUrl: string; index: number }
+interface ScrollViewAll { type: 'viewall'; index: number }
+
+type ScrollItem = ScrollSeparator | ScrollCard | ScrollOverflow | ScrollViewAll
+
+interface ScrollSeparatorIndexed extends ScrollSeparator { index: number }
+const scrollItems: (ScrollSeparatorIndexed | ScrollCard | ScrollOverflow | ScrollViewAll)[] = []
+let itemIndex = 0
+
+for (const group of dayGroups) {
+  scrollItems.push({ type: 'separator', label: shortDate(group.date), dayUrl: group.dayUrl, index: itemIndex++ })
+  for (const note of group.previews) {
+    scrollItems.push({ type: 'card', note, index: itemIndex++ })
+  }
+  const overflow = group.totalCount - group.previews.length
+  if (overflow > 0) {
+    scrollItems.push({ type: 'overflow', count: overflow, dayUrl: group.dayUrl, index: itemIndex++ })
+  }
+}
+
+if (hasMoreContent) {
+  scrollItems.push({ type: 'viewall', index: itemIndex++ })
+}
 ---
 
 <div class="notes-strip-wrapper">
   <div class="notes-strip-header">
-    <span class="notes-badge">Notes</span>
+    <span class="notes-badge font-heading">Notes</span>
     <span class="notes-meta">
-      <FormattedDate date={date} /> &middot; {noteCount} {noteCount === 1 ? 'note' : 'notes'}
+      {dateRangeLabel(dayGroups)} &middot; {totalNoteCount} {totalNoteCount === 1 ? 'note' : 'notes'}
     </span>
     <a href="/notes" class="notes-view-all">
       View all notes
@@ -40,25 +93,63 @@ function truncate(text: string, max = 140): string {
     </a>
   </div>
 
-  {daySummary && (
-    <p class="notes-summary">{daySummary}</p>
+  {leadSummary && (
+    <p class="notes-summary">{leadSummary}</p>
   )}
 
   <div class="notes-scroll-container">
-    {previews.map((note) => {
-      const content = note.description || note.title || 'Note'
-      return (
-        <a href={note.url} class="note-card">
-          <span class="note-card__time">{note.time}</span>
-          <span class="note-card__content">{truncate(content)}</span>
-        </a>
-      )
+    {scrollItems.map((item) => {
+      if (item.type === 'separator') {
+        return (
+          <a
+            href={item.dayUrl}
+            class="day-separator note-anim"
+            style={`--anim-index: ${item.index}`}
+            aria-label={`Notes from ${item.label}`}
+          >
+            <span class="day-separator__accent" aria-hidden="true" />
+            <span class="day-separator__label font-heading">{item.label}</span>
+          </a>
+        )
+      }
+      if (item.type === 'card') {
+        const content = item.note.description || item.note.title || 'Note'
+        return (
+          <a
+            href={item.note.url}
+            class="note-card note-anim"
+            style={`--anim-index: ${item.index}`}
+          >
+            <span class="note-card__time font-code">{item.note.time}</span>
+            <span class="note-card__content">{truncate(content)}</span>
+          </a>
+        )
+      }
+      if (item.type === 'overflow') {
+        return (
+          <a
+            href={item.dayUrl}
+            class="note-card note-card--overflow note-anim"
+            style={`--anim-index: ${item.index}`}
+            aria-label={`${item.count} more notes from this day`}
+          >
+            <span class="note-card__overflow-text">+{item.count} more &rarr;</span>
+          </a>
+        )
+      }
+      if (item.type === 'viewall') {
+        return (
+          <a
+            href="/notes"
+            class="note-card note-card--viewall note-anim"
+            style={`--anim-index: ${item.index}`}
+            aria-label="View all notes"
+          >
+            <span class="note-card__overflow-text">View all &rarr;</span>
+          </a>
+        )
+      }
     })}
-    {overflow > 0 && (
-      <a href={dayUrl} class="note-card note-card--overflow">
-        <span class="note-card__content">and {overflow} more &rarr;</span>
-      </a>
-    )}
   </div>
 </div>
 
@@ -121,24 +212,26 @@ function truncate(text: string, max = 140): string {
     margin: 0 0 0.75rem;
   }
 
-  /* Horizontal scroll strip (desktop) */
+  /* ============================================================
+     Horizontal scroll strip
+     ============================================================ */
   .notes-scroll-container {
     position: relative;
     display: flex;
-    gap: var(--space-md);
+    align-items: stretch;
+    gap: var(--space-sm);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 0.25rem;
-    padding-right: 60px;
   }
 
   .notes-scroll-container::-webkit-scrollbar {
     display: none;
   }
 
-  /* Fade gradient on the left edge (visible only when scrolled) */
+  /* Fade gradient on the left edge — visible when scrolled away from start */
   .notes-strip-wrapper::before {
     content: '';
     position: absolute;
@@ -149,10 +242,15 @@ function truncate(text: string, max = 140): string {
     background: linear-gradient(to right, var(--color-bg-alt), transparent);
     z-index: 2;
     pointer-events: none;
-    opacity: 0; /* Only show when scrolled */
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
   }
 
-  /* Fade gradient on the right edge */
+  .notes-strip-wrapper.is-scrolled::before {
+    opacity: 1;
+  }
+
+  /* Fade gradient on the right edge — hidden when scrolled to end */
   .notes-strip-wrapper::after {
     content: '';
     position: absolute;
@@ -163,8 +261,55 @@ function truncate(text: string, max = 140): string {
     background: linear-gradient(to right, transparent, var(--color-bg-alt));
     pointer-events: none;
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
   }
 
+  .notes-strip-wrapper.is-overflowing::after {
+    opacity: 1;
+  }
+
+  /* ============================================================
+     Day separator — slim inline element in the scroll strip
+     ============================================================ */
+  .day-separator {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    max-width: 64px;
+    padding: 0.5rem 0.25rem;
+    text-decoration: none;
+    gap: 0.375rem;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+
+  .day-separator:hover {
+    opacity: 0.75;
+  }
+
+  .day-separator__accent {
+    width: 20px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+  }
+
+  .day-separator__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* ============================================================
+     Note cards
+     ============================================================ */
   .note-card {
     min-width: 280px;
     max-width: 320px;
@@ -179,18 +324,29 @@ function truncate(text: string, max = 140): string {
     padding: 0.75rem 1rem;
     text-decoration: none;
     transition: border-color var(--duration-fast) var(--ease-out),
-                box-shadow var(--duration-fast) var(--ease-out);
+                box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
   }
 
   .note-card:hover {
     border-color: var(--color-border-strong);
     box-shadow: var(--color-card-glow);
+    transform: translateY(-2px);
   }
 
-  .note-card--overflow {
+  .note-card:focus-visible {
+    border-color: var(--color-border-strong);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .note-card--overflow,
+  .note-card--viewall {
     min-width: auto;
+    max-width: none;
     justify-content: center;
     align-items: center;
+    padding: 0.75rem 1.25rem;
   }
 
   .note-card__time {
@@ -209,19 +365,75 @@ function truncate(text: string, max = 140): string {
     -webkit-box-orient: vertical;
   }
 
-  .note-card--overflow .note-card__content {
+  .note-card__overflow-text {
     font-size: 0.75rem;
+    font-weight: 500;
     color: var(--color-primary);
-    display: block;
-    overflow: visible;
-    -webkit-line-clamp: unset;
+    white-space: nowrap;
   }
 
-  /* Mobile: keep horizontal scroll with narrower cards */
+  /* ============================================================
+     Mobile: narrower cards
+     ============================================================ */
   @media (max-width: 767px) {
     .note-card {
       min-width: 220px;
       max-width: 260px;
     }
   }
+
+  /* ============================================================
+     Staggered fade-in-up animation
+     ============================================================ */
+  @media (prefers-reduced-motion: no-preference) {
+    .note-anim {
+      opacity: 0;
+      animation: note-fade-in-up 0.5s var(--ease-out) forwards;
+      animation-delay: calc(var(--anim-index, 0) * 0.07s + 0.1s);
+    }
+
+    @keyframes note-fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .note-anim {
+      opacity: 1;
+    }
+  }
 </style>
+
+<script>
+  function initNotesScroll() {
+    const wrapper = document.querySelector('.notes-strip-wrapper')
+    const container = wrapper?.querySelector('.notes-scroll-container') as HTMLElement | null
+    if (!wrapper || !container) return
+
+    function updateFades() {
+      const hasOverflow = container.scrollWidth > container.clientWidth + 2
+      const atStart = container.scrollLeft <= 2
+      const atEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2
+
+      wrapper.classList.toggle('is-overflowing', hasOverflow && !atEnd)
+      wrapper.classList.toggle('is-scrolled', hasOverflow && !atStart)
+    }
+
+    updateFades()
+    container.addEventListener('scroll', updateFades, { passive: true })
+    window.addEventListener('resize', updateFades)
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNotesScroll)
+  } else {
+    initNotesScroll()
+  }
+</script>
