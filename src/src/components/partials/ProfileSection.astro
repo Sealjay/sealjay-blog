@@ -185,10 +185,20 @@ const {
 
   .profile-section__bio {
     margin-top: 1.5rem;
+    max-width: 65ch;
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.75;
     color: var(--color-text-muted);
+  }
+
+  /* Inter-paragraph spacing for slotted bio content */
+  .profile-section__bio :global(p) {
+    margin-bottom: 1em;
+  }
+
+  .profile-section__bio :global(p:last-child) {
+    margin-bottom: 0;
   }
 
   @media (min-width: 768px) {
