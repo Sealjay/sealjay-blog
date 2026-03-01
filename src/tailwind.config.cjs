@@ -237,8 +237,6 @@ module.exports = {
           // Quotes
           blockquote: {
             paddingLeft: '1.5rem',
-            borderLeftWidth: '2px',
-            borderLeftColor: 'var(--tw-prose-quote-borders)',
             fontStyle: 'italic',
           },
 
