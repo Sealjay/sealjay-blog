@@ -12,9 +12,11 @@ import AuthorCard from "../components/partials/AuthorCard.astro";
 import PostNavigation from "../components/partials/PostNavigation.astro";
 import TableOfContents from "../components/partials/TableOfContents.astro";
 
-type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[] };
+type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[]; body?: string };
 
-const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body } = Astro.props;
+const words = body?.split(/\s+/).length ?? 0;
+const readingTime = Math.max(1, Math.ceil(words / 200));
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Compute slug from the URL pathname for OG image path
@@ -120,10 +122,20 @@ const breadcrumbJsonLd = JSON.stringify({
 
     <!-- Tag badges -->
     {tags && tags.length > 0 && (
-      <div class="article-tags">
-        {tags.map((tag: string) => (
-          <span class="p-category article-tag">{tag}</span>
+      <div class="article-tags" data-tag-count={tags.length}>
+        {tags.slice(0, 3).map((tag: string) => (
+          <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag">{tag}</a>
         ))}
+        {tags.length > 3 && (
+          <>
+            {tags.slice(3).map((tag: string) => (
+              <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag article-tag--collapsed">{tag}</a>
+            ))}
+            <button class="article-tags-toggle" type="button" aria-expanded="false">
+              +{tags.length - 3} more
+            </button>
+          </>
+        )}
       </div>
     )}
 
@@ -152,6 +164,14 @@ const breadcrumbJsonLd = JSON.stringify({
           </span>
         </>
       )}
+
+      <span class="article-meta-sep">&middot;</span>
+      <span class="article-meta-item">
+        <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{readingTime} min read</span>
+      </span>
 
       <span class="article-meta-sep">&middot;</span>
       <span class="article-meta-item">by Chris Lloyd-Jones</span>
@@ -204,9 +224,9 @@ const breadcrumbJsonLd = JSON.stringify({
     <!-- Separator -->
     <hr class="article-separator" />
 
-    <!-- Mobile ToC -->
+    <!-- Mobile ToC (collapsible, shown below 1024px) -->
     {headings && headings.length > 0 && (
-      <TableOfContents headings={headings} />
+      <TableOfContents headings={headings} variant="mobile" />
     )}
 
     <!-- Two-column grid: article + sidebar ToC -->
@@ -215,7 +235,7 @@ const breadcrumbJsonLd = JSON.stringify({
         <slot />
       </div>
       {headings && headings.length > 0 && (
-        <TableOfContents headings={headings} />
+        <TableOfContents headings={headings} variant="desktop" />
       )}
     </div>
 
@@ -251,7 +271,7 @@ const breadcrumbJsonLd = JSON.stringify({
     list-style: none;
     margin: 0;
     padding: 0;
-    font-family: 'Literata', Georgia, serif;
+    font-family: var(--font-body);
     font-size: 0.875rem;
     line-height: 1.65;
   }
@@ -289,17 +309,57 @@ const breadcrumbJsonLd = JSON.stringify({
     background: var(--color-primary-muted);
     color: var(--color-primary);
     border-radius: var(--radius-full);
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.6875rem;
     font-weight: 500;
     line-height: 1;
     letter-spacing: 0.01em;
-    text-transform: capitalize;
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+
+  .article-tag:hover {
+    background: var(--color-primary);
+    color: #fff;
+  }
+
+  .article-tag--collapsed {
+    display: none;
+  }
+
+  .article-tags.expanded .article-tag--collapsed {
+    display: inline-block;
+  }
+
+  .article-tags.expanded .article-tags-toggle {
+    display: none;
+  }
+
+  .article-tags-toggle {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+
+  .article-tags-toggle:hover {
+    background: var(--color-primary-muted);
+    color: var(--color-primary);
   }
 
   /* Article title */
   .article-title {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-weight: 700;
     color: var(--color-text);
     letter-spacing: -0.025em;
@@ -434,3 +494,20 @@ const breadcrumbJsonLd = JSON.stringify({
     }
   }
 </style>
+
+<script>
+  function initTagToggle() {
+    const toggleBtns = document.querySelectorAll<HTMLButtonElement>('.article-tags-toggle')
+    for (const btn of toggleBtns) {
+      btn.addEventListener('click', () => {
+        const container = btn.closest('.article-tags')
+        if (container) {
+          container.classList.add('expanded')
+          btn.setAttribute('aria-expanded', 'true')
+        }
+      })
+    }
+  }
+  initTagToggle()
+  document.addEventListener('astro:page-load', initTagToggle)
+</script>

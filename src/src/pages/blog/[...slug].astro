@@ -19,7 +19,7 @@ const isOld = post.data.pubDateTime < new Date(Date.now() - 31536000000) && (pos
 
 ---
 
-<BlogPost {...post.data} headings={headings}>
+<BlogPost {...post.data} headings={headings} body={post.body}>
 	{isOld ? <BlogPostOld /> : null}
 	<Content />
 </BlogPost>

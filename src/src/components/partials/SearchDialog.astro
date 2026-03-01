@@ -17,11 +17,10 @@
   <dialog
     id="search-dialog"
     class="search-overlay"
-    role="dialog"
     aria-modal="true"
     aria-label="Search"
   >
-    <div class="search-panel" role="document">
+    <div class="search-panel">
       <div class="search-input-wrap">
         <svg xmlns="http://www.w3.org/2000/svg" class="search-input-icon" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -43,18 +42,20 @@
       </div>
 
       <div class="search-divider"></div>
+      <div id="search-status" role="status" aria-live="polite" class="search-status-wrap">
+        <p id="search-empty" class="search-status hidden">
+          No results found.
+        </p>
+        <p id="search-initial" class="search-status">
+          Start typing to search...
+        </p>
+      </div>
       <ul
         id="search-results"
         role="listbox"
         aria-label="Search results"
         class="search-results"
       >
-        <li id="search-empty" class="search-status hidden" role="status">
-          No results found.
-        </li>
-        <li id="search-initial" class="search-status">
-          Start typing to search...
-        </li>
       </ul>
     </div>
   </dialog>
@@ -90,7 +91,7 @@
 
   .search-shortcut {
     display: none;
-    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-code);
     font-size: 11px;
     color: var(--color-text-subtle);
     border: 1px solid var(--color-border);
@@ -182,19 +183,19 @@
     background: var(--color-bg);
     border-radius: var(--radius-md);
     margin: 8px;
-    font-family: var(--font-body, 'Source Serif 4', Georgia, serif);
+    font-family: var(--font-body);
     font-size: 1rem;
     color: var(--color-text);
-    outline: none;
-    transition: box-shadow var(--duration-fast) var(--ease-out);
+    transition: outline-color var(--duration-fast) var(--ease-out);
   }
 
   .search-input::placeholder {
     color: var(--color-text-subtle);
   }
 
-  .search-input:focus {
-    box-shadow: 0 0 0 2px var(--color-primary);
+  .search-input:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   /* Escape key badge */
@@ -208,7 +209,7 @@
     padding: 2px 8px;
     border: 1px solid var(--color-border-strong);
     border-radius: 6px;
-    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-code);
     font-size: 0.6875rem;
     color: var(--color-text-subtle);
     line-height: 1.4;
@@ -243,6 +244,7 @@
     text-align: center;
     font-size: 0.875rem;
     color: var(--color-text-subtle);
+    margin: 0;
   }
 
   .hidden {
@@ -292,6 +294,9 @@
           this.openDialog()
         }
       })
+
+      // Custom event: allow other components (e.g. 404 page) to open search
+      document.addEventListener('open-search', () => this.openDialog())
 
       this.dialog?.addEventListener('click', (e) => {
         if (e.target === this.dialog) this.closeDialog()
@@ -458,7 +463,7 @@
           </a>
         `
 
-        this.resultsList?.insertBefore(li, this.emptyState)
+        this.resultsList?.appendChild(li)
       }
     }
 
@@ -525,7 +530,7 @@
 
   /* Result title */
   .search-result-title {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text);

@@ -33,12 +33,12 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
     <span class="share-btn-text">Bluesky</span>
     <span class="sr-only">(opens in new tab)</span>
   </a>
-  <a class="share-btn share-btn--mastodon" aria-label="Share on Mastodon" role="button" tabindex="0" data-mastodon-url={`${title}\n${url}`}>
+  <button type="button" class="share-btn share-btn--mastodon" aria-label="Share on Mastodon" data-mastodon-url={`${title}\n${url}`}>
     <svg xmlns="http://www.w3.org/2000/svg" class="share-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 00.023-.043v-1.809a.052.052 0 00-.02-.041.053.053 0 00-.046-.01 20.282 20.282 0 01-4.709.545c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 01-.319-1.433.053.053 0 01.066-.054 19.357 19.357 0 004.636.528c.484 0 .968-.008 1.45-.031 2.024-.098 4.17-.29 6.115-.84l.144-.04c2.407-.654 4.503-2.68 4.72-7.094.009-.157.039-1.637.039-1.8 0-.55.18-3.897-.025-5.456z" />
     </svg>
     <span class="share-btn-text">Mastodon</span>
-  </a>
+  </button>
 </div>
 
 <style>
@@ -51,7 +51,7 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
   }
 
   .share-label {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -69,7 +69,7 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     color: var(--color-text-muted);
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.75rem;
     font-weight: 500;
     text-decoration: none;
@@ -98,7 +98,7 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
 </style>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  function initShareButtons() {
     // Copy link button
     const copyBtns = document.querySelectorAll<HTMLButtonElement>('[data-copy-url]')
     for (const btn of copyBtns) {
@@ -126,7 +126,7 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
     }
 
     // Mastodon share — prompt for instance
-    const mastodonBtns = document.querySelectorAll<HTMLElement>('[data-mastodon-url]')
+    const mastodonBtns = document.querySelectorAll<HTMLButtonElement>('[data-mastodon-url]')
     for (const btn of mastodonBtns) {
       btn.addEventListener('click', () => {
         const text = btn.dataset.mastodonUrl ?? ''
@@ -136,12 +136,9 @@ const blueskyUrl = `https://bsky.app/intent/compose?text=${encodedTitle}%20${enc
           window.open(`https://${cleanInstance}/share?text=${encodeURIComponent(text)}`, '_blank', 'noopener')
         }
       })
-      btn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          btn.click()
-        }
-      })
     }
-  })
+  }
+
+  initShareButtons()
+  document.addEventListener('astro:page-load', initShareButtons)
 </script>

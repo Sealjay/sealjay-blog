@@ -13,6 +13,12 @@ import Button from '../components/partials/Button.astro'
       <p class="not-found__code">404</p>
       <h1 class="not-found__message">This page has wandered off</h1>
       <p class="not-found__hint">The page you're looking for doesn't exist or has been moved.</p>
+      <button type="button" class="not-found__search" onclick="document.dispatchEvent(new CustomEvent('open-search'))">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        Search the site
+      </button>
       <Button variant="primary" href="/">Go home</Button>
     </div>
   </Container>
@@ -38,7 +44,7 @@ import Button from '../components/partials/Button.astro'
   }
 
   .not-found__code {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     font-size: 8rem;
     font-weight: 800;
     line-height: 1;
@@ -57,7 +63,7 @@ import Button from '../components/partials/Button.astro'
   }
 
   .not-found__message {
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     font-size: 1.5rem;
     line-height: 1.4;
     color: var(--color-text-muted);
@@ -71,10 +77,37 @@ import Button from '../components/partials/Button.astro'
   }
 
   .not-found__hint {
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.75;
     color: var(--color-text-subtle);
     margin-bottom: 2rem;
+  }
+
+  .not-found__search {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .not-found__search:hover {
+    border-color: var(--color-primary);
+  }
+
+  .not-found__search:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 </style>

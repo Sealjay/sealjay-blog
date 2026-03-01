@@ -184,7 +184,8 @@ import SearchDialog from './SearchDialog.astro'
 
   @media (min-width: 768px) {
     .desktop-nav {
-      display: block;
+      display: flex;
+      align-items: center;
     }
   }
 
@@ -427,7 +428,7 @@ import SearchDialog from './SearchDialog.astro'
 </style>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  function initHeader() {
     const mobileMenuButton = document.getElementById('mobile-menu-button')
     const mobileMenu = document.getElementById('mobile-menu')
     const menuOpenIcon = document.getElementById('menu-open-icon')
@@ -501,7 +502,8 @@ import SearchDialog from './SearchDialog.astro'
         morePanel!.classList.remove('open')
       }
 
-      moreTrigger.addEventListener('click', () => {
+      moreTrigger.addEventListener('click', (e) => {
+        e.stopPropagation()
         const expanded = moreTrigger.getAttribute('aria-expanded') === 'true'
         if (expanded) {
           closeMore()
@@ -551,5 +553,10 @@ import SearchDialog from './SearchDialog.astro'
         }
       })
     }
-  })
+  }
+
+  // Initialize immediately (module scripts run after DOM parsing)
+  initHeader()
+  // Future-proof for View Transitions
+  document.addEventListener('astro:page-load', initHeader)
 </script>

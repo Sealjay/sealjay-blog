@@ -84,11 +84,6 @@
   --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
   --gradient-hero: linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%);
 
-  /* Font stacks */
-  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
-
   color-scheme: dark;
   scrollbar-color: rgba(129, 140, 248, 0.2) transparent;
 }
@@ -106,7 +101,7 @@
   body {
     background: var(--color-bg);
     color: var(--color-text);
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -115,7 +110,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-family: var(--font-heading);
     color: var(--color-text);
     font-weight: 600;
   }
@@ -125,7 +120,7 @@
   }
 
   code, pre, kbd, samp {
-    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-code);
   }
 
   /* Better touch targets for interactive elements */

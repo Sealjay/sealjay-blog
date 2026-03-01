@@ -179,11 +179,7 @@ const hasAny = uniqueMentions.length > 0
       )}
     </div>
   </div>
-) : (
-  <div class="webmentions__empty">
-    No webmentions yet.
-  </div>
-)}
+) : null}
 
 <style>
   .webmentions {
@@ -415,10 +411,4 @@ const hasAny = uniqueMentions.length > 0
     color: var(--color-primary);
   }
 
-  /* Empty state */
-  .webmentions__empty {
-    margin-top: 3rem;
-    color: var(--color-text-subtle);
-    font-size: 0.875rem;
-  }
 </style>

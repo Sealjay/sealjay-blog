@@ -65,6 +65,7 @@ function truncate(text: string, max = 140): string {
 <style>
   .notes-strip-wrapper {
     position: relative;
+    overflow: hidden;
   }
 
   .notes-strip-header {
@@ -130,10 +131,25 @@ function truncate(text: string, max = 140): string {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 0.25rem;
+    padding-right: 60px;
   }
 
   .notes-scroll-container::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Fade gradient on the left edge (visible only when scrolled) */
+  .notes-strip-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    background: linear-gradient(to right, var(--color-bg-alt), transparent);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0; /* Only show when scrolled */
   }
 
   /* Fade gradient on the right edge */
@@ -201,21 +217,11 @@ function truncate(text: string, max = 140): string {
     -webkit-line-clamp: unset;
   }
 
-  /* Mobile: stack vertically */
+  /* Mobile: keep horizontal scroll with narrower cards */
   @media (max-width: 767px) {
-    .notes-scroll-container {
-      flex-direction: column;
-      overflow-x: visible;
-      scroll-snap-type: none;
-    }
-
     .note-card {
-      min-width: 0;
-      max-width: 100%;
-    }
-
-    .notes-strip-wrapper::after {
-      display: none;
+      min-width: 220px;
+      max-width: 260px;
     }
   }
 </style>

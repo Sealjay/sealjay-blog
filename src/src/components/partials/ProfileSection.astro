@@ -22,7 +22,7 @@ const {
 ---
 
 <div class="profile-section">
-  <!-- Image (Mobile: top, Desktop: right) -->
+  <!-- Image (Mobile: top, Desktop: left) -->
   <div class="profile-section__image-col">
     <div class="profile-section__image-wrapper">
       <img
@@ -101,7 +101,6 @@ const {
 
   @media (min-width: 1024px) {
     .profile-section__image-col {
-      order: 1;
       width: 280px;
     }
   }
@@ -186,7 +185,7 @@ const {
 
   .profile-section__bio {
     margin-top: 1.5rem;
-    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.75;
     color: var(--color-text-muted);

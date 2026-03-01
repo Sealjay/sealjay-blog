@@ -18,7 +18,7 @@
 .prose h5,
 .prose h6 {
   color: var(--color-text);
-  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: -0.015em;
   overflow-wrap: break-word;
@@ -134,7 +134,7 @@
 
 /* Code blocks and inline code */
 .prose code {
-  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  font-family: var(--font-code);
   font-size: 0.9em;
   background-color: var(--color-bg-alt);
   padding: 0.2em 0.4em;

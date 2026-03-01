@@ -17,6 +17,7 @@
     <div class="giscus-container">
       <script
         is:inline
+        id="giscus-script"
         src="https://giscus.app/client.js"
         data-repo="Sealjay/sealjay-blog"
         data-repo-id="R_kgDOIFGusQ"
@@ -34,6 +35,17 @@
         crossorigin="anonymous"
         async
       ></script>
+      <script is:inline>
+        (function() {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved === 'dark' || (!saved && prefersDark);
+          var giscusScript = document.getElementById('giscus-script');
+          if (giscusScript) {
+            giscusScript.setAttribute('data-theme', isDark ? 'dark_dimmed' : 'light');
+          }
+        })();
+      </script>
     </div>
   </div>
 </section>
