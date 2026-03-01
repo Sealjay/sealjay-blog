@@ -1,13 +1,14 @@
 ---
 ---
 
-<mode-toggle>
+<mode-toggle style="display: flex;">
   <button
     id="theme-toggle"
     role="switch"
     aria-checked="false"
     aria-label="Switch to dark mode"
     style="
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -24,6 +25,10 @@
   >
     <span id="icon-sun" style="
       position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.3s ease, transform 0.3s ease;
     ">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -40,6 +45,10 @@
     </span>
     <span id="icon-moon" style="
       position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.3s ease, transform 0.3s ease;
     ">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
