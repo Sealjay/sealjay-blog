@@ -218,9 +218,11 @@ const featuredSpeaking = (await getCollection('speaking'))
 </Layout>
 
 <style>
-  /* Section rhythm */
+  /* Section rhythm — override global section padding */
   .kit-section {
-    margin-bottom: 0.75rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 1.5rem;
   }
 
   .kit-section-heading {
@@ -240,7 +242,7 @@ const featuredSpeaking = (await getCollection('speaking'))
   .kit-divider {
     height: 1px;
     background: linear-gradient(to right, transparent, var(--color-border), transparent);
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
   /* Headshot */

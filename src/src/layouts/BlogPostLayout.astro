@@ -102,7 +102,7 @@ const breadcrumbJsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={articleJsonLd} />
   <script type="application/ld+json" set:html={breadcrumbJsonLd} />
   <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" />
-  <article class="h-entry mx-auto max-w-content px-5 md:px-10 my-8 md:my-14">
+  <article class="h-entry mx-auto px-5 md:px-10 my-8 md:my-14 article-wrapper">
     <!-- Hidden microformat markup -->
     <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
     <span class="p-author h-card" style="display:none">
@@ -258,6 +258,17 @@ const breadcrumbJsonLd = JSON.stringify({
 </PageLayout>
 
 <style>
+  /* Article wrapper: wider on desktop to accommodate ToC sidebar */
+  .article-wrapper {
+    max-width: 720px;
+  }
+
+  @media (min-width: 1024px) {
+    .article-wrapper {
+      max-width: 960px;
+    }
+  }
+
   /* Breadcrumb */
   .breadcrumb {
     margin-bottom: 1rem;
