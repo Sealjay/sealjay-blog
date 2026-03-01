@@ -58,9 +58,7 @@ export const TAG_TO_CATEGORY: Record<string, string> = {
   Governance: 'impact-future',
   'Digital Twins': 'impact-future',
   Microsoft: 'impact-future',
-  microsoft: 'impact-future',
   Azure: 'impact-future',
-  azure: 'impact-future',
   'ai-governance': 'impact-future',
 }
 
