@@ -419,6 +419,9 @@ function buildTemplate(input: OGTemplateInput) {
   // Truncate title for display – max ~90 chars to fit comfortably
   const displayTitle = input.title.length > 90 ? `${input.title.substring(0, 87)}...` : input.title
 
+  // Build tag pills from the first few tags (max 4 to avoid overflow)
+  const displayTags = (input.tags ?? []).slice(0, 4)
+
   return {
     type: 'div',
     props: {
@@ -428,12 +431,12 @@ function buildTemplate(input: OGTemplateInput) {
         display: 'flex',
         position: 'relative',
         overflow: 'hidden',
-        // Deep indigo-to-slate gradient background
-        background: 'linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #020617 100%)',
+        // Indigo Ink hero gradient
+        background: 'linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%)',
         fontFamily: 'Bricolage Grotesque, Source Serif 4, sans-serif',
       },
       children: [
-        // Subtle gradient overlay for depth
+        // Subtle radial overlay for depth, keyed to category accent
         {
           type: 'div',
           props: {
@@ -477,44 +480,79 @@ function buildTemplate(input: OGTemplateInput) {
               position: 'relative',
             },
             children: [
-              // Top: Site branding
+              // Top: Category badge + date
               {
                 type: 'div',
                 props: {
                   style: {
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    gap: '16px',
                   },
                   children: [
-                    // Small accent dot as logo stand-in
+                    // Category badge
                     {
                       type: 'div',
                       props: {
                         style: {
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          backgroundColor: category.accent,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '6px 16px',
+                          borderRadius: '9999px',
+                          backgroundColor: `${category.accent}22`,
+                          border: `1px solid ${category.accent}44`,
                         },
+                        children: [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                backgroundColor: category.accent,
+                              },
+                            },
+                          },
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                fontFamily: 'Bricolage Grotesque',
+                                color: category.accent,
+                              },
+                              children: category.name,
+                            },
+                          },
+                        ],
                       },
                     },
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          fontSize: '18px',
-                          fontWeight: 600,
-                          color: '#a5b4fc',
-                          letterSpacing: '0.05em',
+                    // Date (text-muted)
+                    formattedDate
+                      ? {
+                          type: 'div',
+                          props: {
+                            style: {
+                              fontSize: '14px',
+                              fontFamily: 'Source Serif 4',
+                              color: '#9BA3CF',
+                            },
+                            children: formattedDate,
+                          },
+                        }
+                      : {
+                          type: 'div',
+                          props: {
+                            style: { display: 'none' },
+                          },
                         },
-                        children: 'sealjay.com',
-                      },
-                    },
                   ],
                 },
               },
-              // Middle: Title
+              // Middle: Title + tag pills
               {
                 type: 'div',
                 props: {
@@ -525,23 +563,55 @@ function buildTemplate(input: OGTemplateInput) {
                     maxWidth: '900px',
                   },
                   children: [
+                    // Title – Bricolage Grotesque, ~36px, colour #E0E7FF
                     {
                       type: 'div',
                       props: {
                         style: {
                           fontSize: displayTitle.length > 60 ? '36px' : displayTitle.length > 40 ? '42px' : '48px',
                           fontWeight: 700,
-                          color: '#f4f4f5',
+                          fontFamily: 'Bricolage Grotesque',
+                          color: '#E0E7FF',
                           lineHeight: 1.25,
                           letterSpacing: '-0.02em',
                         },
                         children: displayTitle,
                       },
                     },
+                    // Tag pills row
+                    ...(displayTags.length > 0
+                      ? [
+                          {
+                            type: 'div',
+                            props: {
+                              style: {
+                                display: 'flex',
+                                flexWrap: 'wrap' as const,
+                                gap: '8px',
+                              },
+                              children: displayTags.map((tag) => ({
+                                type: 'div',
+                                props: {
+                                  style: {
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    fontFamily: 'Bricolage Grotesque',
+                                    color: '#818CF8',
+                                    backgroundColor: 'rgba(129, 140, 248, 0.15)',
+                                    borderRadius: '9999px',
+                                    padding: '4px 12px',
+                                  },
+                                  children: tag,
+                                },
+                              })),
+                            },
+                          },
+                        ]
+                      : []),
                   ],
                 },
               },
-              // Bottom: Category badge + date + author
+              // Bottom: Author + watermark
               {
                 type: 'div',
                 props: {
@@ -551,86 +621,30 @@ function buildTemplate(input: OGTemplateInput) {
                     justifyContent: 'space-between',
                   },
                   children: [
-                    // Left: category badge + date
-                    {
-                      type: 'div',
-                      props: {
-                        style: {
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '16px',
-                        },
-                        children: [
-                          // Category badge
-                          {
-                            type: 'div',
-                            props: {
-                              style: {
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '6px 16px',
-                                borderRadius: '9999px',
-                                backgroundColor: `${category.accent}22`,
-                                border: `1px solid ${category.accent}44`,
-                              },
-                              children: [
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      width: '8px',
-                                      height: '8px',
-                                      borderRadius: '50%',
-                                      backgroundColor: category.accent,
-                                    },
-                                  },
-                                },
-                                {
-                                  type: 'div',
-                                  props: {
-                                    style: {
-                                      fontSize: '14px',
-                                      fontWeight: 600,
-                                      color: category.accent,
-                                    },
-                                    children: category.name,
-                                  },
-                                },
-                              ],
-                            },
-                          },
-                          // Date
-                          formattedDate
-                            ? {
-                                type: 'div',
-                                props: {
-                                  style: {
-                                    fontSize: '14px',
-                                    color: '#a1a1aa',
-                                  },
-                                  children: formattedDate,
-                                },
-                              }
-                            : {
-                                type: 'div',
-                                props: {
-                                  style: { display: 'none' },
-                                },
-                              },
-                        ],
-                      },
-                    },
-                    // Right: author
+                    // Left: author name (text-muted)
                     {
                       type: 'div',
                       props: {
                         style: {
                           fontSize: '14px',
-                          fontWeight: 500,
-                          color: '#71717a',
+                          fontWeight: 400,
+                          fontFamily: 'Source Serif 4',
+                          color: '#9BA3CF',
                         },
                         children: 'Chris Lloyd-Jones',
+                      },
+                    },
+                    // Right: sealjay.com watermark
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          fontSize: '14px',
+                          fontWeight: 400,
+                          fontFamily: 'Source Serif 4',
+                          color: '#6670A0',
+                        },
+                        children: 'sealjay.com',
                       },
                     },
                   ],
