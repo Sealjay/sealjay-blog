@@ -68,9 +68,17 @@ const eventsJsonLd = JSON.stringify({
   <Container>
     <PageHeader
       title="Speaking"
-      subtitle="I'm passionate about open-source, green software, and Microsoft AI: you can find here previous conference talks, media mentions, and other speaking engagements."
+      subtitle="on open source, green software, and AI"
       center={false}
     />
+    <p class="speaking-kit-toplink">
+      <a href="/speaking/kit" class="speaking-kit-toplink__anchor">
+        View my speaker kit
+        <svg xmlns="http://www.w3.org/2000/svg" class="speaking-kit-toplink__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </p>
 
     {/* Upcoming Talks */}
     {upcomingTalks.length > 0 && (
@@ -191,6 +199,32 @@ const eventsJsonLd = JSON.stringify({
 </Layout>
 
 <style>
+  /* Top speaker kit link */
+  .speaking-kit-toplink {
+    margin-bottom: 2rem;
+  }
+
+  .speaking-kit-toplink__anchor {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .speaking-kit-toplink__anchor:hover {
+    color: var(--color-accent);
+  }
+
+  .speaking-kit-toplink__icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
   /* Upcoming section */
   .speaking-upcoming {
     margin-bottom: 2.5rem;
