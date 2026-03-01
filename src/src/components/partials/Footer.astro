@@ -24,6 +24,7 @@ const feedLinks = SITE_FOOTER_NAV.filter((item) => item.name === 'RSS' || item.n
 
 const moreLinks = [
   ...SITE_SECONDARY_NAV,
+  ...feedLinks,
   ...SITE_FOOTER_NAV.filter((item) => item.name === 'Privacy'),
 ]
 ---
@@ -32,33 +33,17 @@ const moreLinks = [
   <div class="footer-inner">
     <div class="footer-left">
       <a href="/" class="footer-wordmark">sealjay</a>
-      <p class="footer-copyright">
-        &copy; 2018&ndash;{new Date().getFullYear()} Chris Lloyd-Jones
-      </p>
-      <p class="footer-built">
-        Sealjay&reg; is a registered trademark of Chris Lloyd-Jones.
-      </p>
-      <p class="footer-built">
-        Built with Astro, hosted on Azure Static Web Apps.
-      </p>
-
-      {/* Social icon row - compact visual display */}
-      <nav aria-label="Social links" class="footer-social-icons">
-        {socialLinks.map((link) => (
-          <a
-            href={link.url}
-            target="_blank"
-            rel={link.rel ? `${link.rel} noopener noreferrer` : 'noopener noreferrer'}
-            class="footer-social-icon"
-            aria-label={`${link.name} profile`}
-          >
-            {link.icon === 'github' && <GitHub size={18} />}
-            {link.icon === 'linkedin' && <LinkedIn size={18} />}
-            {link.icon === 'mastodon' && <Mastodon size={18} />}
-            {link.icon === 'bluesky' && <Bluesky size={18} />}
-          </a>
-        ))}
-      </nav>
+      <div class="footer-legal">
+        <p class="footer-legal__line">
+          &copy; 2018&ndash;{new Date().getFullYear()} Chris Lloyd-Jones
+        </p>
+        <p class="footer-legal__line">
+          Sealjay&reg; is a registered trademark of Chris Lloyd-Jones.
+        </p>
+        <p class="footer-legal__line">
+          Built with Astro, hosted on Azure Static Web Apps.
+        </p>
+      </div>
     </div>
 
     <div class="footer-right">
@@ -91,15 +76,6 @@ const moreLinks = [
                 {link.name}
               </a>
             </li>
-          ))}
-        </ul>
-      </div>
-
-      <div class="footer-link-group">
-        <h3 class="footer-group-title">Feeds</h3>
-        <ul class="footer-link-list">
-          {feedLinks.map((link) => (
-            <li><a href={link.path} class="footer-link">{link.name}</a></li>
           ))}
         </ul>
       </div>
@@ -149,7 +125,7 @@ const moreLinks = [
   .footer-left {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-md);
   }
 
   .footer-wordmark {
@@ -161,42 +137,17 @@ const moreLinks = [
     line-height: 1.3;
   }
 
-  .footer-copyright,
-  .footer-built {
-    font-size: 0.875rem;
-    color: var(--color-text-subtle);
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  /* Social icon row in left column */
-  .footer-social-icons {
+  .footer-legal {
     display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-top: var(--space-sm);
+    flex-direction: column;
+    gap: 0.125rem;
   }
 
-  .footer-social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-sm);
+  .footer-legal__line {
+    font-size: 0.75rem;
     color: var(--color-text-subtle);
-    transition: color var(--duration-fast) var(--ease-out),
-                background var(--duration-fast) var(--ease-out);
-  }
-
-  .footer-social-icon:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-muted);
-  }
-
-  .footer-social-icon:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    line-height: 1.6;
+    margin: 0;
   }
 
   /* Right column - link groups */
