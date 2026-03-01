@@ -1,13 +1,20 @@
 import { getCollection } from 'astro:content'
-import { youtubeShorts } from '../config/personal'
-import { getShorts } from '../lib/youtube'
+import { getYouTubeSpeakingEntries, extractYouTubeId } from '../lib/youtube'
+import { youtubeFeeds } from '../config/personal'
 
 export async function GET() {
   const blogs = await getCollection('blog')
   const speaking = await getCollection('speaking')
   const notes = await getCollection('note')
   const projects = await getCollection('project')
-  const shorts = await getShorts(youtubeShorts)
+  const youtubeEntries = await getYouTubeSpeakingEntries(youtubeFeeds)
+
+  // YouTube IDs already covered by MDX speaking entries
+  const mdxYouTubeIds = new Set<string>()
+  for (const entry of speaking) {
+    const id = extractYouTubeId(entry.data.url)
+    if (id) mdxYouTubeIds.add(id)
+  }
 
   const searchIndex = [
     ...blogs.map((post) => ({
@@ -24,6 +31,15 @@ export async function GET() {
       url: entry.data.url,
       type: 'speaking' as const,
     })),
+    ...youtubeEntries
+      .filter((yt) => !mdxYouTubeIds.has(yt.youtubeId))
+      .map((yt) => ({
+        title: yt.title,
+        description: yt.description.slice(0, 120) || yt.title,
+        tags: [yt.eventType],
+        url: yt.url,
+        type: 'speaking' as const,
+      })),
     ...notes.map((entry) => ({
       title: entry.data.description?.slice(0, 80) ?? 'Note',
       description: entry.data.description ?? '',
@@ -37,13 +53,6 @@ export async function GET() {
       tags: entry.data.techStack ?? [],
       url: entry.data.repoUrl,
       type: 'project' as const,
-    })),
-    ...shorts.map((short) => ({
-      title: short.title,
-      description: short.description?.slice(0, 120) ?? '',
-      tags: short.tags,
-      url: short.youtubeUrl,
-      type: 'short' as const,
     })),
   ]
 
