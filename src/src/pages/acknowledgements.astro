@@ -1,73 +1,250 @@
 ---
-import Layout from "../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
-import Card from "../components/partials/Card.astro";
+import Layout from '../layouts/BaseLayout.astro'
+import Container from '../components/containers/Container.astro'
+import PageHeader from '../components/partials/PageHeader.astro'
+import { getCollection } from 'astro:content'
 
-const acknowledgements = await getCollection("acknowledgement");
+const acknowledgements = await getCollection('acknowledgement')
 ---
 
 <Layout
   title="Colophon"
   description="The open-source projects, tools, and resources this site is built with"
-  pubDateTime={new Date("11 May 2023")}
-  updatedDate={new Date("17 February 2026")}
+  pubDateTime={new Date('11 May 2023')}
+  updatedDate={new Date('17 February 2026')}
 >
-  <div class="mx-auto max-w-5xl">
-    <!-- Page Header -->
-    <div class="mb-10 md:mb-16">
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
-        <span class="text-gradient">Colophon</span>
-      </h1>
-      <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
-        This site was built using a collection of open source projects, tools, knowledge, and articles. I've tried to cite and reference all of them here. If I'm missing you, please let me know! The <a href="https://github.com/Sealjay/sealjay-blog" target="_blank" rel="noopener noreferrer" class="text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300 underline decoration-teal-500/30 hover:decoration-teal-500/60 transition-colors">source code</a> is available on GitHub.
+  <Container>
+    <PageHeader
+      title="Colophon"
+      subtitle="This site was built using a collection of open source projects, tools, knowledge, and articles. I've tried to cite and reference all of them here. If I'm missing you, please let me know!"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Colophon' },
+      ]}
+      center={false}
+    >
+      <p class="colophon-source-link">
+        The <a href="https://github.com/Sealjay/sealjay-blog" target="_blank" rel="noopener noreferrer">source code</a> is available on GitHub.
       </p>
-    </div>
+    </PageHeader>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="ack-grid">
       {acknowledgements.map((acknowledgement) => (
-        <Card
-          url={acknowledgement.data.url}
-          cta="Visit project"
-          hasHeaderBg={true}
-          compactHeader={true}
-          contentGap="gap-2"
-        >
-          <div class="flex items-center space-x-3" slot="title">
+        <div class="ack-card">
+          <div class="ack-card__header">
             <img
-              class="h-8 w-8"
+              class="ack-card__icon"
               src={`/images/acknowledgements/${acknowledgement.data.image}`}
               alt={acknowledgement.data.title}
             />
-            <span class="font-medium text-zinc-800 dark:text-zinc-100">
+            <span class="ack-card__title">
               {acknowledgement.data.title}
             </span>
           </div>
-          <div class="space-y-1.5">
-            <p class="text-sm text-zinc-600 dark:text-zinc-400">
-              {acknowledgement.data.description}
-            </p>
-            <p class="text-xs text-zinc-500 dark:text-zinc-500">
+          <p class="ack-card__description">
+            {acknowledgement.data.description}
+          </p>
+          {acknowledgement.data.notes && (
+            <p class="ack-card__notes">
               {acknowledgement.data.notes}
             </p>
+          )}
+          <div class="ack-card__footer">
+            <div class="ack-card__licence">
+              <span>Licence:</span>
+              <a href={acknowledgement.data.licenceUrl}>
+                {acknowledgement.data.licence}
+              </a>
+            </div>
+            {acknowledgement.data.url && (
+              <a
+                href={acknowledgement.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="ack-card__link"
+              >
+                Visit project
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            )}
           </div>
-          <div slot="bottom-left" class="flex items-center space-x-1">
-            <span class="text-xs text-zinc-500 dark:text-zinc-400">License:</span>
-            <a
-              href={acknowledgement.data.licenceUrl}
-              class="text-xs text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
-            >
-              {acknowledgement.data.licence}
-            </a>
-          </div>
-        </Card>
+        </div>
       ))}
     </div>
 
-    <!-- Trademark Notice -->
-    <div class="mt-12 md:mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700/40">
-      <p class="text-xs text-zinc-400 dark:text-zinc-500">
-        Sealjay&reg; is a <a href="https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003592625" target="_blank" rel="noopener noreferrer" class="underline decoration-zinc-300 dark:decoration-zinc-600 hover:text-zinc-500 dark:hover:text-zinc-400 transition-colors">registered trademark</a> of Chris Lloyd-Jones.
+    <div class="ack-trademark">
+      <p>
+        Sealjay&reg; is a <a href="https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003592625" target="_blank" rel="noopener noreferrer">registered trademark</a> of Chris Lloyd-Jones.
       </p>
     </div>
-  </div>
+  </Container>
 </Layout>
+
+<style>
+  .colophon-source-link {
+    margin-top: 0.75rem;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+  }
+
+  .colophon-source-link a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .colophon-source-link a:hover {
+    text-decoration: underline;
+  }
+
+  .ack-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .ack-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .ack-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .ack-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--color-card-glow);
+    overflow: hidden;
+    transition: border-color var(--duration-normal) var(--ease-out),
+                transform var(--duration-normal) var(--ease-out);
+  }
+
+  .ack-card:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-2px);
+  }
+
+  .ack-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-bg-alt);
+  }
+
+  .ack-card__icon {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+  }
+
+  .ack-card__title {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+
+  .ack-card__description {
+    padding: 0.75rem 1rem 0;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    flex-grow: 1;
+  }
+
+  .ack-card__notes {
+    padding: 0.25rem 1rem 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-subtle);
+  }
+
+  .ack-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .ack-card__licence {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .ack-card__licence a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .ack-card__licence a:hover {
+    text-decoration: underline;
+  }
+
+  .ack-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .ack-card__link:hover {
+    background: var(--color-primary-muted);
+  }
+
+  .ack-card__link svg {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .ack-card:hover .ack-card__link svg {
+    transform: translateX(4px);
+  }
+
+  .ack-trademark {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .ack-trademark p {
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+  }
+
+  .ack-trademark a {
+    color: var(--color-text-subtle);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .ack-trademark a:hover {
+    color: var(--color-text-muted);
+  }
+</style>

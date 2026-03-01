@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/BaseLayout.astro'
 import Container from '../components/containers/Container.astro'
-import ContentContainer from '../components/containers/ContentContainer.astro'
+import Button from '../components/partials/Button.astro'
 ---
 
 <Layout
@@ -9,26 +9,12 @@ import ContentContainer from '../components/containers/ContentContainer.astro'
   description="The page you're looking for doesn't exist."
 >
   <Container>
-    <ContentContainer maxWidth="max-w-3xl">
-      <div class="text-center py-16">
-        <p class="text-7xl font-bold text-accent-600 dark:text-accent-400 mb-4">404</p>
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-4">
-          Page not found
-        </h1>
-        <p class="text-lg text-zinc-600 dark:text-zinc-400 mb-8">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <a
-          href="/"
-          class="inline-flex items-center gap-2 rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-accent-500 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to home
-        </a>
-      </div>
-    </ContentContainer>
+    <div class="not-found">
+      <p class="not-found__code">404</p>
+      <h1 class="not-found__message">This page has wandered off</h1>
+      <p class="not-found__hint">The page you're looking for doesn't exist or has been moved.</p>
+      <Button variant="primary" href="/">Go home</Button>
+    </div>
   </Container>
 
   <script is:inline>
@@ -39,3 +25,56 @@ import ContentContainer from '../components/containers/ContentContainer.astro'
     })
   </script>
 </Layout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+  }
+
+  .not-found__code {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @media (min-width: 768px) {
+    .not-found__code {
+      font-size: 12rem;
+    }
+  }
+
+  .not-found__message {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .not-found__message {
+      font-size: 1.875rem;
+    }
+  }
+
+  .not-found__hint {
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-subtle);
+    margin-bottom: 2rem;
+  }
+</style>
