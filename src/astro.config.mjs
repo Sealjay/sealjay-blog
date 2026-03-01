@@ -6,6 +6,7 @@ import tailwind from '@astrojs/tailwind'
 import { defineConfig } from 'astro/config'
 import { legacyRedirectSlugs } from './src/data/legacy-redirects'
 import rehypeMvpUrl from './src/plugins/rehype-mvp-url'
+import remarkRewriteImagePaths from './src/plugins/remark-rewrite-image-paths'
 import indigoDark from './src/styles/shiki-indigo-dark.json'
 import indigoLight from './src/styles/shiki-indigo-light.json'
 
@@ -172,6 +173,7 @@ export default defineConfig({
     }),
     tailwind(),
     mdx({
+      remarkPlugins: [remarkRewriteImagePaths],
       rehypePlugins: [rehypeMvpUrl],
     }),
   ],
