@@ -1,31 +1,20 @@
-import { getCollection } from 'astro:content'
+import type { YouTubeFeedConfig } from '../config/personal'
 
-export interface YouTubeShort {
-  youtubeId: string
+export interface YouTubeSpeakingEntry {
   title: string
   description: string
-  published: Date
+  eventType: 'Short' | 'Podcast'
+  event: string
+  date: Date
+  url: string
+  cta: string
+  youtubeId: string
   thumbnailUrl: string
-  youtubeUrl: string
   tags: string[]
-  source: string
 }
 
-interface PlaylistConfig {
-  playlistId: string
-  source: string
-  defaultTags: string[]
-}
-
-/** Module-level cache — feed is fetched once per build */
-let cachedShorts: YouTubeShort[] | null = null
-
-/** Extract hashtags from a YouTube description */
-function extractHashtags(description: string): string[] {
-  const matches = description.match(/#\w+/g)
-  if (!matches) return []
-  return matches.map((tag) => tag.slice(1))
-}
+/** Module-level cache — feeds are fetched once per build */
+let cached: YouTubeSpeakingEntry[] | null = null
 
 /** Decode common XML/HTML entities */
 function decodeEntities(str: string): string {
@@ -38,87 +27,145 @@ function decodeEntities(str: string): string {
     .replace(/&apos;/g, "'")
 }
 
-/** Fetch and parse a single YouTube playlist RSS feed */
-async function fetchPlaylist(config: PlaylistConfig): Promise<YouTubeShort[]> {
-  const feedUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${config.playlistId}`
+/** Extract hashtags from a YouTube description */
+function extractHashtags(description: string): string[] {
+  const matches = description.match(/#\w+/g)
+  if (!matches) return []
+  return matches.map((tag) => tag.slice(1))
+}
 
-  let xml: string
-  try {
-    const res = await fetch(feedUrl)
-    if (!res.ok) {
-      console.warn(`[youtube] Failed to fetch playlist ${config.playlistId}: ${res.status}`)
-      return []
-    }
-    xml = await res.text()
-  } catch (err) {
-    console.warn(`[youtube] Network error fetching playlist ${config.playlistId}:`, err)
-    return []
-  }
-
-  const shorts: YouTubeShort[] = []
+/** Parse video entries from YouTube RSS XML */
+function parseVideoEntries(xml: string): Array<{
+  youtubeId: string
+  title: string
+  description: string
+  published: string
+  thumbnailUrl: string
+}> {
+  const entries: Array<{
+    youtubeId: string
+    title: string
+    description: string
+    published: string
+    thumbnailUrl: string
+  }> = []
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g
 
   for (const match of xml.matchAll(entryRegex)) {
     const block = match[1]
-
     const youtubeId = block.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1] ?? ''
-    const title = decodeEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? '')
-    const published = block.match(/<published>(.*?)<\/published>/)?.[1] ?? ''
-    const description = decodeEntities(block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? '')
-    const thumbnailUrl =
-      block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ?? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`
-
     if (!youtubeId) continue
 
-    const hashtags = extractHashtags(description)
-    const tags = [...new Set([...config.defaultTags, ...hashtags])]
-
-    shorts.push({
+    entries.push({
       youtubeId,
-      title,
-      description,
-      published: new Date(published),
-      thumbnailUrl,
-      youtubeUrl: `https://www.youtube.com/watch?v=${youtubeId}`,
-      tags,
-      source: config.source,
+      title: decodeEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''),
+      description: decodeEntities(
+        block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? '',
+      ),
+      published: block.match(/<published>(.*?)<\/published>/)?.[1] ?? '',
+      thumbnailUrl:
+        block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ??
+        `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
     })
   }
 
-  return shorts
+  return entries
 }
 
-/** Get all shorts, merging RSS data with optional content collection overrides */
-export async function getShorts(playlists: PlaylistConfig[]): Promise<YouTubeShort[]> {
-  if (cachedShorts) return cachedShorts
-
-  const allShorts: YouTubeShort[] = []
-  for (const playlist of playlists) {
-    const items = await fetchPlaylist(playlist)
-    allShorts.push(...items)
-  }
-
-  // Merge content collection overrides
-  const overrides: Map<string, Record<string, unknown>> = new Map()
+/** Fetch XML from a YouTube RSS feed URL, returning empty string on failure */
+async function fetchFeed(url: string, label: string): Promise<string> {
   try {
-    const shortCollection = await getCollection('short')
-    for (const entry of shortCollection) {
-      overrides.set(entry.data.youtubeId, entry.data)
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.warn(`[youtube] Failed to fetch ${label}: ${res.status}`)
+      return ''
     }
-  } catch {
-    // Collection may not exist yet or be empty — that's fine
+    return await res.text()
+  } catch (err) {
+    console.warn(`[youtube] Network error fetching ${label}:`, err)
+    return ''
   }
+}
 
-  for (const short of allShorts) {
-    const override = overrides.get(short.youtubeId)
-    if (!override) continue
-    if (override.title) short.title = override.title as string
-    if (override.tags) short.tags = [...new Set([...short.tags, ...(override.tags as string[])])]
+/** Fetch all YouTube channel videos and classify as Short or Podcast */
+export async function getYouTubeSpeakingEntries(
+  feeds: YouTubeFeedConfig[],
+): Promise<YouTubeSpeakingEntry[]> {
+  if (cached) return cached
+
+  const allEntries: YouTubeSpeakingEntry[] = []
+
+  for (const feed of feeds) {
+    // Fetch channel feed and shorts playlist in parallel
+    const [channelXml, shortsXml] = await Promise.all([
+      fetchFeed(
+        `https://www.youtube.com/feeds/videos.xml?channel_id=${feed.channelId}`,
+        `channel ${feed.channelId}`,
+      ),
+      feed.shortsPlaylistId
+        ? fetchFeed(
+            `https://www.youtube.com/feeds/videos.xml?playlist_id=${feed.shortsPlaylistId}`,
+            `shorts playlist ${feed.shortsPlaylistId}`,
+          )
+        : Promise.resolve(''),
+    ])
+
+    if (!channelXml) continue
+
+    // Build set of short video IDs
+    const shortIds = new Set<string>()
+    if (shortsXml) {
+      for (const entry of parseVideoEntries(shortsXml)) {
+        shortIds.add(entry.youtubeId)
+      }
+    }
+
+    // Parse all channel videos and classify
+    for (const video of parseVideoEntries(channelXml)) {
+      const isShort = shortIds.has(video.youtubeId)
+      const hashtags = extractHashtags(video.description)
+      const tags = [
+        ...new Set([
+          ...feed.defaultTags,
+          ...(isShort ? ['Shorts'] : ['Podcast']),
+          ...hashtags,
+        ]),
+      ]
+
+      allEntries.push({
+        title: video.title,
+        description: video.description,
+        eventType: isShort ? 'Short' : 'Podcast',
+        event: feed.event,
+        date: new Date(video.published),
+        url: isShort
+          ? `https://www.youtube.com/shorts/${video.youtubeId}`
+          : `https://www.youtube.com/watch?v=${video.youtubeId}`,
+        cta: isShort ? 'Watch short' : 'Watch episode',
+        youtubeId: video.youtubeId,
+        thumbnailUrl: video.thumbnailUrl,
+        tags,
+      })
+    }
   }
 
   // Sort newest first
-  allShorts.sort((a, b) => b.published.valueOf() - a.published.valueOf())
+  allEntries.sort((a, b) => b.date.valueOf() - a.date.valueOf())
 
-  cachedShorts = allShorts
-  return allShorts
+  cached = allEntries
+  return allEntries
+}
+
+/** Extract YouTube video ID from a URL (watch, shorts, or youtu.be) */
+export function extractYouTubeId(url: string): string | null {
+  const patterns = [
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]+)/,
+    /youtube\.com\/watch\?v=([A-Za-z0-9_-]+)/,
+    /youtu\.be\/([A-Za-z0-9_-]+)/,
+  ]
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match) return match[1]
+  }
+  return null
 }

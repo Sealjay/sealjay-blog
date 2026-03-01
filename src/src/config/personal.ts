@@ -84,11 +84,14 @@ export const formerRoles: Badge[] = [
 // Export all badges together
 export const allBadges = [...professionalBadges, ...formerRoles]
 
-// YouTube Shorts playlists fetched at build time
-export const youtubeShorts = [
+// YouTube channel feeds auto-populated as speaking entries at build time
+export const youtubeFeeds = [
   {
-    playlistId: 'PLo9Ah7HeyG1Rkqq0cc1QJtttkywXKWd9g',
-    source: 'Securing the Realm',
-    defaultTags: ['YouTube', 'Shorts', 'Security'],
+    channelId: 'UCS4KTDaZTiyiMj2yZztwmlg',
+    shortsPlaylistId: 'PLo9Ah7HeyG1Rkqq0cc1QJtttkywXKWd9g',
+    event: 'Securing the Realm',
+    defaultTags: ['YouTube', 'Security'],
   },
 ]
+
+export type YouTubeFeedConfig = (typeof youtubeFeeds)[number]
