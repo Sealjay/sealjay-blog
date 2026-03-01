@@ -2,42 +2,21 @@
 import BaseHead from "../components/partials/BaseHead.astro";
 import Header from "../components/partials/Header.astro";
 import Footer from "../components/partials/Footer.astro";
-import Container from "../components/containers/Container.astro";
-import Waves from "../components/partials/IndexWaves.astro";
 
 const { title, description, pubDateTime, updatedDate, heroImage, image, ogType, tags, noindex } = Astro.props;
 ---
 
-<html class="[height:100%] antialiased" lang="en-GB">
+<html lang="en-GB">
   <head>
     <BaseHead title={title} description={description} image={image} ogType={ogType} pubDate={pubDateTime} tags={tags} noindex={noindex} />
   </head>
-  <body class="flex min-h-full flex-col bg-zinc-50 dark:bg-black">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 focus:rounded-lg focus:bg-accent-600 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg">
-      Skip to main content
-    </a>
-    <Waves />
-    <div class="relative flex min-h-full w-full flex-col justify-between">
-      <div class="w-full px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8">
-        <div class="mx-auto max-w-6xl">
-          <div
-            class="w-full bg-white/90 backdrop-blur-md ring-1 ring-zinc-100 dark:bg-zinc-900/80 dark:ring-zinc-300/20 rounded-2xl shadow-xl"
-          >
-            <div class="relative overflow-x-hidden">
-              <Header />
-              <main id="main-content" class="min-h-[60vh]">
-                <Container>
-                  <div class="my-6 md:my-10">
-                    <slot />
-                  </div>
-                </Container>
-              </main>
-              <Footer />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <body style="background: var(--color-bg); color: var(--color-text); font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <Header />
+    <main id="main-content" style="flex: 1;">
+      <slot />
+    </main>
+    <Footer />
     <script>
       // Fix for mobile viewport height issues with iOS Safari
       function setVH() {
