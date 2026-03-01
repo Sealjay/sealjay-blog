@@ -130,6 +130,7 @@ module.exports = {
       },
       maxWidth: {
         content: '720px',
+        article: '960px',
         layout: '1120px',
       },
       transitionTimingFunction: {
@@ -180,7 +181,7 @@ module.exports = {
           h2: {
             fontSize: '1.5rem',
             lineHeight: '1.75rem',
-            marginTop: '5rem',
+            marginTop: '2.5rem',
             marginBottom: '1.5rem',
           },
           h3: {
@@ -236,8 +237,6 @@ module.exports = {
           // Quotes
           blockquote: {
             paddingLeft: '1.5rem',
-            borderLeftWidth: '2px',
-            borderLeftColor: 'var(--tw-prose-quote-borders)',
             fontStyle: 'italic',
           },
 

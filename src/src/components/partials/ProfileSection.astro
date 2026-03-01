@@ -91,7 +91,7 @@ const {
   @media (min-width: 1024px) {
     .profile-section {
       flex-direction: row;
-      gap: 40px;
+      gap: 2.5rem;
     }
   }
 
@@ -161,7 +161,7 @@ const {
   .profile-section__role-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 12px;
+    padding: 0.25rem 0.75rem;
     border-radius: var(--radius-full);
     font-size: 0.875rem;
     font-weight: 500;
@@ -185,10 +185,20 @@ const {
 
   .profile-section__bio {
     margin-top: 1.5rem;
+    max-width: 65ch;
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.75;
     color: var(--color-text-muted);
+  }
+
+  /* Inter-paragraph spacing for slotted bio content */
+  .profile-section__bio :global(p) {
+    margin-bottom: 1em;
+  }
+
+  .profile-section__bio :global(p:last-child) {
+    margin-bottom: 0;
   }
 
   @media (min-width: 768px) {
