@@ -1,81 +1,120 @@
 ---
 import Layout from '../layouts/BaseLayout.astro'
 import Container from '../components/containers/Container.astro'
-import ContentContainer from '../components/containers/ContentContainer.astro'
 import PageHeader from '../components/partials/PageHeader.astro'
 ---
 
 <Layout
   title="Privacy Policy"
-  description="A short overview of how any data you have will be processed."
+  description="How I handle your data on sealjay.com — kept short because there is very little to report."
   pubDateTime={new Date('1 March 2019')}
   updatedDate={new Date('1 March 2026')}
 >
   <Container>
-    <ContentContainer>
-      <PageHeader
-        title="Privacy Policy"
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Privacy' },
-        ]}
-        center={false}
-      />
+    <PageHeader
+      title="Privacy Policy"
+      breadcrumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Privacy' },
+      ]}
+      center={false}
+    />
 
-      <div class="privacy-content">
-        <p>
-          Your privacy is important to me. Sealjay&#174; is a registered trademark,
-          trading name and pseudonym of Chris Lloyd-Jones. My policy is to respect
-          your privacy regarding any information I may collect from you across the
-          website, https://www.sealjay.com, other subdomains, and sites I own and
-          operate.
-        </p>
-        <p>
-          You can contact me via X (formerly Twitter) or LinkedIn to request any updates,
-          corrections, or changes. Factual information will be corrected and
-          attributed (with a note made.) Non-factual information including opinions
-          will be added and attributed at discretion. Defamatory information will not
-          be published.
-        </p>
-        <p>
-          All information provided is on a best-efforts basis, and corrections can be
-          made if incorrect information is identified.
-        </p>
-        <p>
-          I only ask for personal information when I need it to provide a service to
-          you. I collect it by fair and lawful means, with your knowledge and consent.
-          I also let you know why I am collecting it and how it will be used.
-        </p>
-        <p>
-          I only retain collected information for as long as necessary to provide you
-          with your requested service. What data I store, I'll protect within
-          commercially acceptable means to prevent loss and theft, as well as
-          unauthorised access, disclosure, copying, use or modification.
-        </p>
-        <p>
-          I don&rsquo;t share any personally identifying information publicly or with
-          third-parties, except when required to by law.
-        </p>
-        <p>
-          My website may link to external sites that are not operated by me. Please be
-          aware that I have no control over the content and practices of these sites,
-          and I cannot accept responsibility or liability for their respective privacy
-          policies.
-        </p>
-        <p>
-          You are free to refuse any request for your personal information, with the
-          understanding that I may be unable to provide you with some of your desired
-          services.
-        </p>
-        <p>
-          Your continued use of my website will be regarded as acceptance of my
-          practices around privacy and personal information. If you have any questions
-          about how I handle user data and personal information, feel free to contact
-          me.
-        </p>
-        <p>This policy is effective as of 13 March 2019, last updated 31 March 2025.</p>
-      </div>
-    </ContentContainer>
+    <article class="privacy-content">
+      <p>
+        I am Chris Lloyd-Jones, also known online as Sealjay. This policy explains how I handle
+        any personal information when you visit sealjay.com and its subdomains. The short
+        version: I collect very little, I do not use cookies, and I do not track you.
+      </p>
+
+      <h2>What I collect</h2>
+      <p>
+        This site does not have user accounts, login forms, or contact forms. I do not
+        ask for or store your personal information directly. The site does not set any
+        cookies.
+      </p>
+      <p>
+        A theme preference (light or dark mode) is saved in your browser's session
+        storage. This stays on your device and is never sent to any server.
+      </p>
+
+      <h2>Analytics</h2>
+      <p>
+        I use <a href="https://plausible.io" target="_blank" rel="noopener noreferrer">Plausible Analytics</a>
+        to understand how the site is used. Plausible is a privacy-focused service that does
+        not use cookies, does not collect personal data, and cannot identify individual
+        visitors. It works by creating a daily hash from your IP address and browser
+        information, which is rotated every 24 hours and cannot be used to track you across
+        days. All analytics data is processed and stored in the EU (Hetzner, Germany).
+      </p>
+
+      <h2>Comments</h2>
+      <p>
+        Blog posts use <a href="https://giscus.app" target="_blank" rel="noopener noreferrer">Giscus</a>,
+        a commenting system powered by GitHub Discussions. When a page with comments loads,
+        your browser makes requests to giscus.app (hosted on Vercel) and the GitHub API to
+        display existing comments. This means your IP address and browser information are
+        sent to those services, even if you do not interact with the comment section.
+      </p>
+      <p>
+        If you choose to log in and leave a comment, you authenticate directly with GitHub
+        using their OAuth process. Your GitHub profile information and comment content are
+        then handled by GitHub under their own
+        <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener noreferrer">privacy statement</a>.
+        Giscus does not set cookies, but stores an authentication token in your browser's
+        local storage if you log in.
+      </p>
+
+      <h2>Hosting</h2>
+      <p>
+        The site is hosted on Microsoft Azure Static Web Apps. I have not enabled any
+        server-side monitoring or logging, so no visitor data (such as IP addresses or
+        request logs) is collected or stored by the hosting platform.
+      </p>
+
+      <h2>External links</h2>
+      <p>
+        I link to other websites from time to time. Once you leave sealjay.com, those sites'
+        own privacy policies apply. I am not responsible for how they handle your information.
+      </p>
+
+      <h2>Lawful basis</h2>
+      <p>
+        Where any personal data is processed (for example, IP addresses reaching third-party
+        services listed above), the lawful basis under UK GDPR is <strong>legitimate
+        interests</strong> (Article 6(1)(f)) &mdash; specifically, the interest in operating
+        and improving this website. I do not rely on consent for any processing that happens
+        automatically when you visit the site.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        Under UK data protection law, you have the right to:
+      </p>
+      <ul>
+        <li>ask what personal data I hold about you (right of access)</li>
+        <li>ask me to correct inaccurate data (right to rectification)</li>
+        <li>ask me to delete your data (right to erasure)</li>
+        <li>ask me to restrict how I use your data (right to restriction)</li>
+        <li>object to my processing of your data (right to object)</li>
+        <li>receive your data in a portable format (right to data portability)</li>
+      </ul>
+      <p>
+        In practice, because this site collects very little personal data, most of these
+        rights are unlikely to apply. But if you have a concern, please get in touch.
+      </p>
+      <h2>Get in touch</h2>
+      <p>
+        If you have questions about this policy or want to exercise any of your data rights,
+        you can reach me on
+        <a href="https://uk.linkedin.com/in/chrislloydjones" target="_blank" rel="noopener noreferrer">LinkedIn</a> or
+        <a href="https://fosstodon.org/@sealjay" target="_blank" rel="me noopener noreferrer">Mastodon</a>.
+      </p>
+
+      <p class="privacy-meta">
+        This policy was first published on 13 March 2019 and last updated on 1 March 2026.
+      </p>
+    </article>
   </Container>
 </Layout>
 
@@ -87,11 +126,45 @@ import PageHeader from '../components/partials/PageHeader.astro'
     color: var(--color-text-muted);
   }
 
+  .privacy-content h2 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
   .privacy-content p {
     margin-bottom: 1.25rem;
   }
 
-  .privacy-content p:last-child {
-    margin-bottom: 0;
+  .privacy-content ul {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+  }
+
+  .privacy-content li {
+    margin-bottom: 0.375rem;
+  }
+
+  .privacy-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+
+  .privacy-content a:hover {
+    text-decoration-color: var(--color-primary);
+  }
+
+  .privacy-meta {
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
   }
 </style>

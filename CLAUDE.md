@@ -89,6 +89,13 @@ Content uses Astro's content collections with frontmatter schemas defined in `sr
 - JSON: no trailing commas
 - Lints only files matching: `src/**/*.ts`, `src/**/*.js`, `src/**/*.json`, `*.json`, `*.js`, `*.cjs`, `*.mjs`
 
+## Privacy and third-party dependencies
+
+- **Self-host where possible.** Fonts, scripts, and assets should be served from the site itself rather than external CDNs. This avoids sending visitor IP addresses to third parties. Fonts are self-hosted via Fontsource (not Google Fonts CDN).
+- **Minimise third-party service dependencies.** Before adding a new external service that runs in visitors' browsers, consider the privacy implications. Prefer services that don't collect personal data (e.g. Plausible over Google Analytics).
+- **Update the privacy policy** (`src/src/pages/privacy.astro`) whenever a third-party service is added, removed, or changed. The policy lists each user-facing service and what data flows to it. Also update the `updatedDate` in the page frontmatter and the date in the body text.
+- **Update the CSP header** in `src/public/staticwebapp.config.json` when adding or removing external service domains.
+
 ## Conventions
 
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `docs:`)
