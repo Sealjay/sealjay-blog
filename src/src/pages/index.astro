@@ -13,7 +13,6 @@ import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
 import { currentRole } from '../config/personal'
-import avatar from '../assets/chris/avatar.jpg'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -77,7 +76,6 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   description="AI transformation, green software, and open source — Chris Lloyd-Jones (Sealjay), VP at Kyndryl and 6x Microsoft AI MVP"
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2026')}
-  heroImage={avatar.src}
 >
   <!-- Hero Section -->
   <div class="hero-section">

@@ -119,5 +119,3 @@ export const contactCta = {
     'Interested in having Chris speak at your event? Get in touch to discuss topics, formats, and availability.',
   url: 'https://uk.linkedin.com/in/chrislloydjones',
 }
-
-export const headshot = '/chris/avatar.jpg'
