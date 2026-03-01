@@ -1,5 +1,5 @@
 ---
-import { SITE_NAV } from '../../consts'
+import { SITE_NAV, SITE_SECONDARY_NAV } from '../../consts'
 import HeaderLink from './HeaderLink.astro'
 import DarkModeToggle from './DarkModeToggle.astro'
 import SearchDialog from './SearchDialog.astro'
@@ -8,7 +8,9 @@ import SearchDialog from './SearchDialog.astro'
 <header class="site-header">
   <div class="header-inner">
     <a href="/" class="logo-link" aria-label="sealjay home">
-      <span class="logo-mark" aria-hidden="true">S</span>
+      <span class="logo-avatar-ring" aria-hidden="true">
+        <img src="/chris/avatar.jpg" alt="" class="logo-avatar" width="24" height="24" loading="eager" />
+      </span>
       <span class="logo-wordmark">sealjay</span>
     </a>
 
@@ -23,6 +25,25 @@ import SearchDialog from './SearchDialog.astro'
             ))
           }
         </ul>
+        <div class="more-dropdown">
+          <button
+            type="button"
+            class="more-trigger"
+            aria-haspopup="true"
+            aria-expanded="false"
+            id="more-menu-trigger"
+          >
+            More
+            <svg xmlns="http://www.w3.org/2000/svg" class="more-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="more-panel" id="more-menu-panel" role="menu">
+            {SITE_SECONDARY_NAV.map((item) => (
+              <a href={item.path} class="more-panel__link" role="menuitem">{item.name}</a>
+            ))}
+          </div>
+        </div>
       </nav>
 
       <div class="header-actions">
@@ -67,6 +88,21 @@ import SearchDialog from './SearchDialog.astro'
             </li>
           ))
         }
+        {
+          SITE_SECONDARY_NAV.map((navitem, index) => (
+            <li style={`--stagger: ${SITE_NAV.length + index}`}>
+              <a
+                href={navitem.path}
+                class:list={[
+                  'mobile-nav-link mobile-nav-link--secondary',
+                  { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
+                ]}
+              >
+                {navitem.name}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   </div>
@@ -87,7 +123,7 @@ import SearchDialog from './SearchDialog.astro'
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 1280px;
+    max-width: 1120px;
     margin: 0 auto;
     padding: 0 16px;
     height: 60px;
@@ -102,19 +138,23 @@ import SearchDialog from './SearchDialog.astro'
     flex-shrink: 0;
   }
 
-  .logo-mark {
+  .logo-avatar-ring {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     background: linear-gradient(135deg, var(--color-primary), #818cf8);
-    color: #fff;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 1;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .logo-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   .logo-wordmark {
@@ -155,6 +195,107 @@ import SearchDialog from './SearchDialog.astro'
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* More dropdown */
+  .more-dropdown {
+    position: relative;
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .more-dropdown {
+      display: block;
+    }
+  }
+
+  .more-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
+  }
+
+  .more-trigger:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .more-trigger[aria-expanded="true"] {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .more-trigger[aria-expanded="true"] .more-chevron {
+    transform: rotate(180deg);
+  }
+
+  .more-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 160px;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--color-card-glow), 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 50;
+  }
+
+  .more-panel.open {
+    display: block;
+  }
+
+  .more-panel__link {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
+  }
+
+  .more-panel__link:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  .more-panel__link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  /* Secondary mobile nav items */
+  .mobile-nav-link--secondary {
+    font-size: 14px;
+    color: var(--color-text-subtle);
   }
 
   /* Header actions (search + dark mode) */
@@ -213,13 +354,14 @@ import SearchDialog from './SearchDialog.astro'
   .mobile-overlay {
     display: none;
     position: fixed;
-    top: 60px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 99;
     background: var(--color-bg);
     padding: 16px;
+    padding-top: 76px;
     overflow-y: auto;
   }
 
@@ -340,6 +482,72 @@ import SearchDialog from './SearchDialog.astro'
         if (event.key === 'Escape' && mobileMenuButton.getAttribute('aria-expanded') === 'true') {
           closeMenu()
           mobileMenuButton.focus()
+        }
+      })
+    }
+
+    // More dropdown
+    const moreTrigger = document.getElementById('more-menu-trigger')
+    const morePanel = document.getElementById('more-menu-panel')
+
+    if (moreTrigger && morePanel) {
+      function openMore() {
+        moreTrigger!.setAttribute('aria-expanded', 'true')
+        morePanel!.classList.add('open')
+      }
+
+      function closeMore() {
+        moreTrigger!.setAttribute('aria-expanded', 'false')
+        morePanel!.classList.remove('open')
+      }
+
+      moreTrigger.addEventListener('click', () => {
+        const expanded = moreTrigger.getAttribute('aria-expanded') === 'true'
+        if (expanded) {
+          closeMore()
+        } else {
+          openMore()
+        }
+      })
+
+      document.addEventListener('click', (event) => {
+        if (
+          moreTrigger.getAttribute('aria-expanded') === 'true' &&
+          !moreTrigger.contains(event.target as Node) &&
+          !morePanel.contains(event.target as Node)
+        ) {
+          closeMore()
+        }
+      })
+
+      moreTrigger.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          openMore()
+          const firstLink = morePanel.querySelector<HTMLAnchorElement>('.more-panel__link')
+          firstLink?.focus()
+        }
+      })
+
+      morePanel.addEventListener('keydown', (event) => {
+        const links = Array.from(morePanel.querySelectorAll<HTMLAnchorElement>('.more-panel__link'))
+        const currentIndex = links.indexOf(document.activeElement as HTMLAnchorElement)
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          const next = links[currentIndex + 1] || links[0]
+          next?.focus()
+        } else if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          if (currentIndex <= 0) {
+            closeMore()
+            moreTrigger.focus()
+          } else {
+            links[currentIndex - 1]?.focus()
+          }
+        } else if (event.key === 'Escape') {
+          closeMore()
+          moreTrigger.focus()
         }
       })
     }
