@@ -43,7 +43,7 @@ async function loadState() {
 
 async function saveState(state) {
   await mkdir(DATA_DIR, { recursive: true })
-  await writeFile(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8')
+  await writeFile(STATE_FILE, `${JSON.stringify(state, null, 2)}\n`, 'utf-8')
 }
 
 // --- Mastodon API ---

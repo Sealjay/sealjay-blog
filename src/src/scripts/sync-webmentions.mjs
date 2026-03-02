@@ -133,7 +133,7 @@ async function main() {
   console.log(`  Total webmentions after merge: ${totalCount}`)
 
   await mkdir(join(__dirname, '..', 'data'), { recursive: true })
-  await writeFile(DATA_FILE, JSON.stringify(merged, null, 2), 'utf-8')
+  await writeFile(DATA_FILE, `${JSON.stringify(merged, null, 2)}\n`, 'utf-8')
   console.log(`  Saved to ${DATA_FILE}`)
 }
 

@@ -105,7 +105,7 @@ async function loadTracking() {
 
 async function saveTracking(data) {
   await mkdir(join(__dirname, '..', 'data'), { recursive: true })
-  await writeFile(TRACKING_FILE, JSON.stringify(data, null, 2), 'utf-8')
+  await writeFile(TRACKING_FILE, `${JSON.stringify(data, null, 2)}\n`, 'utf-8')
 }
 
 async function main() {

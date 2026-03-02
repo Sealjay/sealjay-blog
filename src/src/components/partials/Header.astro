@@ -70,45 +70,46 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
       </button>
     </div>
   </div>
-
-  <!-- Mobile menu overlay -->
-  <div class="mobile-overlay" id="mobile-menu" aria-label="Mobile navigation">
-    <nav role="navigation" aria-label="Mobile navigation">
-      <ul class="mobile-nav-list">
-        {
-          SITE_NAV.map((navitem, index) => (
-            <li style={`--stagger: ${index}`}>
-              <a
-                href={navitem.path}
-                class:list={[
-                  'mobile-nav-link',
-                  { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
-                ]}
-              >
-                {navitem.name}
-              </a>
-            </li>
-          ))
-        }
-        {
-          SITE_SECONDARY_NAV.map((navitem, index) => (
-            <li style={`--stagger: ${SITE_NAV.length + index}`}>
-              <a
-                href={navitem.path}
-                class:list={[
-                  'mobile-nav-link mobile-nav-link--secondary',
-                  { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
-                ]}
-              >
-                {navitem.name}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </div>
 </header>
+
+<!-- Mobile menu overlay – must live outside <header> because its
+     backdrop-filter creates a containing block that breaks position:fixed -->
+<div class="mobile-overlay" id="mobile-menu" aria-label="Mobile navigation">
+  <nav role="navigation" aria-label="Mobile navigation">
+    <ul class="mobile-nav-list">
+      {
+        SITE_NAV.map((navitem, index) => (
+          <li style={`--stagger: ${index}`}>
+            <a
+              href={navitem.path}
+              class:list={[
+                'mobile-nav-link',
+                { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
+              ]}
+            >
+              {navitem.name}
+            </a>
+          </li>
+        ))
+      }
+      {
+        SITE_SECONDARY_NAV.map((navitem, index) => (
+          <li style={`--stagger: ${SITE_NAV.length + index}`}>
+            <a
+              href={navitem.path}
+              class:list={[
+                'mobile-nav-link mobile-nav-link--secondary',
+                { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
+              ]}
+            >
+              {navitem.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
 
 <style>
   .site-header {
