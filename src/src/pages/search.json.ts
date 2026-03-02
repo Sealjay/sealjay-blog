@@ -19,7 +19,8 @@ export async function GET() {
   const staticPages = [
     {
       title: 'About',
-      description: 'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, doctoral researcher, open source contributor.',
+      description:
+        'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, doctoral researcher, open source contributor.',
       tags: ['about', 'bio', 'background'],
       url: '/about/',
       type: 'page' as const,
