@@ -1,5 +1,21 @@
 import { defineCollection, z } from 'astro:content'
 
+const authorSchema = z.object({
+  name: z.string(),
+  title: z.string().optional(),
+  bio: z.string().optional(),
+  url: z.string().url().optional(),
+  avatar: z.string().optional(),
+  social: z
+    .object({
+      github: z.string().optional(),
+      linkedin: z.string().url().optional(),
+      mastodon: z.string().url().optional(),
+      bluesky: z.string().url().optional(),
+    })
+    .optional(),
+})
+
 const blog = defineCollection({
   schema: ({ image }) =>
     z.object({
@@ -18,6 +34,7 @@ const blog = defineCollection({
       sourceUrl: z.string().url().optional(),
       featured: z.boolean().default(false),
       inReplyTo: z.string().url().optional(),
+      additionalAuthors: z.array(authorSchema).optional(),
     }),
 })
 
