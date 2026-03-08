@@ -16,7 +16,7 @@ import { getTagStyle } from "../lib/tag-categories";
 
 type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[]; body?: string };
 
-const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body, additionalAuthors } = Astro.props;
 const words = body?.split(/\s+/).length ?? 0;
 const readingTime = Math.max(1, Math.ceil(words / 200));
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -40,6 +40,12 @@ const nextPost = currentIndex > 0
   ? { slug: allPosts[currentIndex - 1].slug, title: allPosts[currentIndex - 1].data.title }
   : undefined;
 
+const chrisAuthor = { "@type": "Person" as const, "name": "Chris Lloyd-Jones", "url": "https://sealjay.com" };
+const coAuthors = additionalAuthors?.map((a: { name: string; url?: string }) => ({
+  "@type": "Person" as const, "name": a.name, ...(a.url ? { "url": a.url } : {}),
+})) ?? [];
+const articleAuthors = coAuthors.length > 0 ? [...coAuthors, chrisAuthor] : [chrisAuthor];
+
 const articleJsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Article",
@@ -48,11 +54,7 @@ const articleJsonLd = JSON.stringify({
   "image": new URL(ogImagePath, Astro.site).href,
   "datePublished": pubDateTime?.toISOString(),
   "dateModified": updatedDate?.toISOString() || pubDateTime?.toISOString(),
-  "author": {
-    "@type": "Person",
-    "name": "Chris Lloyd-Jones",
-    "url": "https://sealjay.com"
-  },
+  "author": articleAuthors.length === 1 ? articleAuthors[0] : articleAuthors,
   "publisher": {
     "@type": "Person",
     "name": "Chris Lloyd-Jones",
@@ -107,6 +109,11 @@ const breadcrumbJsonLd = JSON.stringify({
   <article class="h-entry mx-auto px-5 md:px-10 pt-3 md:pt-6 mb-8 md:mb-14 article-wrapper">
     <!-- Hidden microformat markup -->
     <a class="u-url" href={canonicalURL.href} style="display:none">{title}</a>
+    {additionalAuthors?.map((a: { name: string; url?: string }) => (
+      <span class="p-author h-card" style="display:none">
+        <a class="u-url p-name" href={a.url ?? '#'}>{a.name}</a>
+      </span>
+    ))}
     <span class="p-author h-card" style="display:none">
       <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>
     </span>
@@ -174,7 +181,16 @@ const breadcrumbJsonLd = JSON.stringify({
       </span>
 
       <span class="article-meta-sep">&middot;</span>
-      <span class="article-meta-item">by Chris Lloyd-Jones</span>
+      <span class="article-meta-item">
+        by {additionalAuthors && additionalAuthors.length > 0
+          ? <>
+              {additionalAuthors.map((a: { name: string; url?: string }) => (
+                <>{a.url ? <a href={a.url} target="_blank" rel="noopener noreferrer" class="article-meta-author-link">{a.name}</a> : a.name}{' & '}</>
+              ))}
+              Chris Lloyd-Jones
+            </>
+          : 'Chris Lloyd-Jones'}
+      </span>
     </div>
 
     <!-- Hero image -->
@@ -240,7 +256,10 @@ const breadcrumbJsonLd = JSON.stringify({
       )}
     </div>
 
-    <!-- Author -->
+    <!-- Author(s) -->
+    {additionalAuthors?.map((a: { name: string; title?: string; bio?: string; url?: string; avatar?: string; social?: { github?: string; linkedin?: string; mastodon?: string; bluesky?: string } }) => (
+      <AuthorCard author={a} />
+    ))}
     <AuthorCard />
 
     <!-- Post navigation -->
@@ -420,6 +439,17 @@ const breadcrumbJsonLd = JSON.stringify({
 
   .article-meta-sep {
     color: var(--color-text-subtle);
+  }
+
+  .article-meta-author-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .article-meta-author-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
   }
 
   /* Hero image */
