@@ -1,0 +1,149 @@
+---
+title: "Compliance Is Just Rules: The Company as a Codebase"
+description: "The compliance side of running a company is highly rule-based — filing deadlines, approval thresholds, document templates. Once you model it that way, you can automate the mechanical parts and focus on the decisions that actually need judgment. This is composable software, taken to a logical conclusion: the company as a codebase, with compliance as infrastructure."
+pubDateTime: "2026-03-09T22:03:42.000Z"
+tags: ["AI", "How To", "TypeScript"]
+---
+
+> Infrastructure as code. Policy as code. Security as code. The pattern keeps expanding - the influencer statement of 'X as Code' really can be taken to that level: define rules declaratively, and a system can enforce them consistently. I've started applying the same pattern to something less obvious - running a company.
+
+I've been working on two small companies, side projects to house my technology tinkering whilst providing a bit of legal separation. The ongoing compliance work — filing deadlines, approval thresholds, board minutes.. it was a bigger overhead than I expected, but not dissimilar from policies and procedures we obey at work. This compliance work is almost entirely rule-based. Input: incorporation date. Output: confirmation statement due date. Pure functions. The same pattern repeats across every obligation: dates and thresholds in, documents and deadlines out.
+
+I have a legal background (and background is the right word, I've been out of the space since 2016 or arguably earlier), so I recognised the shape of the problem, as a rules system. I used to talk about law as the flipside of politics, and the guardrails for the way we live our lives. But it's also a system of rules that can be modelled, automated, and composed — just like any other software system.
+
+I've built a compliance system using Claude Code, Git, and open-source tooling. The specifics are for the legal system of England and Wales, but the pattern applies anywhere companies have to file things on time and keep records.
+
+## The rules
+
+If you run a company in the UK, you deal with several regulators. Companies House holds the public register of your company's details, directors, shareholders, and filings. HMRC handles tax. The ICO handles data protection registration. Each imposes its own set of recurring obligations, and each has its own set of dates and thresholds.
+
+Your annual confirmation statement — a check-in with Companies House — is due 12 months after incorporation, plus 14 days grace. Annual accounts are due within 9 months of your year-end. Corporation tax and VAT returns follow similar annual or quarterly timelines. Data protection registration needs annual renewal.
+
+None of this is ambiguous, and the laws are published - so the problem isn't that any individual rule is hard — it's that there are a lot of them, they interact across multiple companies, and missing these rules carries escalating penalties.
+
+This is the deterministic layer. It's maybe 30% of what running a company actually involves — the rest is judgment calls, commercial decisions, and interpretation. But it's the 30% that generates late-filing penalties, so you have to be on top of it.
+
+Beyond deadlines, there are rules about transactions. If a company lends money to one of its own directors, you are required to have shareholder approval - even if you are the shareholder, the board, and the person undertaking work for the company. You're basically wearing many different hats. Bear in mind, I'm simplifying - and this isn't legal advice, there are many scenarios [so get your own laweyer!]
+
+As well as the rules, and the hats you have to wear, there's the paperwork you generate in these hats. The legal system expects you to keep a formal record... generally for ten years! And your accountant or solicitor will probably expect the documents to state the legal basis for the decision, the amount, purpose, interest terms, repayment terms, and a note about disclosure in the annual accounts. It's a template with parameters, not creative writing.
+
+## The composed company
+
+I started with a practical problem: two companies, each with a dozen recurring obligations, and a growing sense that tracking them in my head wasn't going to scale. The "composed company" structure came from asking what a software system would look like if the domain happened to be corporate governance.
+
+Each company is a directory with a config file as its single source of truth. Deadlines are functions over that config. Documents are templates with parameters. Filings are tagged commits. Add a new company and you add a new directory with a new config — the deadline calculator, the document generator, and the filing workflow all pick it up automatically. Same separation of concerns you'd apply to any service architecture.
+
+I built a private Git repo with this structure. Here's what a company config looks like — this is the source of truth that everything else reads from:
+
+```yaml
+# config.yaml (anonymised)
+company:
+  name: "Example Ltd"
+  number: "12345678"
+  jurisdiction:
+    country: "GB"
+    subdivision: "EAW"
+    registrar: "companies-house"
+  incorporation_date: "2025-12-08"
+
+# Annual check-in with the company register
+confirmation_statement:
+  last_made_up_to: null
+  last_filed_date: null
+
+# Financial accounts
+accounts:
+  reference_date:
+    day: 31
+    month: 12
+  first_period_end: "2026-12-31"
+
+# Data protection registration
+ico:
+  registration_required: true
+  registered: false
+
+# Money owed between the director and the company
+director_loans:
+  current_balance: 0.00
+```
+
+Bun scripts calculate every deadline deterministically from these configs. The helper functions (`addMonths`, `addDays`, `status`, `daysBetween`, and `TODAY`) are utilities in the repo — here's the confirmation statement calculator to show the pattern:
+
+```typescript
+function calculateConfirmationStatement(config: CompanyConfig): Deadline {
+  // Base date: last filing, or incorporation if never filed
+  const baseDate = config.confirmation_statement.last_made_up_to
+    ? new Date(config.confirmation_statement.last_made_up_to)
+    : new Date(config.company.incorporation_date)
+
+  // Due: 12 months + 14 days grace
+  const reviewDate = addMonths(baseDate, 12)
+  const dueDate = addDays(reviewDate, 14)
+
+  return {
+    company: config.company.name,
+    type: 'confirmation-statement',
+    due_date: dueDate.toISOString().split('T')[0],
+    status: status(dueDate),        // returns 'overdue' | 'due-soon' | 'ok'
+    days_remaining: daysBetween(TODAY, dueDate),
+  }
+}
+```
+
+Every other deadline follows the same pattern — a function that reads the config and returns a due date, a status, and a description. The accounts deadline, the tax payment deadline, the VAT return deadline — each is a separate function over the same interface.
+
+These functions encode the current rules. When statute changes — and it does; a tax charge on director loans, for instance - the functions need updating. That's a maintenance burden, but it's a small and predictable one compared to manually tracking deadlines across multiple companies.
+
+Pandoc and Typst render board minutes, dividend vouchers (the paperwork you need when distributing profits to shareholders), and shareholder resolutions to PDF from markdown templates. Git tags mark every filing event (`example-company/confirmation-statement/2026-12-22`), so the compliance history is searchable with `git tag -l`. Claude Code skills encode the compliance logic as guided workflows:
+
+```markdown
+# Record Director Loan (Claude Code skill, trimmed)
+
+1. Ask which company
+2. Ask the transaction details
+3. If company is lending to director and amount > £10,000:
+   - Warn that shareholder approval is required
+   - Generate a shareholder resolution as well as board minutes
+4. Run the director loan tracker script
+5. Generate board minutes from template
+6. Stage, commit, and tag
+```
+
+The dividend skill does something similar — generates minutes, per-shareholder vouchers, commits and tags, then reminds me to record the payment in the accounts and flag the personal tax implications.
+
+Each layer does one thing. The config stores state. The deadline calculator reads that state and produces outputs. The document generator takes parameters and renders PDFs. The filing workflow commits, tags, and logs. Everything runs from the repo.
+
+A caveat worth stating: the system handles the *when* and the *what format*, not the *what*. Your accounts still need to comply with FRS 102. Your board minutes still need to evidence proper consideration of directors' duties under s.172. The system reminds you and generates the scaffolding — the substance is still yours.
+
+And the system is only as good as its inputs. If a director is appointed and nobody updates the config, or a loan is made informally and never recorded, the deadline calculator will happily report that everything's fine. Building the habit of updating the repo whenever something changes — a new appointment, a change of registered office, a transaction — is the real discipline. The system can remind you of deadlines, but it can't know about events you don't record.
+
+## Governance as infrastructure
+
+I've written about a related pattern on [Securing the Realm](https://securing.quest) - governance at the transport layer rather than bolted on afterwards. Company compliance works the same way. The governance layer isn't a separate process; it's infrastructure embedded in the repo from the start. In both cases, the value depends on how much of the rule system is deterministic. And in both cases, the interesting question is the same: how far can you push automation before you actually need human judgment?
+
+## When the inputs aren't deterministic
+
+The system handles the mechanical parts - rules with clear inputs and defined outputs. But companies don't run on deterministic inputs alone.
+
+Contract reviews need interpretation. Board decisions weigh competing priorities. Tax planning requires judgment about circumstances that haven't happened yet. This is where the rules-as-code framing hits its limits.
+
+I'm not suggesting you point an LLM at your accounts and ask it to file your tax return. But if you're already modelling the deterministic layer in code, how you handle the non-deterministic layer is worth thinking about. [Microsoft Foundry](https://learn.microsoft.com/azure/ai-foundry/what-is-foundry?WT.mc_id=AI-MVP-5004204) provides content safety filters, grounding detection, and evaluation tooling that can assess unstructured inputs - contract clauses, regulatory guidance - before they feed into a decision. Layered with transport-level policies, the pattern holds: deterministic rules in code, non-deterministic inputs reviewed with guardrails, human judgment reserved for what actually needs it.
+
+*Full disclosure: I'm a [Microsoft MVP](https://mvp.microsoft.com?WT.mc_id=AI-MVP-5004204) - I have early access to some of these tools, but I'm not paid by Microsoft.*
+
+## You don't need TypeScript for this
+
+I built this in code because that's what I reach for. But the principle doesn't require it. [Claude Cowork](https://claude.com/blog/cowork-research-preview) and [Copilot Cowork](https://www.microsoft.com/en-us/microsoft-365/blog/2026/03/09/copilot-cowork-a-new-way-of-getting-work-done/?WT.mc_id=AI-MVP-5004204) can maintain structured documents, track deadlines, and generate templated records from a conversation. The interface is different; the pattern is the same.
+
+## Where this goes next
+
+The composed architecture means new capabilities plug in as modules rather than rewrites. Not all at equal distance.
+
+**Near-term: live register reconciliation.** The UK's [Companies House public API](https://developer.company-information.service.gov.uk/) exposes company details, director appointments, and filing history as structured JSON. A reconciliation module could pull the live register nightly and diff it against the local config - flagging mismatched appointment dates, changed registered offices, or filings that appear on the register but haven't been logged locally. The API is well-documented and the diffing logic is simple.
+
+**Further out: personal tax integration and multi-jurisdiction support.** The director loan ledger and dividend records already contain most of what feeds a personal tax return, and the type system already models US entities. But each is a substantial project in its own right - personal tax means understanding the full self-assessment system, and multi-jurisdiction support means implementing the compliance regime of every target jurisdiction. Delaware alone has its own arithmetic (annual report and franchise tax due by 1 March for corporations, calculated using either the authorised shares method or the assumed par value capital method). These are on the list, but they're not "plug in a module" tasks.
+
+---
+
+Nothing in this post is legal, financial, or tax advice or guidance - it's intended to be a technology blog only. I have a legal background, but I haven't been in the field since 2016, and arugably earlier. The examples are from UK company law and apply to UK private companies (primarily in England and Wales) - you should never rely on this, and always seek your own advice. This system is a record-keeping and reminder tool. It doesn't replace an accountant, solicitor, or company secretary. *tl;dr - don't rely on this blog for any form of advice, no liability is accepted!*
