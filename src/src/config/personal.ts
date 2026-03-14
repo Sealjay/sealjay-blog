@@ -33,6 +33,10 @@ export const professionalBadges: Badge[] = [
     text: 'Contributor, ISO/IEC 21031:2024',
   },
   {
+    text: 'OpenUK Data Centre Group Lead',
+    url: 'https://openuk.uk/datacentregroup/',
+  },
+  {
     text: 'OpenUK Ambassador',
     url: 'https://openuk.uk/',
   },
