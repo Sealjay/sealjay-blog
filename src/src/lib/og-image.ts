@@ -134,7 +134,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'circuits': {
       // Circles connected by lines – tech/AI feel
       for (let i = 0; i < count; i++) {
-        const x = seededRandom(seed, i * 3) * 500 + 700
+        const x = seededRandom(seed, i * 3) * 300 + 880
         const y = seededRandom(seed, i * 3 + 1) * 500 + 60
         const size = 8 + seededRandom(seed, i * 3 + 2) * 24
         elements.push({
@@ -148,14 +148,14 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               height: `${size}px`,
               borderRadius: '50%',
               border: `2px solid ${accent}`,
-              opacity: 0.15 + seededRandom(seed, i + 100) * 0.15,
+              opacity: 0.12 + seededRandom(seed, i + 100) * 0.1,
             },
           },
         })
       }
       // Connecting lines
       for (let i = 0; i < 6; i++) {
-        const x = seededRandom(seed, i * 5 + 50) * 400 + 750
+        const x = seededRandom(seed, i * 5 + 50) * 250 + 900
         const y = seededRandom(seed, i * 5 + 51) * 400 + 100
         const w = 60 + seededRandom(seed, i * 5 + 52) * 120
         const rotation = seededRandom(seed, i * 5 + 53) * 360
@@ -169,7 +169,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               width: `${w}px`,
               height: '2px',
               backgroundColor: accent,
-              opacity: 0.08,
+              opacity: 0.06,
               transform: `rotate(${rotation}deg)`,
             },
           },
@@ -186,13 +186,13 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
           props: {
             style: {
               position: 'absolute',
-              right: `${-size / 3}px`,
-              bottom: `${-size / 3 + seededRandom(seed, i) * 40}px`,
+              right: `${-size / 2}px`,
+              bottom: `${-size / 2 + seededRandom(seed, i) * 40}px`,
               width: `${size}px`,
               height: `${size}px`,
               borderRadius: '50%',
               border: `2px solid ${accent}`,
-              opacity: 0.08 + (8 - i) * 0.02,
+              opacity: 0.06 + (8 - i) * 0.015,
             },
           },
         })
@@ -202,7 +202,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'shield': {
       // Diamond/shield shapes – security feel
       for (let i = 0; i < count; i++) {
-        const x = seededRandom(seed, i * 4) * 450 + 720
+        const x = seededRandom(seed, i * 4) * 280 + 880
         const y = seededRandom(seed, i * 4 + 1) * 450 + 80
         const size = 16 + seededRandom(seed, i * 4 + 2) * 40
         elements.push({
@@ -215,7 +215,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               width: `${size}px`,
               height: `${size}px`,
               backgroundColor: accent,
-              opacity: 0.06 + seededRandom(seed, i + 200) * 0.1,
+              opacity: 0.05 + seededRandom(seed, i + 200) * 0.08,
               transform: 'rotate(45deg)',
               borderRadius: '4px',
             },
@@ -227,7 +227,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'diagonal': {
       // Diagonal stripes – dynamic/event feel
       for (let i = 0; i < 10; i++) {
-        const x = 650 + i * 55
+        const x = 850 + i * 35
         elements.push({
           type: 'div',
           props: {
@@ -238,7 +238,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               width: '3px',
               height: '700px',
               backgroundColor: accent,
-              opacity: 0.06 + seededRandom(seed, i + 300) * 0.08,
+              opacity: 0.05 + seededRandom(seed, i + 300) * 0.06,
               transform: `rotate(${25 + seededRandom(seed, i) * 10}deg)`,
             },
           },
@@ -249,7 +249,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'brackets': {
       // Code bracket shapes – developer feel
       for (let i = 0; i < 8; i++) {
-        const x = seededRandom(seed, i * 6) * 400 + 750
+        const x = seededRandom(seed, i * 6) * 250 + 900
         const y = seededRandom(seed, i * 6 + 1) * 400 + 80
         const size = 20 + seededRandom(seed, i * 6 + 2) * 30
         const isLeft = i % 2 === 0
@@ -267,7 +267,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               borderTop: `3px solid ${accent}`,
               borderBottom: `3px solid ${accent}`,
               borderRadius: isLeft ? '6px 0 0 6px' : '0 6px 6px 0',
-              opacity: 0.1 + seededRandom(seed, i + 400) * 0.1,
+              opacity: 0.08 + seededRandom(seed, i + 400) * 0.08,
             },
           },
         })
@@ -277,7 +277,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'hexagons': {
       // Hexagon-ish shapes (rounded squares rotated) – open source / community feel
       for (let i = 0; i < count; i++) {
-        const x = seededRandom(seed, i * 7) * 450 + 700
+        const x = seededRandom(seed, i * 7) * 280 + 880
         const y = seededRandom(seed, i * 7 + 1) * 450 + 60
         const size = 20 + seededRandom(seed, i * 7 + 2) * 35
         elements.push({
@@ -291,7 +291,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               height: `${size}px`,
               border: `2px solid ${accent}`,
               borderRadius: `${size * 0.25}px`,
-              opacity: 0.1 + seededRandom(seed, i + 500) * 0.12,
+              opacity: 0.08 + seededRandom(seed, i + 500) * 0.08,
               transform: `rotate(${30 + seededRandom(seed, i) * 30}deg)`,
             },
           },
@@ -302,7 +302,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     case 'arrows': {
       // Upward chevrons – impact/future/progress feel
       for (let i = 0; i < 8; i++) {
-        const x = seededRandom(seed, i * 8) * 400 + 750
+        const x = seededRandom(seed, i * 8) * 250 + 900
         const y = seededRandom(seed, i * 8 + 1) * 400 + 100
         const size = 18 + seededRandom(seed, i * 8 + 2) * 28
         elements.push({
@@ -316,7 +316,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               height: `${size}px`,
               borderTop: `3px solid ${accent}`,
               borderRight: `3px solid ${accent}`,
-              opacity: 0.1 + seededRandom(seed, i + 600) * 0.12,
+              opacity: 0.08 + seededRandom(seed, i + 600) * 0.08,
               transform: `rotate(-45deg)`,
             },
           },
@@ -327,7 +327,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
     default: {
       // Subtle dot grid – general/neutral
       for (let i = 0; i < 20; i++) {
-        const x = seededRandom(seed, i * 2) * 480 + 700
+        const x = seededRandom(seed, i * 2) * 280 + 880
         const y = seededRandom(seed, i * 2 + 1) * 520 + 50
         const size = 4 + seededRandom(seed, i * 2 + 2) * 10
         elements.push({
@@ -341,7 +341,7 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
               height: `${size}px`,
               borderRadius: '50%',
               backgroundColor: accent,
-              opacity: 0.06 + seededRandom(seed, i + 700) * 0.08,
+              opacity: 0.05 + seededRandom(seed, i + 700) * 0.06,
             },
           },
         })
@@ -377,11 +377,11 @@ function buildTemplate(input: OGTemplateInput) {
       })
     : ''
 
-  // Truncate title for display – max ~90 chars to fit comfortably
-  const displayTitle = input.title.length > 90 ? `${input.title.substring(0, 87)}...` : input.title
+  // Show full title – scale font size down for longer titles to avoid truncation
+  const displayTitle = input.title
 
-  // Build tag pills from the first few tags (max 4 to avoid overflow)
-  const displayTags = (input.tags ?? []).slice(0, 4)
+  // Build tag pills from the first few tags (max 3 to avoid clutter)
+  const displayTags = (input.tags ?? []).slice(0, 3)
 
   return {
     type: 'div',
@@ -458,8 +458,8 @@ function buildTemplate(input: OGTemplateInput) {
                         style: {
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '8px',
-                          padding: '6px 16px',
+                          gap: '10px',
+                          padding: '8px 20px',
                           borderRadius: '9999px',
                           backgroundColor: `${category.accent}22`,
                           border: `1px solid ${category.accent}44`,
@@ -469,8 +469,8 @@ function buildTemplate(input: OGTemplateInput) {
                             type: 'div',
                             props: {
                               style: {
-                                width: '8px',
-                                height: '8px',
+                                width: '12px',
+                                height: '12px',
                                 borderRadius: '50%',
                                 backgroundColor: category.accent,
                               },
@@ -480,7 +480,7 @@ function buildTemplate(input: OGTemplateInput) {
                             type: 'div',
                             props: {
                               style: {
-                                fontSize: '14px',
+                                fontSize: '20px',
                                 fontWeight: 600,
                                 fontFamily: 'Bricolage Grotesque',
                                 color: category.accent,
@@ -497,7 +497,7 @@ function buildTemplate(input: OGTemplateInput) {
                           type: 'div',
                           props: {
                             style: {
-                              fontSize: '14px',
+                              fontSize: '18px',
                               fontFamily: 'Source Serif 4',
                               color: '#9BA3CF',
                             },
@@ -521,7 +521,7 @@ function buildTemplate(input: OGTemplateInput) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '20px',
-                    maxWidth: '900px',
+                    maxWidth: '780px',
                   },
                   children: [
                     // Title – Bricolage Grotesque, ~36px, colour #E0E7FF
@@ -529,7 +529,14 @@ function buildTemplate(input: OGTemplateInput) {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: displayTitle.length > 80 ? '32px' : displayTitle.length > 50 ? '36px' : '40px',
+                          fontSize:
+                            displayTitle.length > 80
+                              ? '36px'
+                              : displayTitle.length > 55
+                                ? '44px'
+                                : displayTitle.length > 35
+                                  ? '48px'
+                                  : '56px',
                           fontWeight: 700,
                           fontFamily: 'Bricolage Grotesque',
                           color: '#E0E7FF',
@@ -554,14 +561,14 @@ function buildTemplate(input: OGTemplateInput) {
                                 type: 'div',
                                 props: {
                                   style: {
-                                    fontSize: '12px',
+                                    fontSize: '16px',
                                     fontWeight: 600,
                                     fontFamily: 'Bricolage Grotesque',
                                     color: '#818CF8',
                                     backgroundColor: 'rgba(129, 140, 248, 0.15)',
                                     border: '1px solid rgba(129, 140, 248, 0.25)',
                                     borderRadius: '9999px',
-                                    padding: '4px 12px',
+                                    padding: '6px 16px',
                                   },
                                   children: tag,
                                 },
@@ -588,7 +595,7 @@ function buildTemplate(input: OGTemplateInput) {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: '14px',
+                          fontSize: '18px',
                           fontWeight: 400,
                           fontFamily: 'Source Serif 4',
                           color: '#9BA3CF',
@@ -601,7 +608,7 @@ function buildTemplate(input: OGTemplateInput) {
                       type: 'div',
                       props: {
                         style: {
-                          fontSize: '14px',
+                          fontSize: '18px',
                           fontWeight: 400,
                           fontFamily: 'Source Serif 4',
                           color: '#6670A0',
