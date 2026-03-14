@@ -376,10 +376,15 @@ function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [], in
     lines.push('')
   }
 
-  // Add images
+  // Add images using <img> tags to avoid Vite module resolution in MDX
   for (const img of images) {
     const src = img.filename ? `/images/mastodon/${img.filename}` : img.remoteUrl
-    lines.push(`![${img.alt}](${src})`)
+    // Sanitize alt text: replace curly quotes with straight quotes, escape double quotes
+    const alt = (img.alt ?? '')
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/"/g, '&quot;')
+    lines.push(`<img src="${src}" alt="${alt}" />`)
     lines.push('')
   }
 
