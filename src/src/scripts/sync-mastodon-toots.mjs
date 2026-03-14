@@ -2,7 +2,7 @@
  * Sync public toots from Mastodon/Fosstodon into notes.
  *
  * Fetches recent public toots (skipping replies to others, boosts,
- * image posts, and non-public visibility), deduplicates against
+ * standalone image posts, and non-public visibility), deduplicates against
  * existing notes, and creates MDX note files. Self-reply threads
  * (replies to own toots) are included and linked via inReplyTo.
  * Sets mastodonUrl on each synced note to prevent re-syndication
@@ -19,6 +19,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const NOTE_DIR = join(__dirname, '..', 'content', 'note')
 const DATA_DIR = join(__dirname, '..', 'data')
 const STATE_FILE = join(DATA_DIR, 'mastodon-sync-state.json')
+const IMAGE_DIR = join(__dirname, '..', '..', 'public', 'images', 'mastodon')
 
 const DEFAULT_LIMIT = 40
 const FUZZY_THRESHOLD = 0.8
@@ -61,6 +62,28 @@ async function mastodonGet(path) {
   return res.json()
 }
 
+async function downloadImage(url, tootId, index) {
+  const ext = url.match(/\.(\w+)$/)?.[1] ?? 'png'
+  const filename = `${tootId}-${index}.${ext}`
+  const filepath = join(IMAGE_DIR, filename)
+
+  try {
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.log(`  Warning: failed to download image (${res.status}), using remote URL`)
+      return { filename: null, remoteUrl: url, alt: '' }
+    }
+
+    await mkdir(IMAGE_DIR, { recursive: true })
+    const buffer = await res.arrayBuffer()
+    await writeFile(filepath, Buffer.from(buffer))
+    return { filename, alt: '' }
+  } catch (err) {
+    console.log(`  Warning: failed to download image (${err.message}), using remote URL`)
+    return { filename: null, remoteUrl: url, alt: '' }
+  }
+}
+
 async function fetchToots(sinceId) {
   const account = await mastodonGet('/api/v1/accounts/verify_credentials')
   console.log(`Account: @${account.acct} (ID: ${account.id})`)
@@ -94,7 +117,8 @@ async function fetchToots(sinceId) {
 function shouldInclude(toot, ownAccountId) {
   if (toot.in_reply_to_id && String(toot.in_reply_to_account_id) !== String(ownAccountId)) return 'reply-to-other'
   if (toot.reblog) return 'boost'
-  if (toot.media_attachments?.length > 0) return 'has-images'
+  const isSelfReply = toot.in_reply_to_id && String(toot.in_reply_to_account_id) === String(ownAccountId)
+  if (toot.media_attachments?.length > 0 && !isSelfReply) return 'has-images'
   if (toot.visibility !== 'public') return `visibility:${toot.visibility}`
   return null
 }
@@ -320,7 +344,7 @@ function detectPlatform(url) {
   }
 }
 
-function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [], inReplyTo = null } = {}) {
+function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [], inReplyTo = null, images = [] } = {}) {
   const pubDateTime = new Date(toot.created_at).toISOString().replace(/:\d{2}\.\d{3}Z$/, ':00.000Z')
 
   // Ensure "mastodon" tag is present for synced notes
@@ -349,6 +373,13 @@ function generateMDX(toot, description, tags, { bodyMarkdown = '', urls = [], in
   // Add markdown body if it has links (differs from plain description)
   if (bodyMarkdown) {
     lines.push(bodyMarkdown)
+    lines.push('')
+  }
+
+  // Add images
+  for (const img of images) {
+    const src = img.filename ? `/images/mastodon/${img.filename}` : img.remoteUrl
+    lines.push(`![${img.alt}](${src})`)
     lines.push('')
   }
 
@@ -451,10 +482,26 @@ async function main() {
       selfReplies++
     }
 
+    // Download images
+    const images = []
+    if (toot.media_attachments?.length > 0) {
+      for (let i = 0; i < toot.media_attachments.length; i++) {
+        const attachment = toot.media_attachments[i]
+        if (attachment.type !== 'image') continue
+        if (!dryRun) {
+          const img = await downloadImage(attachment.url, toot.id, i)
+          if (img) {
+            img.alt = attachment.description ?? ''
+            images.push(img)
+          }
+        }
+      }
+    }
+
     // Generate note
     const slug = generateSlug(description, toot.created_at)
     const uniqueSlug = await ensureUniqueSlug(slug)
-    const { content } = generateMDX(toot, description, tags, { bodyMarkdown, urls, inReplyTo })
+    const { content } = generateMDX(toot, description, tags, { bodyMarkdown, urls, inReplyTo, images })
     const filename = `${uniqueSlug}.mdx`
 
     if (dryRun) {
@@ -463,6 +510,7 @@ async function main() {
       console.log(`    Tags: ${[...new Set([...tags, 'mastodon'])].join(', ')}`)
       if (urls.length) console.log(`    External: ${urls[0]} (${detectPlatform(urls[0])})`)
       if (bodyMarkdown) console.log(`    Body: has markdown links`)
+      if (toot.media_attachments?.length) console.log(`    Images: ${toot.media_attachments.length} attachment(s)`)
       if (inReplyTo) console.log(`    Thread: reply to ${inReplyTo}`)
       console.log(`    URL:  ${toot.url}`)
     } else {
