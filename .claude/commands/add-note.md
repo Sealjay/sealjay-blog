@@ -38,7 +38,7 @@ If there are **2 or more notes** for the same day (including the one just create
 3. Add the `daySummary` field to the **most recently created** note's frontmatter (the one just created)
 5. If an older note from the same day already has a `daySummary`, remove it from that note (only one note per day should carry the summary)
 
-The `daySummary` is AI-generated (the UI displays an "AI summary" label automatically) and should be a short, single sentence capturing the flavour of all notes that day.
+The `daySummary` is AI-generated (the UI displays an "AI summary" label automatically) and should be a short, single sentence capturing the flavour of all notes that day. Never use em dashes (—) in daily summaries — use a normal dash (-) instead.
 
 ## File Template
 
