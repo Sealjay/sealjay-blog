@@ -35,7 +35,7 @@
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
-    "astro": "^5.18.0",
+    "astro": "^6.0.5",
     "caniuse-lite": "^1.0.30001775",
     "date-fns": "^4.1.0",
     "fuse.js": "^7.1.0",
