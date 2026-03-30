@@ -47,7 +47,7 @@ export async function GET() {
       title: post.data.title,
       description: post.data.description,
       tags: post.data.tags ?? [],
-      url: `/blog/${post.slug}/`,
+      url: `/blog/${post.id}/`,
       type: 'blog' as const,
     })),
     ...speaking.map((entry) => ({
@@ -70,7 +70,7 @@ export async function GET() {
       title: entry.data.description?.slice(0, 80) ?? 'Note',
       description: entry.data.description ?? '',
       tags: entry.data.tags ?? [],
-      url: `/notes/${entry.slug}/`,
+      url: `/notes/${entry.id}/`,
       type: 'note' as const,
     })),
     ...projects.map((entry) => ({

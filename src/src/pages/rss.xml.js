@@ -25,7 +25,7 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.updatedDate || post.data.pubDateTime,
       description: post.data.description,
-      link: `/blog/${post.slug}/`,
+      link: `/blog/${post.id}/`,
       content: parser.render(stripMdx(post.body || '')),
     })),
   })

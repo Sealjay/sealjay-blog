@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content'
+import { getCollection, render } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
@@ -38,7 +38,7 @@ for (const n of allNotes) {
   if (n.data.mastodonUrl) {
     const nDateKey = n.data.pubDateTime.toISOString().slice(0, 10)
     mastodonUrlToNote.set(n.data.mastodonUrl, {
-      slug: n.slug,
+      slug: n.id,
       dateKey: nDateKey,
       description: n.data.description,
     })
@@ -70,7 +70,7 @@ function resolveReplyLink(url: string): { href: string; isLocal: boolean } {
 
 // Render all note bodies
 const rendered = await Promise.all(notes.map(async (n: any) => {
-  const { Content } = await n.render()
+  const { Content } = await render(n)
   const hasBody = n.body?.trim().length > 0
   return { note: n, Content, hasBody }
 }))
@@ -109,8 +109,8 @@ const pageDescription = daySummary
       {/* Notes for this day */}
       <div class="note-detail__notes">
         {rendered.map(({ note, Content, hasBody }: any) => (
-          <article id={note.slug} class="h-entry note-article scroll-mt-20">
-            <a class="u-url" href={`/notes/${dateKey}/#${note.slug}`} style="display:none">{note.data.title || 'Note'}</a>
+          <article id={note.id} class="h-entry note-article scroll-mt-20">
+            <a class="u-url" href={`/notes/${dateKey}/#${note.id}`} style="display:none">{note.data.title || 'Note'}</a>
             <time class="dt-published" datetime={note.data.pubDateTime.toISOString()} style="display:none">{note.data.pubDateTime.toISOString()}</time>
             <span class="p-author h-card" style="display:none">
               <a class="u-url p-name" href="https://sealjay.com">Chris Lloyd-Jones</a>

@@ -34,8 +34,8 @@ export async function GET(context) {
       },
     ],
     items: sorted.map((post) => ({
-      id: new URL(`/blog/${post.slug}/`, context.site).href,
-      url: new URL(`/blog/${post.slug}/`, context.site).href,
+      id: new URL(`/blog/${post.id}/`, context.site).href,
+      url: new URL(`/blog/${post.id}/`, context.site).href,
       title: post.data.title,
       summary: post.data.description,
       content_html: parser.render(stripMdx(post.body || '')),

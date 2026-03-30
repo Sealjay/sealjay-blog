@@ -82,7 +82,7 @@ for (const dayKey of sortedDayKeys) {
       minute: '2-digit',
       hour12: false,
     }),
-    url: `/notes/${dayKey}/#${n.slug}`,
+    url: `/notes/${dayKey}/#${n.id}`,
   }))
 
   dayGroups.push({
@@ -166,7 +166,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
           const words = post.body?.split(/\s+/).length ?? 0
           const readingTime = Math.max(1, Math.ceil(words / 200))
           return (
-            <a href={`/blog/${post.slug}/`} class="writing-card">
+            <a href={`/blog/${post.id}/`} class="writing-card">
               <div class="writing-card__row">
                 {firstTag && (
                   <span class="writing-card__tag">{firstTag}</span>

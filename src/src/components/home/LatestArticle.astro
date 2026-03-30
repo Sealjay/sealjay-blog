@@ -3,7 +3,7 @@ import FormattedDate from '../partials/FormattedDate.astro'
 
 interface Props {
   post: {
-    slug: string
+    id: string
     data: {
       title: string
       description: string
@@ -18,7 +18,7 @@ interface Props {
 const { post } = Astro.props
 ---
 
-<a href={`/blog/${post.slug}/`} class="bento-card group">
+<a href={`/blog/${post.id}/`} class="bento-card group">
   <span class="bento-card__label">Latest Post</span>
   <p class="bento-card__title font-heading">{post.data.title}</p>
   <span class="bento-card__meta">

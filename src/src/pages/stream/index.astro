@@ -38,7 +38,7 @@ const blogItems: StreamItem[] = blogEntries.map((entry) => ({
   title: entry.data.title,
   description: entry.data.description ?? '',
   date: new Date(entry.data.pubDateTime),
-  url: `/blog/${entry.slug}/`,
+  url: `/blog/${entry.id}/`,
   tags: entry.data.tags ?? [],
 }))
 
@@ -98,7 +98,7 @@ const noteGroupItems: StreamItem[] = [...notesByDay.entries()].map(([dateKey, da
       }),
       hasExternalLink: !!n.data.externalUrl,
       externalUrl: n.data.externalUrl ?? '',
-      url: `/notes/${dateKey}/#${n.slug}`,
+      url: `/notes/${dateKey}/#${n.id}`,
     })),
   }
 })

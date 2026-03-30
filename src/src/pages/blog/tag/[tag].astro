@@ -105,7 +105,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
 
         return (
           <a
-            href={`/blog/${post.slug}/`}
+            href={`/blog/${post.id}/`}
             class="blog-card group"
             data-post-index={index}
             style={index >= 12 ? 'display:none' : undefined}
@@ -126,7 +126,7 @@ const lastPostDate = new Date(posts[0].data.pubDateTime)
             ) : (
               <div class="blog-card__image">
                 <img
-                  src={getOGImagePath(post.slug)}
+                  src={getOGImagePath(post.id)}
                   alt=""
                   width="1200"
                   height="630"

@@ -1,4 +1,6 @@
-import { defineCollection, z } from 'astro:content'
+import { defineCollection } from 'astro:content'
+import { glob } from 'astro/loaders'
+import { z } from 'astro/zod'
 
 const authorSchema = z.object({
   name: z.string(),
@@ -17,6 +19,7 @@ const authorSchema = z.object({
 })
 
 const blog = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/blog' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -39,6 +42,7 @@ const blog = defineCollection({
 })
 
 const speaking = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/speaking' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -59,6 +63,7 @@ const speaking = defineCollection({
 })
 
 const note = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/note' }),
   schema: z.object({
     description: z.string().optional(),
     pubDateTime: z
@@ -79,6 +84,7 @@ const note = defineCollection({
 })
 
 const project = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/project' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -100,6 +106,7 @@ const project = defineCollection({
 })
 
 const acknowledgement = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/acknowledgement' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
