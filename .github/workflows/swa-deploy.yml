@@ -10,6 +10,9 @@ on:
   workflow_dispatch:
   workflow_call:
 
+permissions:
+  contents: write
+
 concurrency:
   group: swa-deploy
   cancel-in-progress: true
