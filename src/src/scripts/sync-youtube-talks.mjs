@@ -167,8 +167,8 @@ function generateMDX(video, { isShort, event }) {
   const url = isShort
     ? `https://www.youtube.com/shorts/${video.youtubeId}`
     : `https://www.youtube.com/watch?v=${video.youtubeId}`
-  const eventType = isShort ? 'Short' : 'Podcast'
-  const cta = isShort ? 'Watch short' : 'Watch episode'
+  const eventType = isShort ? 'Short' : 'Video'
+  const cta = isShort ? 'Watch short' : 'Watch video'
   const description = truncateDescription(video.description) || video.title
 
   const lines = [
@@ -180,6 +180,7 @@ function generateMDX(video, { isShort, event }) {
     `date: "${date}"`,
     `cta: "${cta}"`,
     `url: "${url}"`,
+    `videoEmbedUrl: "https://www.youtube.com/embed/${video.youtubeId}"`,
     '---',
     '',
   ]
@@ -256,7 +257,7 @@ async function main() {
       const filename = `yt-${video.youtubeId}.mdx`
 
       if (dryRun) {
-        const eventType = isShort ? 'Short' : 'Podcast'
+        const eventType = isShort ? 'Short' : 'Video'
         console.log(`  [CREATE] ${filename} (${eventType}): ${video.title}`)
       } else {
         await mkdir(SPEAKING_DIR, { recursive: true })
