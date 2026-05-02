@@ -56,6 +56,8 @@ bun src/scripts/sync-securing-quest.mjs          # Sync blog posts from securing
 WEBMENTION_IO_TOKEN=xxx bun src/scripts/sync-webmentions.mjs  # Sync webmentions
 MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs     # Sync public Mastodon toots to notes
 MASTODON_TOKEN=xxx bun src/scripts/sync-mastodon-toots.mjs --dry-run  # Preview without writing
+bun src/scripts/sync-youtube-talks.mjs           # Sync YouTube videos as speaking entries
+bun src/scripts/sync-youtube-talks.mjs --dry-run # Preview without writing
 ```
 
 The Mastodon sync script fetches public toots (skipping replies to others, boosts, image posts, and non-public toots), deduplicates against existing notes, and creates MDX files in `src/src/content/note/`. Self-reply threads (replies to own toots) are included and linked via `inReplyTo`. Each synced note has `mastodonUrl` set to prevent re-syndication. State is tracked in `src/data/mastodon-sync-state.json`.

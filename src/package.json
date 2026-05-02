@@ -23,6 +23,7 @@
     "sync:str": "bun src/scripts/sync-securing-quest.mjs",
     "sync:webmentions": "bun src/scripts/sync-webmentions.mjs",
     "sync:mastodon": "bun src/scripts/sync-mastodon-toots.mjs",
+    "sync:youtube": "bun src/scripts/sync-youtube-talks.mjs",
     "send:webmentions": "bun src/scripts/send-webmentions.mjs"
   },
   "dependencies": {
