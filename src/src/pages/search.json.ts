@@ -70,19 +70,22 @@ export async function GET() {
       title: entry.data.description?.slice(0, 80) ?? 'Note',
       description: entry.data.description ?? '',
       tags: entry.data.tags ?? [],
-      url: `/notes/${entry.id}/`,
+      url: `/notes/${entry.data.pubDateTime.toISOString().slice(0, 10)}/#${entry.id}`,
       type: 'note' as const,
     })),
     ...projects.map((entry) => ({
       title: entry.data.title,
       description: entry.data.description,
       tags: entry.data.techStack ?? [],
-      url: entry.data.repoUrl,
+      url: entry.data.demoUrl ?? entry.data.repoUrl ?? '/projects/',
       type: 'project' as const,
     })),
   ]
 
   return new Response(JSON.stringify(searchIndex), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=3600',
+    },
   })
 }

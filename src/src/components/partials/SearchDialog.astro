@@ -508,7 +508,9 @@
     }
   }
 
-  customElements.define('site-search', SiteSearch)
+  if (!customElements.get('site-search')) {
+    customElements.define('site-search', SiteSearch)
+  }
 </script>
 
 <style is:global>

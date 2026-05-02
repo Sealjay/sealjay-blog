@@ -58,33 +58,37 @@ const pastYears = Object.keys(pastByYear).sort((a, b) => Number(b) - Number(a))
 
 const eventTypes = [...new Set(speakingSlots.map((s) => s.data.eventType))].sort()
 
-const eventsJsonLd = JSON.stringify({
+const speakingPageJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  itemListElement: sortedSpeakingSlots.map((slot, i) => ({
-    '@type': 'ListItem',
-    position: i + 1,
-    item: {
-      '@type': 'Event',
-      name: slot.data.title,
-      description: slot.data.description,
-      startDate: slot.data.date.toISOString(),
+  '@type': 'CollectionPage',
+  name: 'Speaking',
+  description: 'Conference talks, videos, podcasts, and media mentions on Microsoft AI, open source, and green software',
+  url: new URL('/speaking/', Astro.site).href,
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListOrder: 'https://schema.org/ItemListOrderDescending',
+    numberOfItems: sortedSpeakingSlots.length,
+    itemListElement: sortedSpeakingSlots.map((slot, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
       url: slot.data.url,
-      location: {
-        '@type': 'VirtualLocation',
+      item: {
+        '@type': 'CreativeWork',
+        name: slot.data.title,
+        description: slot.data.description,
         url: slot.data.url,
+        creator: {
+          '@type': 'Person',
+          name: 'Chris Lloyd-Jones',
+          url: 'https://sealjay.com',
+        },
+        about: [
+          { '@type': 'Thing', name: slot.data.eventType },
+          { '@type': 'Thing', name: slot.data.event },
+        ],
       },
-      organizer: {
-        '@type': 'Organization',
-        name: slot.data.event,
-      },
-      performer: {
-        '@type': 'Person',
-        name: 'Chris Lloyd-Jones',
-        url: 'https://sealjay.com',
-      },
-    },
-  })),
+    })),
+  },
 })
 ---
 
@@ -94,7 +98,7 @@ const eventsJsonLd = JSON.stringify({
   pubDateTime={new Date('1 March 2023')}
   updatedDate={lastConferenceSlot.data.date}
 >
-  <script type="application/ld+json" set:html={eventsJsonLd} />
+  <script type="application/ld+json" set:html={speakingPageJsonLd} />
   <Container>
     <PageHeader
       title="Speaking"

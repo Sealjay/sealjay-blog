@@ -70,14 +70,6 @@ const websiteJsonLd = JSON.stringify({
   '@type': 'WebSite',
   'name': 'Sealjay',
   'url': 'https://sealjay.com',
-  'potentialAction': {
-    '@type': 'SearchAction',
-    'target': {
-      '@type': 'EntryPoint',
-      'urlTemplate': 'https://sealjay.com/search?q={search_term_string}',
-    },
-    'query-input': 'required name=search_term_string',
-  },
 })
 ---
 
@@ -93,7 +85,10 @@ const websiteJsonLd = JSON.stringify({
 <!-- Dark mode: apply before CSS to prevent flash of wrong theme -->
 <script is:inline>
   (function() {
-    var saved = sessionStorage.getItem('theme');
+    var saved = null;
+    try {
+      saved = localStorage.getItem('theme');
+    } catch (_) {}
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var theme = saved || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
@@ -165,7 +160,7 @@ const websiteJsonLd = JSON.stringify({
 <!-- JSON-LD Structured Data (Person) -->
 <script type="application/ld+json" set:html={personJsonLd} />
 
-<!-- JSON-LD Structured Data (WebSite + SearchAction) -->
+<!-- JSON-LD Structured Data (WebSite) -->
 <script type="application/ld+json" set:html={websiteJsonLd} />
 
 <!-- Plausible -->

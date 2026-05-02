@@ -37,9 +37,7 @@
       ></script>
       <script is:inline>
         (function() {
-          var saved = localStorage.getItem('theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var isDark = saved === 'dark' || (!saved && prefersDark);
+          var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
           var giscusScript = document.getElementById('giscus-script');
           if (giscusScript) {
             giscusScript.setAttribute('data-theme', isDark ? 'dark_dimmed' : 'light');
