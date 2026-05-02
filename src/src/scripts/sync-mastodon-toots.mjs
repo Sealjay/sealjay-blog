@@ -409,8 +409,8 @@ async function ensureUniqueSlug(slug) {
 async function main() {
   const token = process.env.MASTODON_TOKEN
   if (!token) {
-    console.log('MASTODON_TOKEN not set, skipping Mastodon toot sync.')
-    return
+    console.error('MASTODON_TOKEN not set — aborting.')
+    process.exit(1)
   }
 
   const state = await loadState()

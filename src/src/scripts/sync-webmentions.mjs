@@ -106,8 +106,8 @@ function findLatestTimestamp(data) {
 async function main() {
   const token = process.env.WEBMENTION_IO_TOKEN
   if (!token) {
-    console.log('WEBMENTION_IO_TOKEN not set, skipping webmention sync.')
-    return
+    console.error('WEBMENTION_IO_TOKEN not set — aborting.')
+    process.exit(1)
   }
 
   const existing = await loadExisting()
