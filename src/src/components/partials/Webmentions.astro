@@ -57,6 +57,10 @@ const otherMentions = uniqueMentions.filter((m) =>
 )
 
 const hasAny = uniqueMentions.length > 0
+
+function avatarInitial(name?: string) {
+  return (name || '?').trim().charAt(0) || '?'
+}
 ---
 
 {hasAny ? (
@@ -77,13 +81,9 @@ const hasAny = uniqueMentions.length > 0
           <div class="webmentions__avatars">
             {likes.map((like) => (
               <a href={like.author?.url || like.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={like.author?.name || 'Someone'} class="webmentions__avatar-link">
-                {like.author?.photo ? (
-                  <img src={like.author.photo} alt={like.author?.name || 'Someone who liked this'} class="webmentions__avatar webmentions__avatar--overlap" loading="lazy" />
-                ) : (
-                  <span class="webmentions__avatar-fallback webmentions__avatar--overlap">
-                    {(like.author?.name || '?').charAt(0)}
-                  </span>
-                )}
+                <span class="webmentions__avatar-fallback webmentions__avatar--overlap">
+                  {avatarInitial(like.author?.name)}
+                </span>
               </a>
             ))}
           </div>
@@ -98,13 +98,9 @@ const hasAny = uniqueMentions.length > 0
           <div class="webmentions__avatars">
             {reposts.map((repost) => (
               <a href={repost.author?.url || repost.url || '#'} target="_blank" rel="noopener noreferrer nofollow" title={repost.author?.name || 'Someone'} class="webmentions__avatar-link">
-                {repost.author?.photo ? (
-                  <img src={repost.author.photo} alt={repost.author?.name || 'Someone who reposted this'} class="webmentions__avatar" loading="lazy" />
-                ) : (
-                  <span class="webmentions__avatar-fallback webmentions__avatar-fallback--repost">
-                    {(repost.author?.name || '?').charAt(0)}
-                  </span>
-                )}
+                <span class="webmentions__avatar-fallback webmentions__avatar-fallback--repost">
+                  {avatarInitial(repost.author?.name)}
+                </span>
               </a>
             ))}
           </div>
@@ -120,13 +116,9 @@ const hasAny = uniqueMentions.length > 0
             {replies.map((reply) => (
               <div class="webmentions__reply">
                 <a href={reply.author?.url || '#'} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__reply-avatar-link">
-                  {reply.author?.photo ? (
-                    <img src={reply.author.photo} alt={reply.author?.name || 'Anonymous commenter'} class="webmentions__reply-avatar" loading="lazy" />
-                  ) : (
-                    <span class="webmentions__reply-avatar-fallback">
-                      {(reply.author?.name || '?').charAt(0)}
-                    </span>
-                  )}
+                  <span class="webmentions__reply-avatar-fallback">
+                    {avatarInitial(reply.author?.name)}
+                  </span>
                 </a>
                 <div class="webmentions__reply-content">
                   <div class="webmentions__reply-meta">
@@ -162,13 +154,9 @@ const hasAny = uniqueMentions.length > 0
           <ul class="webmentions__mention-list">
             {otherMentions.map((mention) => (
               <li class="webmentions__mention-item">
-                {mention.author?.photo ? (
-                  <img src={mention.author.photo} alt={mention.author?.name || 'Someone'} class="webmentions__mention-avatar" loading="lazy" />
-                ) : (
-                  <span class="webmentions__mention-avatar-fallback">
-                    {(mention.author?.name || '?').charAt(0)}
-                  </span>
-                )}
+                <span class="webmentions__mention-avatar-fallback">
+                  {avatarInitial(mention.author?.name)}
+                </span>
                 <a href={mention.url || mention['wm-source']} target="_blank" rel="noopener noreferrer nofollow" class="webmentions__mention-link">
                   {mention.author?.name || mention['wm-source']}
                 </a>
