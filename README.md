@@ -10,7 +10,7 @@ The source behind [sealjay.com](https://sealjay.com) — a personal site that br
 
 ## Tech stack
 
-- **Framework:** [Astro](https://astro.build/) v5 with MDX and Tailwind CSS
+- **Framework:** [Astro](https://astro.build/) v6 with MDX and Tailwind CSS
 - **Package manager:** [Bun](https://bun.sh/) (not npm/yarn)
 - **Linting & formatting:** [Biome](https://biomejs.dev/) (not ESLint or Prettier)
 - **Language:** TypeScript
