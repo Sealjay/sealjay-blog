@@ -121,17 +121,68 @@ function buildLastmodMap() {
 
 /** Build a set of tag page URLs where the tag has only one blog post */
 function buildSinglePostTagUrls() {
+  const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---/
+  const stripQuotes = (value) => value.trim().replace(/^['"]|['"]$/g, '')
+  const parseTagArray = (value) =>
+    value
+      .split(',')
+      .map((tag) => stripQuotes(tag))
+      .filter(Boolean)
+
+  function extractTags(content) {
+    const frontmatter = content.match(frontmatterRegex)?.[1]
+    if (!frontmatter) return []
+
+    const lines = frontmatter.split('\n')
+    const tagsLineIndex = lines.findIndex((line) => /^tags:\s*/.test(line))
+    if (tagsLineIndex === -1) return []
+
+    const inlineValue = lines[tagsLineIndex].replace(/^tags:\s*/, '').trim()
+    if (inlineValue.startsWith('[') && inlineValue.endsWith(']')) {
+      return parseTagArray(inlineValue.slice(1, -1))
+    }
+    if (inlineValue && !inlineValue.startsWith('[')) {
+      return [stripQuotes(inlineValue)]
+    }
+
+    const tags = []
+    let inBracketList = false
+    let bracketValue = ''
+
+    for (let i = tagsLineIndex + 1; i < lines.length; i++) {
+      const line = lines[i]
+
+      if (/^\s{0,1}\w+:\s*/.test(line)) break
+
+      const listMatch = line.match(/^\s*-\s+(.+)$/)
+      if (listMatch) {
+        tags.push(stripQuotes(listMatch[1]))
+        continue
+      }
+
+      if (line.trim().startsWith('[') || inBracketList) {
+        inBracketList = true
+        bracketValue += `${line}\n`
+        if (line.includes(']')) {
+          const clean = bracketValue.replace(/^\s*\[/, '').replace(/\]\s*$/, '')
+          tags.push(...parseTagArray(clean))
+          inBracketList = false
+          bracketValue = ''
+        }
+      }
+    }
+
+    return tags
+  }
+
   const tagCounts = new Map()
   const blogDir = path.resolve('./src/content/blog')
   for (const file of fs.readdirSync(blogDir)) {
     if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue
     const content = fs.readFileSync(path.join(blogDir, file), 'utf-8')
-    const match = content.match(/^tags:\s*\[(.+?)\]/m)
-    if (match) {
-      const tags = match[1].split(',').map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
-      for (const tag of tags) {
-        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
-      }
+    const tags = extractTags(content)
+    for (const tag of tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
     }
   }
   const thinTagUrls = new Set()

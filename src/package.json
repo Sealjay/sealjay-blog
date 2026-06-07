@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "private": true,
   "author": "Chris Lloyd-Jones",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Sealjay/sealjay-blog.git",
@@ -33,7 +33,9 @@
     "@astrojs/tailwind": "^5.1.5",
     "@fontsource-variable/bricolage-grotesque": "^5.2.10",
     "@fontsource-variable/source-serif-4": "^5.2.9",
+    "@fontsource/bricolage-grotesque": "^5.2.10",
     "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/source-serif-4": "^5.2.9",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "astro": "^6.0.8",

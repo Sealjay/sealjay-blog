@@ -21,7 +21,7 @@ const DATA_DIR = join(__dirname, '..', 'data')
 const STATE_FILE = join(DATA_DIR, 'mastodon-sync-state.json')
 const IMAGE_DIR = join(__dirname, '..', '..', 'public', 'images', 'mastodon')
 
-const DEFAULT_LIMIT = 40
+const DEFAULT_LIMIT = 0
 const FUZZY_THRESHOLD = 0.8
 
 // --- CLI args ---
@@ -29,7 +29,16 @@ const FUZZY_THRESHOLD = 0.8
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
 const limitArg = args.find((a) => a.startsWith('--limit='))
-const fetchLimit = limitArg ? Number.parseInt(limitArg.split('=')[1], 10) : DEFAULT_LIMIT
+const parsedLimit = limitArg ? Number.parseInt(limitArg.split('=')[1], 10) : DEFAULT_LIMIT
+const fetchLimit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : null
+
+function compareMastodonIds(a, b) {
+  const left = BigInt(a)
+  const right = BigInt(b)
+  if (left < right) return -1
+  if (left > right) return 1
+  return 0
+}
 
 // --- State management ---
 
@@ -89,22 +98,24 @@ async function fetchToots(sinceId) {
   console.log(`Account: @${account.acct} (ID: ${account.id})`)
 
   const allStatuses = []
-  let maxId
+  let minId = sinceId
 
-  while (allStatuses.length < fetchLimit) {
-    const remaining = fetchLimit - allStatuses.length
-    const batchLimit = Math.min(remaining, 40)
+  while (fetchLimit === null || allStatuses.length < fetchLimit) {
+    const remaining = fetchLimit === null ? 40 : Math.min(fetchLimit - allStatuses.length, 40)
+    const batchLimit = Math.max(1, remaining)
 
     // Don't exclude replies — we want self-reply threads
     let path = `/api/v1/accounts/${account.id}/statuses?exclude_reblogs=true&limit=${batchLimit}`
-    if (sinceId) path += `&since_id=${sinceId}`
-    if (maxId) path += `&max_id=${maxId}`
+    if (minId) path += `&min_id=${minId}`
 
     const batch = await mastodonGet(path)
     if (batch.length === 0) break
 
     allStatuses.push(...batch)
-    maxId = batch[batch.length - 1].id
+    minId = batch.reduce((latest, status) => {
+      if (!latest) return status.id
+      return compareMastodonIds(status.id, latest) > 0 ? status.id : latest
+    }, minId)
 
     if (batch.length < batchLimit) break
   }
@@ -416,7 +427,7 @@ async function main() {
   const state = await loadState()
   const sinceId = state.sinceId ?? null
 
-  console.log(`Fetching up to ${fetchLimit} toots...`)
+  console.log(`Fetching ${fetchLimit ? `up to ${fetchLimit}` : 'all available'} toots...`)
   if (sinceId) console.log(`  Since ID: ${sinceId}`)
 
   const { statuses: toots, accountId } = await fetchToots(sinceId)
@@ -439,7 +450,7 @@ async function main() {
   const affectedDays = new Set()
 
   // Process oldest first so since_id advances correctly
-  const sorted = [...toots].sort((a, b) => a.id.localeCompare(b.id))
+  const sorted = [...toots].sort((a, b) => compareMastodonIds(a.id, b.id))
 
   for (const toot of sorted) {
     const skipReason = shouldInclude(toot, accountId)

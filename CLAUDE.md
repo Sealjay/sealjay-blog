@@ -6,7 +6,7 @@ Personal blog and portfolio site for Chris Lloyd-Jones (Sealjay), hosted at http
 
 ## Tech stack
 
-- **Framework:** [Astro](https://astro.build/) v5 with MDX, React, and Tailwind CSS
+- **Framework:** [Astro](https://astro.build/) v6 with MDX and Tailwind CSS
 - **Package manager:** [Bun](https://bun.sh/) (not npm/yarn)
 - **Linting & formatting:** [Biome](https://biomejs.dev/) (not ESLint or Prettier)
 - **Language:** TypeScript
@@ -19,7 +19,7 @@ The Astro source lives inside `src/`:
 ```
 src/
 ├── src/
-│   ├── components/     # Astro and React components
+│   ├── components/     # Astro components
 │   ├── config/         # Site configuration (personal.ts)
 │   ├── content/        # Content collections (blog/, speaking/, acknowledgement/)
 │   ├── layouts/        # Page layouts (BaseLayout, IndexLayout)

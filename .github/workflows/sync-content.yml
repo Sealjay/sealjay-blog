@@ -39,22 +39,30 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run sync script
+        id: sync_str
+        continue-on-error: true
         working-directory: src
         run: bun run sync:str
 
       - name: Sync webmentions
+        id: sync_webmentions
+        continue-on-error: true
         working-directory: src
         env:
           WEBMENTION_IO_TOKEN: ${{ secrets.WEBMENTION_IO_TOKEN }}
         run: bun run sync:webmentions
 
       - name: Sync Mastodon toots
+        id: sync_mastodon
+        continue-on-error: true
         working-directory: src
         env:
           MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
         run: bun run sync:mastodon
 
       - name: Sync YouTube talks
+        id: sync_youtube
+        continue-on-error: true
         working-directory: src
         run: bun run sync:youtube
 
@@ -88,4 +96,6 @@ jobs:
     needs: sync
     if: needs.sync.outputs.has_changes == 'true'
     uses: ./.github/workflows/swa-deploy.yml
+    with:
+      checkout_ref: main
     secrets: inherit

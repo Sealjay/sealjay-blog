@@ -9,6 +9,11 @@ on:
       - ".github/workflows/swa-deploy.yml"
   workflow_dispatch:
   workflow_call:
+    inputs:
+      checkout_ref:
+        description: Git ref (branch, tag, or SHA) to checkout for build/deploy
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -25,6 +30,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
+          ref: ${{ inputs.checkout_ref || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

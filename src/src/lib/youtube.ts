@@ -3,7 +3,7 @@ import type { YouTubeFeedConfig } from '../config/personal'
 export interface YouTubeSpeakingEntry {
   title: string
   description: string
-  eventType: 'Short' | 'Podcast'
+  eventType: 'Short' | 'Video'
   event: string
   date: Date
   url: string
@@ -84,7 +84,7 @@ async function fetchFeed(url: string, label: string): Promise<string> {
   }
 }
 
-/** Fetch all YouTube channel videos and classify as Short or Podcast */
+/** Fetch all YouTube channel videos and classify as Short or Video */
 export async function getYouTubeSpeakingEntries(feeds: YouTubeFeedConfig[]): Promise<YouTubeSpeakingEntry[]> {
   if (cached) return cached
 
@@ -116,18 +116,18 @@ export async function getYouTubeSpeakingEntries(feeds: YouTubeFeedConfig[]): Pro
     for (const video of parseVideoEntries(channelXml)) {
       const isShort = shortIds.has(video.youtubeId)
       const hashtags = extractHashtags(video.description)
-      const tags = [...new Set([...feed.defaultTags, ...(isShort ? ['Shorts'] : ['Podcast']), ...hashtags])]
+      const tags = [...new Set([...feed.defaultTags, ...(isShort ? ['Shorts'] : ['Video']), ...hashtags])]
 
       allEntries.push({
         title: video.title,
         description: video.description,
-        eventType: isShort ? 'Short' : 'Podcast',
+        eventType: isShort ? 'Short' : 'Video',
         event: feed.event,
         date: new Date(video.published),
         url: isShort
           ? `https://www.youtube.com/shorts/${video.youtubeId}`
           : `https://www.youtube.com/watch?v=${video.youtubeId}`,
-        cta: isShort ? 'Watch short' : 'Watch episode',
+        cta: isShort ? 'Watch short' : 'Watch video',
         youtubeId: video.youtubeId,
         thumbnailUrl: video.thumbnailUrl,
         tags,

@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { Resvg } from '@resvg/resvg-js'
 import satori from 'satori'
 import { TAG_TO_CATEGORY } from './tag-categories'
@@ -628,45 +630,46 @@ function buildTemplate(input: OGTemplateInput) {
 }
 
 // ---------------------------------------------------------------------------
-// Font loading – fetch from Google Fonts API at build time
+// Font loading – read vendored Fontsource files from node_modules
 // ---------------------------------------------------------------------------
+
+type FontWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 
 interface FontEntry {
   name: string
-  data: ArrayBuffer
-  weight: number
-  style: string
+  data: Buffer
+  weight: FontWeight
+  style: 'normal'
 }
 
-async function fetchGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
-  const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`
-  const cssResponse = await fetch(url, {
-    headers: {
-      // Use IE10 UA to get woff format (not woff2) - satori needs woff/ttf
-      'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-    },
-  })
-  const css = await cssResponse.text()
-  // Extract the font file URL from the CSS @font-face src
-  const match = css.match(/src:\s*url\(([^)]+)\)/)
-  if (!match?.[1]) {
-    throw new Error(`Could not find font URL for ${family} weight ${weight}`)
-  }
-  const fontResponse = await fetch(match[1])
-  return fontResponse.arrayBuffer()
+async function readFontsourceFile(relativePath: string): Promise<Buffer> {
+  const absolutePath = path.resolve(process.cwd(), relativePath)
+  return readFile(absolutePath)
 }
 
 async function loadFonts(): Promise<FontEntry[]> {
-  const fontSpecs = [
-    { name: 'Bricolage Grotesque', weight: 700 },
-    { name: 'Bricolage Grotesque', weight: 600 },
-    { name: 'Source Serif 4', weight: 400 },
+  const fontSpecs: Array<{ name: string; weight: FontWeight; file: string }> = [
+    {
+      name: 'Bricolage Grotesque',
+      weight: 700,
+      file: 'node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-700-normal.woff',
+    },
+    {
+      name: 'Bricolage Grotesque',
+      weight: 600,
+      file: 'node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff',
+    },
+    {
+      name: 'Source Serif 4',
+      weight: 400,
+      file: 'node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff',
+    },
   ]
 
   const fonts = await Promise.all(
     fontSpecs.map(async (spec) => ({
       name: spec.name,
-      data: await fetchGoogleFont(spec.name, spec.weight),
+      data: await readFontsourceFile(spec.file),
       weight: spec.weight,
       style: 'normal' as const,
     })),
@@ -689,7 +692,7 @@ async function getFonts(): Promise<FontEntry[]> {
 // Public API – generate a PNG buffer for a blog post
 // ---------------------------------------------------------------------------
 
-export async function generateOGImage(input: OGTemplateInput): Promise<Buffer> {
+export async function generateOGImage(input: OGTemplateInput): Promise<ArrayBuffer> {
   const fonts = await getFonts()
   const template = buildTemplate(input)
 
@@ -707,7 +710,8 @@ export async function generateOGImage(input: OGTemplateInput): Promise<Buffer> {
   })
 
   const pngData = resvg.render()
-  return Buffer.from(pngData.asPng())
+  const png = pngData.asPng()
+  return Uint8Array.from(png).buffer
 }
 
 export function getOGImagePath(slug: string): string {
