@@ -1,4 +1,6 @@
 ---
+import { tagMvpUrl } from '../../lib/mvp-url'
+
 type Props = {
   title: string
   linkUrl: string
@@ -6,10 +8,12 @@ type Props = {
 }
 
 const { title, linkUrl, imageUrl } = Astro.props
+// Tag *.microsoft.com embeds with the MVP tracking param (no-op for others)
+const href = tagMvpUrl(linkUrl)
 ---
 
 <div class="social-embed">
-  <a href={linkUrl} target="_blank" rel="noopener noreferrer" class="social-embed-link">
+  <a href={href} target="_blank" rel="noopener noreferrer" class="social-embed-link">
     <div class="social-embed-container">
       <div class="social-embed-content">
         <h3 class="social-embed-title">{title}</h3>

@@ -1,3 +1,5 @@
+import { tagMvpUrl } from '../lib/mvp-url'
+
 // Professional badges/affiliations
 export interface Badge {
   text: string
@@ -19,7 +21,7 @@ export const professionalBadges: Badge[] = [
   // Homepage badges (first 3 shown on homepage, all shown on About)
   {
     text: '6x Microsoft MVP in AI',
-    url: 'https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4',
+    url: tagMvpUrl('https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4'),
   },
   {
     text: 'Doctoral Student, Green AI (UEL, 2022\u20132027)',
