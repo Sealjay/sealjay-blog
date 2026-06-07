@@ -1,6 +1,5 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { Resvg } from '@resvg/resvg-js'
 import satori from 'satori'
 import { TAG_TO_CATEGORY } from './tag-categories'
@@ -643,12 +642,8 @@ interface FontEntry {
   style: 'normal'
 }
 
-const currentFilePath = fileURLToPath(import.meta.url)
-const currentDir = path.dirname(currentFilePath)
-const srcRoot = path.resolve(currentDir, '../..')
-
 async function readFontsourceFile(relativePath: string): Promise<Buffer> {
-  const absolutePath = path.resolve(srcRoot, relativePath)
+  const absolutePath = path.resolve(process.cwd(), relativePath)
   return readFile(absolutePath)
 }
 
@@ -657,17 +652,17 @@ async function loadFonts(): Promise<FontEntry[]> {
     {
       name: 'Bricolage Grotesque',
       weight: 700,
-      file: 'node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2',
+      file: 'node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-700-normal.woff',
     },
     {
       name: 'Bricolage Grotesque',
       weight: 600,
-      file: 'node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2',
+      file: 'node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff',
     },
     {
       name: 'Source Serif 4',
       weight: 400,
-      file: 'node_modules/@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2',
+      file: 'node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff',
     },
   ]
 
