@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
+import { tagMvpUrl } from './lib/mvp-url'
 
 const authorSchema = z.object({
   name: z.string(),
@@ -34,7 +35,11 @@ const blog = defineCollection({
         .transform((str) => (str ? new Date(str) : undefined)),
       heroImage: image().optional(),
       tags: z.array(z.string()).optional(),
-      sourceUrl: z.string().url().optional(),
+      sourceUrl: z
+        .string()
+        .url()
+        .optional()
+        .transform((u) => (u ? tagMvpUrl(u) : u)),
       featured: z.boolean().default(false),
       inReplyTo: z.string().url().optional(),
       additionalAuthors: z.array(authorSchema).optional(),
@@ -54,7 +59,9 @@ const speaking = defineCollection({
         .or(z.date())
         .transform((val) => new Date(val)),
       cta: z.string(),
-      url: z.string().url(),
+      // Tag *.microsoft.com links with the MVP tracking param; these live in
+      // frontmatter so the rehype-mvp-url plugin never sees them.
+      url: z.string().url().transform(tagMvpUrl),
       thumbnail: image().optional(),
       blogPostSlug: z.string().optional(),
       featured: z.boolean().default(false),
@@ -71,7 +78,11 @@ const note = defineCollection({
       .or(z.date())
       .transform((val) => new Date(val)),
     tags: z.array(z.string()).optional(),
-    externalUrl: z.string().url().optional(),
+    externalUrl: z
+      .string()
+      .url()
+      .optional()
+      .transform((u) => (u ? tagMvpUrl(u) : u)),
     externalPlatform: z
       .enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace'])
       .optional(),
@@ -112,7 +123,7 @@ const acknowledgement = defineCollection({
     description: z.string(),
     notes: z.string(),
     image: z.string(),
-    url: z.string().url(),
+    url: z.string().url().transform(tagMvpUrl),
     licence: z.string(),
     licenceUrl: z.string().url(),
   }),
