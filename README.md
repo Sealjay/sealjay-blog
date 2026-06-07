@@ -45,6 +45,9 @@ bun run sync:str                                    # Sync posts from securing.q
 WEBMENTION_IO_TOKEN=xxx bun run sync:webmentions    # Token from webmention.io/settings
 MASTODON_TOKEN=xxx bun run sync:mastodon             # Token from Mastodon app settings
 MASTODON_TOKEN=xxx bun run sync:mastodon -- --dry-run  # Preview without writing
+bun run sync:youtube                                 # Sync YouTube talks into speaking entries
+bun run sync:youtube -- --dry-run                    # Preview YouTube sync without writing
+bun run send:webmentions                             # Send queued webmentions for published URLs
 ```
 
 ## Features
@@ -55,7 +58,7 @@ MASTODON_TOKEN=xxx bun run sync:mastodon -- --dry-run  # Preview without writing
 - **Search** — Client-side fuzzy search powered by [Fuse.js](https://www.fusejs.io/) over a generated search index
 - **Dynamic OG images** — Category-themed Open Graph cards generated with [Satori](https://github.com/vercel/satori) and [resvg](https://github.com/nicbou/resvg-js)
 - **Webmentions** — Receives via [webmention.io](https://webmention.io/) and sends on deploy
-- **Content sync** — Automated weekly sync of Mastodon toots and [Securing Quest](https://securing.quest/) RSS posts
+- **Content sync** — Automated weekly sync of Mastodon toots, YouTube talks, webmentions, and [Securing Quest](https://securing.quest/) RSS posts
 - **Comments** — [Giscus](https://giscus.app/) powered by GitHub Discussions
 - **Embeds** — YouTube, tweets, GitHub Gists, and CodePen
 
@@ -64,7 +67,7 @@ MASTODON_TOKEN=xxx bun run sync:mastodon -- --dry-run  # Preview without writing
 Two GitHub Actions workflows handle deployment and content freshness automatically — you do not need to trigger these manually.
 
 - **`swa-deploy.yml`** — Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions.
-- **`sync-content.yml`** — Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, and Mastodon toots.
+- **`sync-content.yml`** — Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, Mastodon toots, and YouTube talks.
 
 ## Licensing
 

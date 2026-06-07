@@ -4,9 +4,9 @@
     "src": {
       "appLocation": "src",
       "outputLocation": "dist",
-      "appBuildCommand": "npm run build",
-      "run": "npm run dev",
-      "appDevserverUrl": "http://localhost:3000",
+      "appBuildCommand": "bun run build",
+      "run": "bun run dev",
+      "appDevserverUrl": "http://localhost:4321",
       "open": true,
       "appName": "sealjay-blog",
       "env": "Production",
