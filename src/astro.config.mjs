@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { unified } from '@astrojs/markdown-remark'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
@@ -224,8 +225,13 @@ export default defineConfig({
     }),
     tailwind(),
     mdx({
-      remarkPlugins: [remarkRewriteImagePaths],
-      rehypePlugins: [rehypeMvpUrl],
+      // mdx 6 deprecated remarkPlugins/rehypePlugins here; pass them through a
+      // unified() processor instead. Scoped to mdx() (not markdown.processor)
+      // so plain .md files keep their existing behaviour.
+      processor: unified({
+        remarkPlugins: [remarkRewriteImagePaths],
+        rehypePlugins: [rehypeMvpUrl],
+      }),
     }),
   ],
 })
