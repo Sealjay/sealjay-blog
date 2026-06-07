@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "private": true,
   "author": "Chris Lloyd-Jones",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Sealjay/sealjay-blog.git",
