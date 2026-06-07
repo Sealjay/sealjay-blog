@@ -15,8 +15,16 @@ function stripMdx(body) {
     .trim()
 }
 
+/** Rewrite root-relative src/href URLs in rendered HTML to absolute URLs. */
+function absolutizeRootRelativeUrls(html, site) {
+  return html.replace(/(href|src)="\/(?!\/)([^"]*)"/g, (_, attribute, path) => {
+    return `${attribute}="${new URL(`/${path}`, site).href}"`
+  })
+}
+
 export async function GET(context) {
   const posts = await getCollection('blog')
+  const site = context.site
   return rss({
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
@@ -26,7 +34,7 @@ export async function GET(context) {
       pubDate: post.data.updatedDate || post.data.pubDateTime,
       description: post.data.description,
       link: `/blog/${post.id}/`,
-      content: parser.render(stripMdx(post.body || '')),
+      content: absolutizeRootRelativeUrls(parser.render(stripMdx(post.body || '')), site),
     })),
   })
 }
