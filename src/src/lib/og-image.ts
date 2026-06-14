@@ -798,7 +798,12 @@ function buildCardArtTemplate(input: { tags: string[] | undefined; slug: string 
                     {
                       type: 'div',
                       props: {
-                        style: { fontSize: '42px', fontWeight: 600, fontFamily: 'Bricolage Grotesque', color: category.accent },
+                        style: {
+                          fontSize: '42px',
+                          fontWeight: 600,
+                          fontFamily: 'Bricolage Grotesque',
+                          color: category.accent,
+                        },
                         children: category.name,
                       },
                     },
@@ -929,7 +934,14 @@ function buildHomeTemplate() {
               {
                 type: 'div',
                 props: {
-                  style: { fontSize: '88px', fontWeight: 700, fontFamily: 'Bricolage Grotesque', color: '#E0E7FF', lineHeight: 1.02, letterSpacing: '-0.03em' },
+                  style: {
+                    fontSize: '88px',
+                    fontWeight: 700,
+                    fontFamily: 'Bricolage Grotesque',
+                    color: '#E0E7FF',
+                    lineHeight: 1.02,
+                    letterSpacing: '-0.03em',
+                  },
                   children: 'Chris Lloyd-Jones',
                 },
               },

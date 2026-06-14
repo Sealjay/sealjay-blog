@@ -172,7 +172,8 @@ const websiteJsonLd = JSON.stringify({
 <!-- JSON-LD Structured Data (WebSite) -->
 <script type="application/ld+json" set:html={websiteJsonLd} />
 
-<!-- Plausible -->
+<!-- Plausible (privacy-respecting analytics) -->
+<link rel="preconnect" href="https://plausible.io" crossorigin />
 <script
   is:inline
   defer

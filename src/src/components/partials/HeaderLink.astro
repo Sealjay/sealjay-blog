@@ -29,7 +29,8 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, '')
     display: inline-flex;
     align-items: center;
     border-radius: var(--radius-sm);
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
     text-decoration: none;
   }
 

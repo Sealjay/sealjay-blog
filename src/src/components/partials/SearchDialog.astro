@@ -253,7 +253,9 @@
 </style>
 
 <script>
-  import Fuse from 'fuse.js'
+  // Type-only import; the library itself is dynamically imported on first search
+  // (loadIndex) so it never ships on pages where search is not opened.
+  import type FuseType from 'fuse.js'
 
   interface SearchItem {
     title: string
@@ -264,7 +266,7 @@
   }
 
   class SiteSearch extends HTMLElement {
-    private fuse: Fuse<SearchItem> | null = null
+    private fuse: FuseType<SearchItem> | null = null
     private dialog: HTMLDialogElement | null = null
     private input: HTMLInputElement | null = null
     private resultsList: HTMLElement | null = null
@@ -329,7 +331,7 @@
       this.dialog?.addEventListener('keydown', (e) => {
         if (e.key !== 'Tab') return
         const focusable = this.dialog!.querySelectorAll<HTMLElement>(
-          'input, button, a[href], [tabindex]:not([tabindex="-1"])'
+          'input, button:not([tabindex="-1"]), a[href]:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])'
         )
         if (focusable.length === 0) return
         const first = focusable[0]
@@ -352,6 +354,7 @@
       if (this.fuse) return
       const res = await fetch('/search.json')
       const data: SearchItem[] = await res.json()
+      const { default: Fuse } = await import('fuse.js')
       this.fuse = new Fuse(data, {
         keys: [
           { name: 'title', weight: 2 },
@@ -383,12 +386,15 @@
       if (this.initialState) this.initialState.classList.remove('hidden')
       if (this.emptyState) this.emptyState.classList.add('hidden')
       this.input?.setAttribute('aria-expanded', 'false')
+      this.input?.removeAttribute('aria-activedescendant')
     }
 
     clearResults() {
       if (!this.resultsList) return
       const items = this.resultsList.querySelectorAll('[data-search-result]')
       for (const item of items) item.remove()
+      // Drop any stale active-descendant pointer to a removed option.
+      this.input?.removeAttribute('aria-activedescendant')
     }
 
     search(query: string) {
@@ -449,7 +455,7 @@
         const typeLabel = `<span class="search-badge search-badge--${badgeInfo.cssVar}">${badgeInfo.label}</span>`
 
         li.innerHTML = `
-          <a href="${item.url}"${rel} class="search-result-link">
+          <a href="${item.url}"${rel} class="search-result-link" tabindex="-1">
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 ${typeLabel}

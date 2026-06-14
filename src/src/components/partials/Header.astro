@@ -31,8 +31,8 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
           <button
             type="button"
             class="more-trigger"
-            aria-haspopup="true"
             aria-expanded="false"
+            aria-controls="more-menu-panel"
             id="more-menu-trigger"
           >
             More
@@ -40,9 +40,9 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div class="more-panel" id="more-menu-panel" role="menu">
+          <div class="more-panel" id="more-menu-panel">
             {SITE_SECONDARY_NAV.map((item) => (
-              <a href={item.path} class="more-panel__link" role="menuitem">{item.name}</a>
+              <a href={item.path} class="more-panel__link">{item.name}</a>
             ))}
           </div>
         </div>
@@ -74,7 +74,7 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
 
 <!-- Mobile menu overlay – must live outside <header> because its
      backdrop-filter creates a containing block that breaks position:fixed -->
-<div class="mobile-overlay" id="mobile-menu" aria-label="Mobile navigation">
+<div class="mobile-overlay" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
   <nav role="navigation" aria-label="Mobile navigation">
     <ul class="mobile-nav-list">
       {
@@ -410,7 +410,8 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     font-weight: 500;
     color: var(--color-text-muted);
     text-decoration: none;
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast) var(--ease-out),
+                background var(--duration-fast) var(--ease-out);
   }
 
   .mobile-nav-link:hover,
@@ -439,12 +440,36 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     const menuCloseIcon = document.getElementById('menu-close-icon')
 
     if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+      const inertTargets = () => [
+        document.getElementById('main-content'),
+        document.querySelector('footer'),
+      ]
+
+      function trapTab(event: KeyboardEvent) {
+        if (event.key !== 'Tab') return
+        const focusables = mobileMenu!.querySelectorAll<HTMLElement>('a[href], button')
+        if (focusables.length === 0) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
+
       function openMenu() {
         mobileMenuButton!.setAttribute('aria-expanded', 'true')
         mobileMenu!.classList.add('open')
         menuOpenIcon!.style.display = 'none'
         menuCloseIcon!.style.display = 'block'
         document.body.style.overflow = 'hidden'
+        // Make the page behind the modal inert for keyboard/AT users, and trap Tab.
+        for (const el of inertTargets()) el?.setAttribute('inert', '')
+        document.addEventListener('keydown', trapTab)
+        mobileMenu!.querySelector<HTMLElement>('a[href]')?.focus()
       }
 
       function closeMenu() {
@@ -453,6 +478,8 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
         menuOpenIcon!.style.display = 'block'
         menuCloseIcon!.style.display = 'none'
         document.body.style.overflow = ''
+        for (const el of inertTargets()) el?.removeAttribute('inert')
+        document.removeEventListener('keydown', trapTab)
       }
 
       mobileMenuButton.addEventListener('click', () => {
