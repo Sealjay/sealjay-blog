@@ -289,17 +289,6 @@
 
       openButton?.addEventListener('click', () => this.openDialog())
 
-      // Global keyboard shortcut: Ctrl/Cmd + K
-      document.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-          e.preventDefault()
-          this.openDialog()
-        }
-      })
-
-      // Custom event: allow other components (e.g. 404 page) to open search
-      document.addEventListener('open-search', () => this.openDialog())
-
       this.dialog?.addEventListener('click', (e) => {
         if (e.target === this.dialog) this.closeDialog()
       })
@@ -367,6 +356,7 @@
     }
 
     openDialog() {
+      if (!this.isConnected) return
       this.previouslyFocused = document.activeElement as HTMLElement | null
       this.loadIndex()
       this.dialog?.showModal()
@@ -513,6 +503,22 @@
       return div.innerHTML
     }
   }
+
+  // Module-scope listeners: registered exactly once for the page's lifetime.
+  // They resolve the currently-connected <site-search> element at event time,
+  // so view-transition re-instantiation never creates stale duplicate handlers.
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault()
+      const el = document.querySelector('site-search') as any
+      el?.openDialog?.()
+    }
+  })
+
+  document.addEventListener('open-search', () => {
+    const el = document.querySelector('site-search') as any
+    el?.openDialog?.()
+  })
 
   if (!customElements.get('site-search')) {
     customElements.define('site-search', SiteSearch)

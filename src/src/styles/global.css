@@ -26,14 +26,12 @@
   --color-danger: #D81A45; /* CONTRAST FIX: was #E11D48 (4.46:1 FAIL) -> 4.80:1 bg / 5.06:1 surf */
   --color-border: rgba(99, 102, 241, 0.1);
   --color-border-strong: rgba(99, 102, 241, 0.2);
-  --color-primary-hover: #6366F1; /* fills/backgrounds only — fails as text */
   --color-card-glow: 0 2px 20px rgba(79, 70, 229, 0.06);
   --color-card-glow-hover: 0 4px 20px rgba(79, 70, 229, 0.1);
 
   /* Living Ink — evergreen-teal co-primary (~20%: links/CTAs/sustainability) */
   --color-living: #0B6E5F;        /* links + living text, 5.85:1 bg / 6.16:1 surface (verified) */
   --color-living-solid: #0A5C4F;  /* filled CTA bg + #fff text -> 7.90:1 (verified) */
-  --color-living-muted: rgba(11, 110, 95, 0.08);
   --color-living-accent: #10B981; /* fills / borders / glows ONLY — never text (2.41:1, verified) */
 
   /* Decorative daypart tokens (overridden by [data-daypart]); never contrast-bearing */
@@ -110,14 +108,12 @@
   --color-danger: #FB7185;
   --color-border: rgba(129, 140, 248, 0.12);
   --color-border-strong: rgba(129, 140, 248, 0.25);
-  --color-primary-hover: #6366F1;
   --color-card-glow: 0 0 40px rgba(129, 140, 248, 0.06);
   --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
 
   /* Living Ink — evergreen-teal co-primary (dark surfaces) */
   --color-living: #5EEAD4;        /* links + living text, 13.18:1 bg / 12.14:1 surface (verified) */
   --color-living-solid: #0C7A68;  /* RETUNED: #fff text 5.25:1 AA + 3.71:1 CTA pop vs bg (verified) */
-  --color-living-muted: rgba(94, 234, 212, 0.12);
   --color-living-accent: #34D399; /* fills / borders / glows */
 
   /* Decorative daypart tokens (overridden by [data-daypart]); never contrast-bearing */
@@ -262,7 +258,7 @@
   top: -100%;
   left: 16px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   padding: 8px 16px;
   border-radius: var(--radius-sm);
   font-size: 0.8125rem;
@@ -316,14 +312,6 @@
   .h-screen-safe {
     height: 100vh;
     height: calc(var(--vh, 1vh) * 100);
-  }
-
-  /* Gradient text - indigo spectrum */
-  .text-gradient {
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    background-image: linear-gradient(to right, var(--color-primary), var(--color-accent));
   }
 
   /* Consistent content width */

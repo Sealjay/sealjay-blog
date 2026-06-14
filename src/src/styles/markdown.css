@@ -184,7 +184,7 @@
 }
 
 /* Drop-cap on the first paragraph only; opt-in via .has-dropcap on the prose container. */
-.prose.has-dropcap > p:first-of-type::first-letter {
+.prose.has-dropcap > p:first-child::first-letter {
   float: left;
   font-family: var(--font-heading);
   font-weight: 700;
@@ -196,12 +196,12 @@
 }
 
 /* Green-software / sustainability posts: the drop-cap takes the evergreen ink. */
-.prose.has-dropcap.is-living > p:first-of-type::first-letter {
+.prose.has-dropcap.is-living > p:first-child::first-letter {
   color: var(--color-living);
 }
 
 @media (max-width: 480px) {
-  .prose.has-dropcap > p:first-of-type::first-letter {
+  .prose.has-dropcap > p:first-child::first-letter {
     font-size: 2.8em;
   }
   .standfirst {

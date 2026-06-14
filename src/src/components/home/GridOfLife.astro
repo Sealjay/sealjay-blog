@@ -231,13 +231,13 @@ const uid = `gol-${(seed >>> 0).toString(36)}`
 <script is:inline>
   // Tiny progressive enhancement: enable the slow CSS breathing only when the visitor
   // has not asked to reduce motion. No-JS / reduced-motion -> static server-rendered grid.
-  (function () {
-    if (window.__golBreatheInit) return
-    window.__golBreatheInit = true
+  // Adding an existing class is idempotent, so re-running on astro:page-load is harmless.
+  function golApplyBreathe() {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    var els = document.querySelectorAll('[data-gol]')
-    for (var i = 0; i < els.length; i++) els[i].classList.add('gol--breathe')
-  })()
+    document.querySelectorAll('[data-gol]').forEach(function (el) { el.classList.add('gol--breathe') })
+  }
+  golApplyBreathe()
+  document.addEventListener('astro:page-load', golApplyBreathe)
 </script>
 
 <style>

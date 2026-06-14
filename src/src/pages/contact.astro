@@ -77,7 +77,7 @@ const helpWith = [
           <a
             href={c.href}
             class="contact__card"
-            style={`--accent: var(--color-cat-${c.cat}); --accent-bg: var(--color-cat-${c.cat}-bg);`}
+            style={`--accent: var(--color-cat-${c.cat});`}
             {...(c.external ? { target: '_blank', rel: 'me noopener noreferrer' } : {})}
           >
             <span class="contact__label">{c.label}</span>
