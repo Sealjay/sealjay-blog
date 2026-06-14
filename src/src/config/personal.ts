@@ -17,6 +17,12 @@ export const currentRole = {
 // Location
 export const location = 'London'
 
+// Contact channels (single source for the footer + /contact page)
+export const contact = {
+  email: 'chris@sealjay.com',
+  linkedin: 'https://uk.linkedin.com/in/chrislloydjones',
+}
+
 export const professionalBadges: Badge[] = [
   // Homepage badges (first 3 shown on homepage, all shown on About)
   {

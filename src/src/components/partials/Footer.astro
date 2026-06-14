@@ -1,16 +1,19 @@
 ---
 import { SITE_NAV, SITE_SECONDARY_NAV, SITE_FOOTER_NAV } from '../../consts'
+import { contact } from '../../config/personal'
 import GitHub from '../socialicons/GitHub.astro'
 import LinkedIn from '../socialicons/LinkedIn.astro'
 import Mastodon from '../socialicons/Mastodon.astro'
 import Bluesky from '../socialicons/Bluesky.astro'
 
+// Order mirrors the header nav (About first), with Contact surfaced.
 const navLinks = [
+  { name: 'About', path: '/about' },
   { name: 'Writing', path: '/blog' },
   { name: 'Speaking', path: '/speaking' },
   { name: 'Projects', path: '/projects' },
   { name: 'Notes', path: '/notes' },
-  { name: 'About', path: '/about' },
+  { name: 'Contact', path: '/contact' },
 ]
 
 const socialLinks = [
@@ -33,6 +36,7 @@ const moreLinks = [
   <div class="footer-inner">
     <div class="footer-left">
       <a href="/" class="footer-wordmark">sealjay</a>
+      <a href={`mailto:${contact.email}`} class="footer-email">{contact.email}</a>
       <div class="footer-legal">
         <p class="footer-legal__line">
           &copy; 2018&ndash;{new Date().getFullYear()} Chris Lloyd-Jones
@@ -135,6 +139,18 @@ const moreLinks = [
     color: var(--color-primary);
     text-decoration: none;
     line-height: 1.3;
+  }
+
+  .footer-email {
+    font-family: var(--font-code);
+    font-size: 0.8125rem;
+    color: var(--color-living);
+    text-decoration: none;
+    width: fit-content;
+  }
+
+  .footer-email:hover {
+    text-decoration: underline;
   }
 
   .footer-legal {

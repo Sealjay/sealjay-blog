@@ -15,6 +15,7 @@ export const SITE_NAV = [
 
 export const SITE_SECONDARY_NAV = [
   { name: 'Stream', path: '/stream' },
+  { name: 'Contact', path: '/contact' },
   { name: 'Colophon', path: '/acknowledgements' },
 ]
 

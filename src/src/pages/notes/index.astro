@@ -50,7 +50,11 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
         { label: 'Home', href: '/' },
         { label: 'Notes' },
       ]}
-    />
+    >
+      <p class="notes-stream-pointer">
+        Want everything in one place? The <a href="/stream">Stream</a> weaves notes together with articles, talks, and projects.
+      </p>
+    </PageHeader>
 
     <div class="notes-feed">
       {/* Timeline */}
@@ -181,6 +185,20 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
 </Layout>
 
 <style>
+  .notes-stream-pointer {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0.75rem 0 0;
+  }
+
+  .notes-stream-pointer a {
+    color: var(--color-living);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
   /* ── Layout ────────────────────────────────────────────────── */
   .notes-feed {
     max-width: 48rem; /* 768px — readable text column, wider than old 560px */
