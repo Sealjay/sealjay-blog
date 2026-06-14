@@ -99,29 +99,58 @@ Chris Lloyd-Jones (Sealjay) is a Data.D candidate (ABD) in Data Science at the U
 ```markdown
 ### Hi there
 
-I'm Chris Lloyd-Jones! I'm the Vice President of AI Consulting Transformation at Kyndryl, a six-time Microsoft MVP in AI, and a Data.D candidate (ABD) in Data Science at the University of East London, researching Green AI. I bridge AI transformation with enterprise governance, sustainability, and open source.
+I'm Chris Lloyd-Jones! I'm the Vice President of AI Consulting Transformation at Kyndryl, a six-time Microsoft MVP in AI, and a Data.D candidate in Data Science at the University of East London, researching Green AI. I bridge AI transformation with enterprise governance, sustainability, and open source.
 
-- I created and lead Kyndryl's Forward Deployed Engineering capability - engineers embedded with clients to build, ship, and own outcomes; scaling to 22,000 engineers.
-- I'm currently working on agentic AI, AI governance, and green software research as part of my Data.D.
-- I contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation.
-- I'm a co-host of [Securing the Realm](https://securing.quest/) - a D&D-inspired podcast on AI governance and AI-driven development.
-- I'm an [OpenUK Honours 2025/26](https://openuk.uk) recipient for contributions to open source.
-- [Contact me on LinkedIn](https://linkedin.com/in/chrislloydjones/) to get in touch!
+- I created and lead Kyndryl's Forward Deployed Engineering capability - engineers who build with clients, scaling to 22,000 engineers.
+- 🔭 I'm currently working on AI governance, explainability frameworks, and building AI maturity assessment tools.
+- 🌱 I'm researching sustainable LLMs and SLMs as part of my Doctoral research in Green AI.
+- 🔌 I'm building [MCP servers](#mcp-servers) that give AI assistants access to real-world communication and productivity tools.
+- I contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the [Green Software Foundation](https://greensoftware.foundation/), where I served as Steering Committee Vice-Chair.
+- ✍️ I write about [AI security, agent governance, and organisational transformation](https://sealjay.com/blog/).
+- 🎙️ I'm a co-host of [Securing the Realm](https://securing.quest/) - a D&D-inspired podcast on AI governance and AI-driven development.
+- I'm an [OpenUK New Year's Honours 2025/26](https://openuk.uk/honours/) recipient and OpenUK Ambassador, and I lead the [OpenUK Data Centre Advisory Group](https://openuk.uk/datacentregroup/).
+- 📫 [Contact me on LinkedIn](https://linkedin.com/in/chrislloydjones/) to get in touch!
 - Pronouns: he/him
 
 // open, sustainable, real
 
-#### Active projects
+#### Recent writing
 
-- [Securing the Realm](https://securing.quest/) - D&D-inspired podcast on AI governance and AI-driven development
-- [sealjay-blog](https://github.com/Sealjay/sealjay-blog) - Personal site and blog (Astro, TypeScript)
+- [Compliance Is Just Rules: The Company as a Codebase](https://sealjay.com/blog/compliance-is-just-rules/)
+- [Your AI Agents Need a Bouncer](https://sealjay.com/blog/str-your-ai-agents-need-a-bouncer/)
+- [AI Browser Automation with Microsoft Foundry and Browser Use](https://sealjay.com/blog/foundry-browser-use/)
+- [AI AppSec Is Still AppSec](https://sealjay.com/blog/str-ai-appsec-is-still-appsec/)
 
-#### Earlier work
+More at [sealjay.com/blog](https://sealjay.com/blog/).
 
-- [Distributed Data](https://github.com/Avanade/emtech-distributed-data) - Exploring SQL Ledger, Confidential Ledger and other technologies
-- [TeamsVid](https://github.com/Sealjay/teams-vid) - Devpost hackathon category winner. Web app to quickly post videos for your team.
-- [PyCognitiveSearch](https://github.com/Sealjay/py-cognitive-search) - Python SDK for Azure Cognitive Search
-- [powerbi-adt](https://github.com/Sealjay/powerbi-adt) - Querying Azure Digital Twins with PowerBI ([blog post](https://www.sealjay.com/querying-azure-digital-twins-with-powerbi/))
+Here are some of my public projects.
+
+#### MCP Servers
+
+I build [Model Context Protocol](https://modelcontextprotocol.io/) servers that give AI assistants access to real-world communication and productivity tools.
+
+- [![Go](https://img.shields.io/badge/--3178C6?logo=go&logoColor=ffffff)](https://go.dev/) [mcp-whatsapp](https://github.com/Sealjay/mcp-whatsapp) - Single-binary Go MCP server for WhatsApp with 41 tools (messaging, groups, polls, media, privacy)
+- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [mcp-hey](https://github.com/Sealjay/mcp-hey) - MCP server for Hey.com email with full-text search and SQLite caching
+- [![Swift](https://img.shields.io/badge/--3178C6?logo=swift&logoColor=ffffff)](https://swift.org/) [mcp-ical-swift](https://github.com/Sealjay/mcp-ical-swift) - Apple Calendar MCP server using compiled Swift to bypass macOS TCC restrictions
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [mcp-signal](https://github.com/Sealjay/mcp-signal) - Local Signal MCP server (reads via Signal Desktop, sends via signal-cli)
+
+#### Current Projects
+
+- 🎙️ [Securing the Realm](https://securing.quest/) - Podcast on AI security and governance
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [str-agentic-adventures](https://github.com/SecuringTheRealm/str-agentic-adventures) - AI-powered web app for tabletop RPGs replacing the human Dungeon Master
+
+#### Proof of concepts for blog posts
+
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [foundry-browser-use](https://github.com/Sealjay/foundry-browser-use) - Interactive AI browser automation using Browser Use + Microsoft Foundry
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [str-mcp-purview](https://github.com/SecuringTheRealm/str-mcp-purview) - MCP implementation for Microsoft Purview
+- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [str-foundry-local](https://github.com/SecuringTheRealm/str-foundry-local) - Example of Azure Foundry Local running for content creation
+
+#### Archive - no longer maintained, previous projects
+
+- [![Docker](https://img.shields.io/badge/--3178C6?logo=docker&logoColor=ffffff)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [Distributed Data](https://github.com/Avanade/emtech-distributed-data) - Exploring SQL Ledger, Confidential Ledger and other technologies
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [PyCognitiveSearch](https://github.com/Sealjay/py-cognitive-search) - Python SDK for Azure Cognitive Search
+- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [![Power BI](https://custom-icon-badges.demolab.com/badge/-F2C811?logo=powerbi&logoColor=black)](https://learn.microsoft.com/en-us/power-bi/?WT.mc_id=AI-MVP-5004204) [powerbi-adt](https://github.com/Sealjay/powerbi-adt) - Querying Azure Digital Twins with PowerBI ([blog post](https://www.sealjay.com/querying-azure-digital-twins-with-powerbi/))
+- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [PolicyForge](https://devpost.com/software/policyforge-ai-automation-policy-simulator) - Autonomous agent monitoring AI regulations worldwide, simulating policy impacts, and generating implementation roadmaps (Gemini 3 hackathon)
 ```
 
 ---

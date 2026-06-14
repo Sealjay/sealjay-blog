@@ -327,21 +327,22 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Indigo->evergreen duotone: greyscale base, recoloured by the overlay below */
-    filter: grayscale(1) contrast(1.05) brightness(1.02);
+    /* Natural photo with only a light desaturation; the overlay adds a gentle brand tint */
+    filter: saturate(0.92) contrast(1.02);
   }
 
   .hero-portrait__duotone {
     position: absolute;
     inset: 0;
     background: linear-gradient(150deg, var(--color-primary) 0%, var(--color-living) 100%);
-    mix-blend-mode: color;
-    opacity: 0.68;
+    /* soft-light keeps natural skin tones, just a subtle indigo->green cast (not a full duotone) */
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
     pointer-events: none;
   }
 
   :global([data-theme='dark']) .hero-portrait__duotone {
-    opacity: 0.58;
+    opacity: 0.45;
   }
 
   .hero-portrait__ring {
