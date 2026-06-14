@@ -13,12 +13,17 @@ import AuthorCard from "../components/partials/AuthorCard.astro";
 import PostNavigation from "../components/partials/PostNavigation.astro";
 import TableOfContents from "../components/partials/TableOfContents.astro";
 import { getTagStyle } from "../lib/tag-categories";
+import { readingTime } from "../lib/reading-time";
 
 type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[]; body?: string };
 
 const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body, additionalAuthors } = Astro.props;
-const words = body?.split(/\s+/).length ?? 0;
-const readingTime = Math.max(1, Math.ceil(words / 200));
+const minutesToRead = readingTime(body);
+// Only depth-2/3 headings produce a ToC; use this so we never reserve an empty sidebar column.
+const tocHeadings = (headings ?? []).filter((h) => h.depth === 2 || h.depth === 3);
+const hasToc = tocHeadings.length > 0;
+// Green-software / sustainability posts take the evergreen drop-cap.
+const isLiving = (tags ?? []).some((t) => /green|sustainab/i.test(t));
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Compute slug from the URL pathname for OG image path
@@ -128,9 +133,14 @@ const breadcrumbJsonLd = JSON.stringify({
     </nav>
 
     <!-- Article title -->
-    <h1 class="p-name article-title">
+    <h1 class="p-name article-title" transition:name={`post-title-${slug}`}>
       {title}
     </h1>
+
+    <!-- Standfirst (editorial lede from the description) -->
+    {description && (
+      <p class="standfirst">{description}</p>
+    )}
 
     <!-- Tag badges -->
     {tags && tags.length > 0 && (
@@ -177,7 +187,7 @@ const breadcrumbJsonLd = JSON.stringify({
         <svg xmlns="http://www.w3.org/2000/svg" class="article-meta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>{readingTime} min read</span>
+        <span>{minutesToRead} min read</span>
       </span>
 
       <span class="article-meta-sep">&middot;</span>
@@ -242,16 +252,16 @@ const breadcrumbJsonLd = JSON.stringify({
     <hr class="article-separator" />
 
     <!-- Mobile ToC (collapsible, shown below 1024px) -->
-    {headings && headings.length > 0 && (
+    {hasToc && (
       <TableOfContents headings={headings} variant="mobile" />
     )}
 
-    <!-- Two-column grid: article + sidebar ToC -->
-    <div class="article-grid">
-      <div class="e-content prose prose-lg max-w-none">
+    <!-- Two-column grid: article + sidebar ToC (single column when no ToC) -->
+    <div class:list={["article-grid", !hasToc && "article-grid--no-toc"]}>
+      <div class:list={["e-content prose prose-lg max-w-none has-dropcap", isLiving && "is-living"]}>
         <slot />
       </div>
-      {headings && headings.length > 0 && (
+      {hasToc && (
         <TableOfContents headings={headings} variant="desktop" />
       )}
     </div>
@@ -394,22 +404,10 @@ const breadcrumbJsonLd = JSON.stringify({
     font-family: var(--font-heading);
     font-weight: 700;
     color: var(--color-text);
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
     margin: 0 0 1rem;
-    font-size: 2rem;
-  }
-
-  @media (min-width: 640px) {
-    .article-title {
-      font-size: 2.5rem;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .article-title {
-      font-size: 2.75rem;
-    }
+    font-size: clamp(2rem, 3.5vw + 1rem, 3.25rem);
   }
 
   /* Meta row */
@@ -533,7 +531,12 @@ const breadcrumbJsonLd = JSON.stringify({
 
   @media (min-width: 1024px) {
     .article-grid {
-      grid-template-columns: minmax(0, 720px) 15rem;
+      grid-template-columns: minmax(0, 42rem) 15rem;
+    }
+    /* No ToC -> single centred column instead of an empty 15rem gutter */
+    .article-grid--no-toc {
+      grid-template-columns: minmax(0, 42rem);
+      justify-content: center;
     }
   }
 
