@@ -4,8 +4,8 @@
   "description": "VP, AI Consulting Transformation at Kyndryl. 6x Microsoft AI MVP. Agentic AI, open source, and green software. // open, sustainable, real.",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#F8F9FC",
+  "theme_color": "#F8F9FC",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

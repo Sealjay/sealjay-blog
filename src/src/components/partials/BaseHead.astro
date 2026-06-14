@@ -16,6 +16,7 @@ export interface Props {
   title: string;
   description: string;
   image?: string;
+  imageAlt?: string;
   ogType?: "website" | "article";
   pubDate?: Date;
   tags?: string[];
@@ -27,7 +28,9 @@ const SITE_SUFFIX = ' | Chris Lloyd-Jones, Sealjay'
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const defaultImage = avatarImage.src
-const { title: rawTitle, description, image = defaultImage, ogType = "website", pubDate, tags, noindex } = Astro.props;
+const { title: rawTitle, description, image = defaultImage, imageAlt, ogType = "website", pubDate, tags, noindex } = Astro.props;
+// Alt text for the social-share image: portrait for the bare-avatar fallback, otherwise the page title.
+const ogImageAlt = imageAlt ?? (image === defaultImage ? 'Chris Lloyd-Jones (Sealjay)' : rawTitle);
 
 // Auto-append site suffix unless the title already contains the brand name
 const title = rawTitle.includes('Chris Lloyd-Jones') ? rawTitle : rawTitle + SITE_SUFFIX;
@@ -92,6 +95,10 @@ const websiteJsonLd = JSON.stringify({
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var theme = saved || (prefersDark ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
+    // Decorative daypart (purely cosmetic — nudges the hero glow + canopy tint only)
+    var h = new Date().getHours();
+    var daypart = h < 5 ? 'night' : h < 8 ? 'dawn' : h < 17 ? 'day' : h < 21 ? 'dusk' : 'night';
+    document.documentElement.setAttribute('data-daypart', daypart);
   })();
 </script>
 
@@ -117,6 +124,7 @@ const websiteJsonLd = JSON.stringify({
 <meta property="og:image" content={new URL(image, Astro.url)} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
 
 {ogType === "article" && pubDate && (
   <>
@@ -136,6 +144,7 @@ const websiteJsonLd = JSON.stringify({
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={new URL(image, Astro.url)} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
 
 <!-- Identity verification links -->
 <link href="https://fosstodon.org/@sealjay" rel="me" />

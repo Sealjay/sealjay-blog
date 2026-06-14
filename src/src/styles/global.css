@@ -15,20 +15,33 @@
   --color-surface-hover: #F3F3FB;
   --color-text: #1E1B3A;
   --color-text-muted: #4B4772;
-  --color-text-subtle: #7E7AAA;
+  --color-text-subtle: #67638F; /* CONTRAST FIX: was #7E7AAA (3.80:1 FAIL) -> 5.31:1 on bg (verified) */
   --color-primary: #4F46E5;
   --color-primary-muted: rgba(79, 70, 229, 0.08);
-  --color-accent: #6366F1;
-  --color-warm: #DB2777;
+  --color-accent: #6366F1; /* GUARDRAIL: decorative/gradient/fill + AA-large UI (>=3:1) ONLY — never small body text (4.24:1 FAIL) */
+  --color-on-primary: #FFFFFF; /* text on filled --color-primary buttons */
+  --color-warm: #DB2777; /* AA-large ONLY (4.37:1 bg) — never small body text */
   --color-warm-muted: rgba(219, 39, 119, 0.08);
-  --color-success: #059669;
-  --color-danger: #E11D48;
+  --color-success: #047857; /* CONTRAST FIX: was #059669 (3.58:1 FAIL) -> 5.21:1 on bg (verified) */
+  --color-danger: #D81A45; /* CONTRAST FIX: was #E11D48 (4.46:1 FAIL) -> 4.80:1 bg / 5.06:1 surf */
   --color-border: rgba(99, 102, 241, 0.1);
   --color-border-strong: rgba(99, 102, 241, 0.2);
-  --color-primary-hover: #6366F1;
+  --color-primary-hover: #6366F1; /* fills/backgrounds only — fails as text */
   --color-card-glow: 0 2px 20px rgba(79, 70, 229, 0.06);
   --color-card-glow-hover: 0 4px 20px rgba(79, 70, 229, 0.1);
-  --gradient-hero: linear-gradient(160deg, #F8F9FC 0%, #EEF2FF 40%, #E8ECFE 70%, #F8F9FC 100%);
+
+  /* Living Ink — evergreen-teal co-primary (~20%: links/CTAs/sustainability) */
+  --color-living: #0B6E5F;        /* links + living text, 5.85:1 bg / 6.16:1 surface (verified) */
+  --color-living-solid: #0A5C4F;  /* filled CTA bg + #fff text -> 7.90:1 (verified) */
+  --color-living-muted: rgba(11, 110, 95, 0.08);
+  --color-living-accent: #10B981; /* fills / borders / glows ONLY — never text (2.41:1, verified) */
+
+  /* Decorative daypart tokens (overridden by [data-daypart]); never contrast-bearing */
+  --hero-glow: rgba(16, 185, 129, 0.10);
+  --canopy-alive: rgba(16, 185, 129, 0.05);
+
+  /* Hero gradient — indigo giving way to green */
+  --gradient-hero: linear-gradient(155deg, #F8F9FC 0%, #EEF2FF 35%, #E7F4EF 72%, #F8F9FC 100%);
 
   /* Spacing scale */
   --space-xs: 0.25rem;
@@ -86,10 +99,11 @@
   --color-surface-hover: #1E1A3A;
   --color-text: #E0E7FF;
   --color-text-muted: #9BA3CF;
-  --color-text-subtle: #6670A0;
+  --color-text-subtle: #828DBE; /* CONTRAST FIX: was #6670A0 (4.08:1 FAIL) -> 6.04:1 on bg (verified) */
   --color-primary: #818CF8;
   --color-primary-muted: rgba(129, 140, 248, 0.15);
-  --color-accent: #6366F1;
+  --color-accent: #6366F1; /* GUARDRAIL: decorative/fill + AA-large UI ONLY — never text (4.37:1 FAIL) */
+  --color-on-primary: #0C0A1D; /* CONTRAST FIX: dark ink replaces white on #818CF8 (was 2.98:1 FAIL) -> 6.54:1 */
   --color-warm: #F472B6;
   --color-warm-muted: rgba(244, 114, 182, 0.15);
   --color-success: #34D399;
@@ -99,7 +113,19 @@
   --color-primary-hover: #6366F1;
   --color-card-glow: 0 0 40px rgba(129, 140, 248, 0.06);
   --color-card-glow-hover: 0 4px 20px rgba(129, 140, 248, 0.1);
-  --gradient-hero: linear-gradient(160deg, #0C0A1D 0%, #1E1660 30%, #312E81 55%, #1E1660 80%, #0C0A1D 100%);
+
+  /* Living Ink — evergreen-teal co-primary (dark surfaces) */
+  --color-living: #5EEAD4;        /* links + living text, 13.18:1 bg / 12.14:1 surface (verified) */
+  --color-living-solid: #0C7A68;  /* RETUNED: #fff text 5.25:1 AA + 3.71:1 CTA pop vs bg (verified) */
+  --color-living-muted: rgba(94, 234, 212, 0.12);
+  --color-living-accent: #34D399; /* fills / borders / glows */
+
+  /* Decorative daypart tokens (overridden by [data-daypart]); never contrast-bearing */
+  --hero-glow: rgba(94, 234, 212, 0.12);
+  --canopy-alive: rgba(94, 234, 212, 0.06);
+
+  /* Hero gradient — indigo giving way to green */
+  --gradient-hero: linear-gradient(155deg, #0C0A1D 0%, #1E1660 28%, #14463E 62%, #0C0A1D 92%);
 
   /* Tag category colours */
   --color-cat-ai: #818CF8;
@@ -122,6 +148,32 @@
 }
 
 /* ============================================================
+   Daypart — DECORATIVE ONLY. Nudges --hero-glow hue and the
+   --canopy-alive cell tint. Touches NO contrast-bearing token.
+   OG cards pin data-daypart="day" for deterministic output.
+   ============================================================ */
+[data-daypart="dawn"] {
+  --hero-glow: rgba(251, 146, 60, 0.14);    /* warm amber sunrise */
+  --canopy-alive: rgba(244, 113, 133, 0.06);
+}
+[data-daypart="day"] {
+  --hero-glow: rgba(16, 185, 129, 0.12);    /* canonical biophilic green */
+  --canopy-alive: rgba(16, 185, 129, 0.05);
+}
+[data-daypart="dusk"] {
+  --hero-glow: rgba(129, 140, 248, 0.16);   /* indigo-violet evening */
+  --canopy-alive: rgba(124, 58, 237, 0.06);
+}
+[data-daypart="night"] {
+  --hero-glow: rgba(56, 189, 248, 0.10);    /* cool teal-cyan night */
+  --canopy-alive: rgba(45, 212, 191, 0.06);
+}
+
+[data-theme="dark"][data-daypart="dawn"] { --hero-glow: rgba(251, 146, 60, 0.16); --canopy-alive: rgba(244, 113, 133, 0.07); }
+[data-theme="dark"][data-daypart="dusk"] { --hero-glow: rgba(129, 140, 248, 0.18); --canopy-alive: rgba(124, 58, 237, 0.07); }
+[data-theme="dark"][data-daypart="night"] { --hero-glow: rgba(56, 189, 248, 0.12); --canopy-alive: rgba(45, 212, 191, 0.07); }
+
+/* ============================================================
    Base layer
    ============================================================ */
 @layer base {
@@ -140,6 +192,8 @@
     text-rendering: optimizeLegibility;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
+    /* Coordinated tonal shift on theme toggle (neutralised under reduced-motion below) */
+    transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -228,49 +282,15 @@
 @layer components {
   /* Card hover effects */
   .card-hover {
-    transition: all var(--duration-normal) var(--ease-out);
+    transition: transform var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out);
     box-shadow: var(--color-card-glow);
   }
 
   .card-hover:hover {
     transform: translateY(-2px);
     box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
-  }
-
-  /* Button styles */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-md);
-    font-weight: 500;
-    transition: all var(--duration-fast) var(--ease-out);
-  }
-
-  .btn:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-
-  .btn-primary:hover {
-    background: var(--color-accent);
-  }
-
-  .btn-secondary {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border-strong);
-  }
-
-  .btn-secondary:hover {
-    background: var(--color-surface-hover);
-    border-color: var(--color-primary);
   }
 
   /* Section divider */

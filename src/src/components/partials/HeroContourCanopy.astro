@@ -1,0 +1,309 @@
+---
+// HeroContourCanopy — decorative topographic / contour-line field for the homepage hero.
+//
+// Living Ink direction: nested concentric contour lines (like a height map / isobars)
+// drift indigo -> evergreen across the right half of the hero, with one or two
+// evergreen "peak" highlights. Quiet, cartographic, low visual weight.
+//
+// - Purely decorative: aria-hidden, pointer-events: none, masked away from hero text.
+// - Deterministic: every contour, peak position and animation phase derives from `seed`.
+// - Server-rendered SVG: works with NO JS. Optional slow CSS breathing is gated by
+//   `prefers-reduced-motion: no-preference`, so reduced-motion users get the static field.
+// - Themeable via design tokens: --color-primary (dormant indigo), --color-living
+//   (alive evergreen), --canopy-alive (summit tint) and --hero-glow (ambience).
+//   These adapt to light/dark + daypart automatically; literal fallbacks are decorative only.
+
+interface Props {
+  seed?: number
+  daypart?: 'dawn' | 'day' | 'dusk' | 'night'
+}
+
+const { seed = 1, daypart = 'day' } = Astro.props
+
+// --- deterministic PRNG (mulberry32) ---
+function mulberry32(a: number) {
+  let s = a >>> 0
+  return () => {
+    s = (s + 0x6d2b79f5) | 0
+    let t = Math.imul(s ^ (s >>> 15), 1 | s)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+const rnd = mulberry32((seed >>> 0) * 0x9e3779b1 + 0x1234567)
+
+const W = 460
+const H = 620
+const round = (n: number) => Math.round(n * 10) / 10
+
+type Pt = [number, number]
+const mid = (a: Pt, b: Pt): Pt => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+
+// smooth CLOSED path through points (quadratic through midpoints — buttery, cheap)
+function closedPath(pts: Pt[]) {
+  const n = pts.length
+  const m0 = mid(pts[n - 1], pts[0])
+  let d = `M${round(m0[0])} ${round(m0[1])}`
+  for (let i = 0; i < n; i++) {
+    const p = pts[i]
+    const m = mid(p, pts[(i + 1) % n])
+    d += `Q${round(p[0])} ${round(p[1])} ${round(m[0])} ${round(m[1])}`
+  }
+  return `${d}Z`
+}
+
+// smooth OPEN path through points
+function openPath(pts: Pt[]) {
+  let d = `M${round(pts[0][0])} ${round(pts[0][1])}`
+  for (let i = 1; i < pts.length - 1; i++) {
+    const p = pts[i]
+    const nx = pts[i + 1]
+    d += `Q${round(p[0])} ${round(p[1])} ${round((p[0] + nx[0]) / 2)} ${round((p[1] + nx[1]) / 2)}`
+  }
+  const last = pts[pts.length - 1]
+  return `${d}L${round(last[0])} ${round(last[1])}`
+}
+
+// --- a peak: nested wobbly contour rings that share one wobble shape so they nest cleanly ---
+interface Ring {
+  d: string
+  opacity: number
+  alive: boolean
+  summit: boolean
+}
+interface Peak {
+  rings: Ring[]
+  cx: number
+  cy: number
+  dur: number
+  delay: number
+}
+
+function buildPeak(
+  cx: number,
+  cy: number,
+  count: number,
+  r0: number,
+  step: number,
+  wobble: number,
+  alivePeak: boolean,
+): Peak {
+  const harmonics = [2, 3, 5]
+  const rawAmps = harmonics.map(() => rnd() * 0.6 + 0.4)
+  const ampSum = rawAmps.reduce((a, b) => a + b, 0)
+  const amps = rawAmps.map((a) => a / ampSum) // normalise so |wobble| <= `wobble` < step (no self-intersection)
+  const phases = harmonics.map(() => rnd() * Math.PI * 2)
+  const SAMPLES = 46
+  const rings: Ring[] = []
+  // draw outer rings first (under), inner last (over)
+  for (let i = count - 1; i >= 0; i--) {
+    const baseR = r0 + i * step
+    const pts: Pt[] = []
+    for (let s = 0; s < SAMPLES; s++) {
+      const th = (s / SAMPLES) * Math.PI * 2
+      let w = 0
+      for (let k = 0; k < harmonics.length; k++) w += amps[k] * Math.sin(harmonics[k] * th + phases[k])
+      const r = baseR + wobble * w
+      pts.push([cx + Math.cos(th) * r, cy + Math.sin(th) * r])
+    }
+    const t = 1 - i / Math.max(1, count - 1) // 0 = outer, 1 = inner
+    rings.push({
+      d: closedPath(pts),
+      opacity: round(0.24 + t * 0.26),
+      alive: alivePeak && i <= 2,
+      summit: alivePeak && i === 0,
+    })
+  }
+  return { rings, cx, cy, dur: round(9 + rnd() * 3), delay: round(rnd() * -6) }
+}
+
+// main "alive" peak sits bottom-right (the green end of the gradient);
+// a quieter secondary peak sits upper-left (the indigo end).
+const peakA = buildPeak(W * (0.6 + rnd() * 0.08), H * (0.62 + rnd() * 0.08), 9, 16, 27, 12, true)
+const peakB = buildPeak(W * (0.26 + rnd() * 0.08), H * (0.24 + rnd() * 0.06), 6, 14, 25, 11, false)
+const peaks = [peakA, peakB]
+
+// open isobar-like sweeps that cross the panel and tie the composition together
+interface Line {
+  d: string
+  opacity: number
+}
+const lines: Line[] = []
+const LINE_COUNT = 4
+for (let l = 0; l < LINE_COUNT; l++) {
+  const baseY = H * (0.12 + (l / (LINE_COUNT - 1)) * 0.76) + (rnd() - 0.5) * 30
+  const amp = 22 + rnd() * 24
+  const freq = 1.1 + rnd() * 0.8
+  const ph = rnd() * Math.PI * 2
+  const pts: Pt[] = []
+  const STEPS = 24
+  for (let s = 0; s <= STEPS; s++) {
+    const x = -50 + (s / STEPS) * (W + 100)
+    const y = baseY + Math.sin((x / W) * Math.PI * 2 * freq + ph) * amp
+    pts.push([x, y])
+  }
+  lines.push({ d: openPath(pts), opacity: round(0.12 + rnd() * 0.07) })
+}
+
+const gradId = `cc-grad-${seed}`
+const glowId = `cc-glow-${seed}`
+
+// Decorative-only fallbacks (used solely if a token is absent). These never carry text.
+const canopyFallback: Record<string, string> = {
+  dawn: 'rgba(45, 212, 191, 0.20)',
+  day: 'rgba(16, 185, 129, 0.18)',
+  dusk: 'rgba(13, 148, 136, 0.20)',
+  night: 'rgba(94, 234, 212, 0.16)',
+}
+const glowFallback: Record<string, string> = {
+  dawn: 'rgba(94, 234, 212, 0.16)',
+  day: 'rgba(16, 185, 129, 0.14)',
+  dusk: 'rgba(20, 184, 166, 0.16)',
+  night: 'rgba(45, 212, 191, 0.12)',
+}
+const canopyTint = `var(--canopy-alive, ${canopyFallback[daypart]})`
+const glowTint = `var(--hero-glow, ${glowFallback[daypart]})`
+---
+
+<div class="canopy" aria-hidden="true" data-daypart={daypart}>
+  <svg
+    class="canopy__svg"
+    viewBox={`0 0 ${W} ${H}`}
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+    role="presentation"
+    focusable="false"
+  >
+    <defs>
+      {/* indigo (top-left) giving way to evergreen (bottom-right), ~155deg axis */}
+      <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={W * 0.92} y2={H}>
+        <stop offset="0%" stop-color="var(--color-primary, #4F46E5)" />
+        <stop offset="42%" stop-color="var(--color-primary, #4F46E5)" />
+        <stop offset="78%" stop-color="var(--color-living, #0B6E5F)" />
+        <stop offset="100%" stop-color="var(--color-living, #0B6E5F)" />
+      </linearGradient>
+      <radialGradient id={glowId} cx={peakA.cx} cy={peakA.cy} r={H * 0.52} gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color={glowTint} />
+        <stop offset="100%" stop-color="transparent" />
+      </radialGradient>
+    </defs>
+
+    {/* ambient glow behind the alive peak */}
+    <rect class="canopy__glow" x="0" y="0" width={W} height={H} fill={`url(#${glowId})`} />
+
+    {/* open isobar sweeps */}
+    <g class="canopy__lines" fill="none" stroke={`url(#${gradId})`} stroke-width="1">
+      {lines.map((ln) => <path d={ln.d} vector-effect="non-scaling-stroke" style={`opacity:${ln.opacity}`} />)}
+    </g>
+
+    {/* nested contour peaks */}
+    {
+      peaks.map((pk) => (
+        <g
+          class="canopy__peak"
+          style={`--ox:${round(pk.cx)}px;--oy:${round(pk.cy)}px;--dur:${pk.dur}s;--delay:${pk.delay}s`}
+        >
+          {pk.rings.map((r) => (
+            <path
+              d={r.d}
+              fill={r.summit ? canopyTint : 'none'}
+              stroke={`url(#${gradId})`}
+              stroke-width={r.alive ? 1.25 : 1}
+              vector-effect="non-scaling-stroke"
+              style={`opacity:${r.opacity}`}
+            />
+          ))}
+        </g>
+      ))
+    }
+  </svg>
+</div>
+
+<style>
+  .canopy {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .canopy__svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 62%;
+    min-width: 440px;
+    /* keep total weight low and fade the field away from the (left-aligned) hero text */
+    opacity: 0.6;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 24%, #000 56%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 24%, #000 56%);
+  }
+
+  :global([data-theme='dark']) .canopy__svg {
+    opacity: 0.72;
+  }
+
+  /* On narrow screens the field sits behind full-width text — pull it back hard. */
+  @media (max-width: 767px) {
+    .canopy__svg {
+      width: 78%;
+      min-width: 0;
+      opacity: 0.3;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 38%, #000 72%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 38%, #000 72%);
+    }
+    :global([data-theme='dark']) .canopy__svg {
+      opacity: 0.4;
+    }
+  }
+
+  /* Very slow, low-amplitude "breathing". Static (no animation) without this block,
+     so the server-rendered field is the no-JS / reduced-motion fallback. */
+  @media (prefers-reduced-motion: no-preference) {
+    .canopy__peak {
+      transform-box: view-box;
+      transform-origin: var(--ox) var(--oy);
+      animation: canopy-breathe var(--dur, 10s) ease-in-out var(--delay, 0s) infinite;
+    }
+
+    .canopy__lines {
+      animation: canopy-drift 17s ease-in-out infinite;
+    }
+
+    .canopy__glow {
+      animation: canopy-glow 12s ease-in-out infinite;
+    }
+
+    @keyframes canopy-breathe {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.008);
+      }
+    }
+
+    @keyframes canopy-drift {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(-6px);
+      }
+    }
+
+    @keyframes canopy-glow {
+      0%,
+      100% {
+        opacity: 0.82;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+  }
+</style>

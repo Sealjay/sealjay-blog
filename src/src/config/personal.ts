@@ -24,7 +24,7 @@ export const professionalBadges: Badge[] = [
     url: tagMvpUrl('https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4'),
   },
   {
-    text: 'Doctoral Student, Green AI (UEL, 2022\u20132027)',
+    text: 'Data.D Candidate (ABD), Green AI (UEL, 2022\u20132027)',
     url: 'https://orcid.org/0000-0001-7995-7865',
   },
   {
