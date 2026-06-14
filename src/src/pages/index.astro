@@ -16,7 +16,7 @@ import Section from '../components/containers/Section.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
 import { currentRole } from '../config/personal'
 import { readingTime } from '../lib/reading-time'
-import portraitSrc from '../assets/chris/portrait.jpg'
+import portraitSrc from '../assets/chris/avatar.jpg'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -197,7 +197,6 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
   <Section bg="alt" ariaLabel="Recent writing">
     <Container>
       <div class="section-head">
-        <span class="section-kicker" style="--kicker: var(--color-cat-ai)">Latest essays</span>
         <h2 class="section-title font-heading">Recent Writing</h2>
       </div>
       <div class="writing-list">
@@ -228,7 +227,6 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
   <Section bg="default" ariaLabel="Featured projects">
     <Container>
       <div class="section-head">
-        <span class="section-kicker" style="--kicker: var(--color-cat-green)">Things I build</span>
         <h2 class="section-title font-heading">Featured Projects</h2>
       </div>
       {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
@@ -239,7 +237,6 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
   <Section bg="alt" ariaLabel="Latest notes">
     <Container>
       <div class="section-head">
-        <span class="section-kicker" style="--kicker: var(--color-cat-dev)">From the notebook</span>
         <h2 class="section-title font-heading">Latest Notes</h2>
       </div>
       {dayGroups.length > 0 && (
@@ -339,12 +336,12 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
     inset: 0;
     background: linear-gradient(150deg, var(--color-primary) 0%, var(--color-living) 100%);
     mix-blend-mode: color;
-    opacity: 0.82;
+    opacity: 0.68;
     pointer-events: none;
   }
 
   :global([data-theme='dark']) .hero-portrait__duotone {
-    opacity: 0.68;
+    opacity: 0.58;
   }
 
   .hero-portrait__ring {
@@ -415,6 +412,13 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-bento {
+      margin-top: 2.5rem;
+    }
   }
 
   @media (min-width: 768px) {
@@ -488,30 +492,8 @@ const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
   /* ============================================================
      Section Titles
      ============================================================ */
-  /* Section heads — topic-coloured newspaper kicker over the title for rhythm */
   .section-head {
     margin-bottom: 1.5rem;
-  }
-
-  .section-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-heading);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--kicker, var(--color-primary));
-    margin-bottom: 0.4rem;
-  }
-
-  .section-kicker::before {
-    content: '';
-    width: 1.5rem;
-    height: 2px;
-    border-radius: 2px;
-    background: var(--kicker, var(--color-primary));
   }
 
   .section-title {
