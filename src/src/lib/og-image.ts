@@ -692,28 +692,301 @@ async function getFonts(): Promise<FontEntry[]> {
 // Public API – generate a PNG buffer for a blog post
 // ---------------------------------------------------------------------------
 
-export async function generateOGImage(input: OGTemplateInput): Promise<ArrayBuffer> {
+async function renderPng(template: unknown, outputWidth = 1200): Promise<ArrayBuffer> {
   const fonts = await getFonts()
-  const template = buildTemplate(input)
+  // Design at 1200x630; rasterise at outputWidth (downscale for on-page thumbnails).
+  const svg = await satori(template as any, { width: 1200, height: 630, fonts })
+  const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: outputWidth } })
+  return Uint8Array.from(resvg.render().asPng()).buffer
+}
 
-  const svg = await satori(template as any, {
-    width: 1200,
-    height: 630,
-    fonts,
-  })
-
-  const resvg = new Resvg(svg, {
-    fitTo: {
-      mode: 'width',
-      value: 1200,
-    },
-  })
-
-  const pngData = resvg.render()
-  const png = pngData.asPng()
-  return Uint8Array.from(png).buffer
+export async function generateOGImage(input: OGTemplateInput): Promise<ArrayBuffer> {
+  return renderPng(buildTemplate(input))
 }
 
 export function getOGImagePath(slug: string): string {
   return `/og/${slug}.png`
+}
+
+export function getCardArtPath(slug: string): string {
+  return `/og/card/${slug}.png`
+}
+
+// ---------------------------------------------------------------------------
+// Card-art: title-FREE thumbnail for the blog index. The post title already
+// sits beside the thumbnail, so this carries only colour + pattern + category
+// — injecting the per-topic palette across the index instead of repeating text.
+// ---------------------------------------------------------------------------
+
+function buildCardArtTemplate(input: { tags: string[] | undefined; slug: string }) {
+  const category = resolveCategory(input.tags)
+  const seed = hashSlug(input.slug)
+  const patternElements = generatePatternElements(category.pattern, category.accent, seed)
+
+  return {
+    type: 'div',
+    props: {
+      style: {
+        width: '1200px',
+        height: '630px',
+        display: 'flex',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(155deg, #0C0A1D 0%, #1E1660 30%, #14463E 70%, #0C0A1D 96%)',
+        fontFamily: 'Bricolage Grotesque, Source Serif 4, sans-serif',
+      },
+      children: [
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              width: '1200px',
+              height: '630px',
+              background: `radial-gradient(ellipse at 75% 60%, ${category.accentMuted}26 0%, transparent 60%)`,
+            },
+          },
+        },
+        ...patternElements,
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              left: '0',
+              top: '0',
+              width: '8px',
+              height: '630px',
+              background: `linear-gradient(180deg, ${category.accent} 0%, ${category.accentMuted} 100%)`,
+            },
+          },
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '30px',
+              width: '1200px',
+              height: '630px',
+            },
+            children: [
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '18px',
+                    padding: '16px 38px',
+                    borderRadius: '9999px',
+                    backgroundColor: `${category.accent}1f`,
+                    border: `1px solid ${category.accent}55`,
+                  },
+                  children: [
+                    {
+                      type: 'div',
+                      props: {
+                        style: { width: '20px', height: '20px', borderRadius: '50%', backgroundColor: category.accent },
+                      },
+                    },
+                    {
+                      type: 'div',
+                      props: {
+                        style: {
+                          fontSize: '42px',
+                          fontWeight: 600,
+                          fontFamily: 'Bricolage Grotesque',
+                          color: category.accent,
+                        },
+                        children: category.name,
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                type: 'div',
+                props: {
+                  style: { fontSize: '24px', fontFamily: 'Source Serif 4', color: '#9BA3CF', letterSpacing: '0.04em' },
+                  children: '// open, sustainable, real',
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              bottom: '38px',
+              right: '48px',
+              display: 'flex',
+              fontSize: '20px',
+              fontFamily: 'Source Serif 4',
+              color: '#6670A0',
+            },
+            children: 'sealjay.com',
+          },
+        },
+      ],
+    },
+  }
+}
+
+export async function generateCardArt(input: { tags: string[] | undefined; slug: string }): Promise<ArrayBuffer> {
+  // Rasterise at 600px — the index thumbnail only renders ~256px wide, so this
+  // cuts each card image to roughly a quarter of the full-size byte weight.
+  return renderPng(buildCardArtTemplate(input), 600)
+}
+
+// ---------------------------------------------------------------------------
+// Branded home/profile card — the homepage's social share image (instead of a
+// bare headshot). Name + role + honours + the // open, sustainable, real motif.
+// ---------------------------------------------------------------------------
+
+function buildHomeTemplate() {
+  const topics = [
+    { label: 'AI', color: '#818cf8' },
+    { label: 'Green Software', color: '#34d399' },
+    { label: 'Open Source', color: '#a78bfa' },
+    { label: 'MVP', color: '#fbbf24' },
+  ]
+  return {
+    type: 'div',
+    props: {
+      style: {
+        width: '1200px',
+        height: '630px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden',
+        padding: '64px 72px',
+        background: 'linear-gradient(155deg, #0C0A1D 0%, #1E1660 28%, #14463E 62%, #0C0A1D 92%)',
+        fontFamily: 'Bricolage Grotesque, Source Serif 4, sans-serif',
+      },
+      children: [
+        {
+          type: 'div',
+          props: {
+            style: {
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              width: '1200px',
+              height: '630px',
+              background: 'radial-gradient(ellipse at 80% 30%, rgba(16,185,129,0.18) 0%, transparent 58%)',
+            },
+          },
+        },
+        // Top: wordmark + topic chips
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+            children: [
+              {
+                type: 'div',
+                props: {
+                  style: { fontSize: '30px', fontWeight: 700, fontFamily: 'Bricolage Grotesque', color: '#E0E7FF' },
+                  children: 'sealjay',
+                },
+              },
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', gap: '10px' },
+                  children: topics.map((t) => ({
+                    type: 'div',
+                    props: {
+                      style: {
+                        fontSize: '18px',
+                        fontWeight: 600,
+                        fontFamily: 'Bricolage Grotesque',
+                        color: t.color,
+                        backgroundColor: `${t.color}1f`,
+                        border: `1px solid ${t.color}44`,
+                        borderRadius: '9999px',
+                        padding: '6px 16px',
+                      },
+                      children: t.label,
+                    },
+                  })),
+                },
+              },
+            ],
+          },
+        },
+        // Middle: name + role
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '900px' },
+            children: [
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    fontSize: '88px',
+                    fontWeight: 700,
+                    fontFamily: 'Bricolage Grotesque',
+                    color: '#E0E7FF',
+                    lineHeight: 1.02,
+                    letterSpacing: '-0.03em',
+                  },
+                  children: 'Chris Lloyd-Jones',
+                },
+              },
+              {
+                type: 'div',
+                props: {
+                  style: { fontSize: '30px', fontFamily: 'Source Serif 4', color: '#9BA3CF' },
+                  children: 'VP, AI Consulting Transformation at Kyndryl · 6x Microsoft AI MVP',
+                },
+              },
+            ],
+          },
+        },
+        // Bottom: motif + watermark
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+            children: [
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', fontSize: '24px', fontFamily: 'Source Serif 4', color: '#9BA3CF' },
+                  children: [
+                    { type: 'div', props: { style: { display: 'flex', color: '#6670A0' }, children: '// open, ' } },
+                    { type: 'div', props: { style: { display: 'flex', color: '#34d399' }, children: 'sustainable' } },
+                    { type: 'div', props: { style: { display: 'flex', color: '#6670A0' }, children: ', real' } },
+                  ],
+                },
+              },
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', fontSize: '22px', fontFamily: 'Source Serif 4', color: '#6670A0' },
+                  children: 'sealjay.com',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  }
+}
+
+export async function generateHomeOGImage(): Promise<ArrayBuffer> {
+  return renderPng(buildHomeTemplate())
 }

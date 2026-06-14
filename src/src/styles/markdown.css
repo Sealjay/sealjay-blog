@@ -6,9 +6,11 @@
    (colours, fonts, backgrounds, scroll-offsets, etc.) live here.
    ============================================================ */
 
-/* Base Typography — max-width only (color & line-height from Tailwind) */
+/* Base Typography — measure only (color & line-height from Tailwind).
+   Governs prose contexts that don't override it (e.g. notes); article pages
+   use max-w-none and are constrained by the ToC grid column instead. */
 .prose {
-  max-width: 75ch;
+  max-width: 72ch;
 }
 
 /* Headings — font-family, letter-spacing, and word-wrap (Tailwind handles margins, font-size, weight) */
@@ -41,13 +43,8 @@
   scroll-margin-top: 5rem;
 }
 
-/* h4 — not defined in Tailwind typography config */
-.prose h4 {
-  font-size: 1.15rem;
-  margin-top: 1.75rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
+/* h4 font-size/line-height/margins are owned by the typography `lg` config
+   (single-source monotonic scale: h2 > h3 > h4 > body). */
 
 /* Remove extra margin when h1/h4 are adjacent to other elements
    (h2/h3 adjacent-sibling rule is in Tailwind config) */
@@ -56,19 +53,17 @@
   margin-top: 0;
 }
 
-/* Paragraph opacity (spacing from Tailwind) */
-.prose p {
-  opacity: 0.92;
-}
+/* Body colour is token-driven via --tw-prose-body (var(--color-text)) — no opacity. */
 
-/* Link underline-offset and hover accent (base link styling from Tailwind) */
+/* Link underline-offset; base colour from Tailwind. Hover goes evergreen (Living Ink),
+   which also clears AA (5.85:1) — the old --color-accent hover failed AA as text. */
 .prose a {
   text-underline-offset: 2px;
 }
 
 .prose a:hover {
-  color: var(--color-accent);
-  text-decoration-color: var(--color-accent);
+  color: var(--color-living);
+  text-decoration-color: var(--color-living);
 }
 
 /* List marker colour (list-style-type, padding, and spacing from Tailwind) */
@@ -76,14 +71,16 @@
   color: var(--color-text-subtle);
 }
 
-/* Blockquote enhanced styling (font-style and border-left basics from Tailwind) */
+/* Blockquote = typographic pull-quote — deliberately DISTINCT from the filled
+   .note/.warning/.tip callout boxes (no fill; evergreen rule; larger serif italic). */
 .prose blockquote {
-  background-color: var(--color-primary-muted);
-  margin: 1.5rem 0;
-  padding: 1rem 1.5rem;
-  border-radius: 0 0.625rem 0.625rem 0;
-  border-left-width: 3px;
-  border-left-color: var(--color-primary);
+  background: none;
+  margin: 2rem 0;
+  padding: 0.25rem 0 0.25rem 1.5rem;
+  border-left: 3px solid var(--color-living);
+  font-size: 1.15em;
+  font-style: italic;
+  color: var(--color-text-muted);
 }
 
 .prose blockquote p {
@@ -140,10 +137,6 @@
   .prose h1 {
     font-size: 2.5rem;
   }
-
-  .prose h4 {
-    font-size: 1.25rem;
-  }
 }
 
 /* Special styles for note/warning/tip blocks */
@@ -173,4 +166,45 @@
 
 [data-theme="dark"] .prose .tip {
   background-color: rgba(52, 211, 153, 0.1);
+}
+
+/* ============================================================
+   Editorial flourish (Living Ink)
+   Standfirst lede + a single Bricolage drop-cap — one ornament
+   per article so the reading experience feels edited, not busy.
+   ============================================================ */
+.standfirst {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0 0 1.75rem;
+  max-width: 42rem;
+  text-wrap: pretty;
+}
+
+/* Drop-cap on the first paragraph only; opt-in via .has-dropcap on the prose container. */
+.prose.has-dropcap > p:first-child::first-letter {
+  float: left;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding: 0.04em 0.1em 0 0;
+  margin: 0.02em 0.04em 0 0;
+  color: var(--color-primary);
+}
+
+/* Green-software / sustainability posts: the drop-cap takes the evergreen ink. */
+.prose.has-dropcap.is-living > p:first-child::first-letter {
+  color: var(--color-living);
+}
+
+@media (max-width: 480px) {
+  .prose.has-dropcap > p:first-child::first-letter {
+    font-size: 2.8em;
+  }
+  .standfirst {
+    font-size: 1.125rem;
+  }
 }

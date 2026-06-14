@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
+import { Image } from 'astro:assets'
 import Layout from '../layouts/BaseLayout.astro'
 
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
@@ -9,10 +10,13 @@ import LatestArticle from '../components/home/LatestArticle.astro'
 import RecentTalks from '../components/home/RecentTalks.astro'
 import FeaturedProjects from '../components/home/FeaturedProjects.astro'
 import LatestNotes from '../components/home/LatestNotes.astro'
+import GridOfLife from '../components/home/GridOfLife.astro'
 import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
 import { currentRole } from '../config/personal'
+import { readingTime } from '../lib/reading-time'
+import portraitSrc from '../assets/chris/avatar.jpg'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -100,8 +104,22 @@ const totalNoteCount = dayGroups.reduce((sum, g) => sum + g.totalCount, 0)
 const hasMoreContent = sortedDayKeys.length > dayGroups.length
   || dayGroups.some((g) => g.totalCount > g.previews.length)
 
-// --- Expertise tags for hero ---
-const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI MVP']
+// --- Expertise tags for hero (topic-coloured to read as a spectrum of disciplines) ---
+const expertiseTags = [
+  { label: 'AI Transformation', cat: 'ai' },
+  { label: 'Green Software', cat: 'green' },
+  { label: 'Open Source', cat: 'oss' },
+  { label: 'AI MVP', cat: 'events' },
+]
+
+// --- Decorative hero canopy seed + daypart (derived at build time; the component is Date-free) ---
+const _now = new Date()
+const heroSeed =
+  _now.getUTCFullYear() * 1000 +
+  Math.floor((Date.UTC(_now.getUTCFullYear(), _now.getUTCMonth(), _now.getUTCDate()) - Date.UTC(_now.getUTCFullYear(), 0, 0)) / 86400000)
+const _hr = _now.getHours()
+const heroDaypart: 'dawn' | 'day' | 'dusk' | 'night' =
+  _hr < 5 ? 'night' : _hr < 8 ? 'dawn' : _hr < 17 ? 'day' : _hr < 21 ? 'dusk' : 'night'
 
 ---
 
@@ -110,47 +128,66 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   description="AI transformation, green software, and open source | Chris Lloyd-Jones (Sealjay), VP at Kyndryl and 6x Microsoft AI MVP"
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2026')}
+  image="/og/home.png"
+  imageAlt="Chris Lloyd-Jones — VP, AI Consulting Transformation at Kyndryl, 6x Microsoft AI MVP — open, sustainable, real"
 >
   <!-- Hero Section -->
   <div class="hero-section">
-    <!-- Ambient radial glow -->
-    <div class="hero-glow" aria-hidden="true" />
+    <!-- Living Ink canopy: a carbon-aware "grid of life" — indigo giving way to green -->
+    <GridOfLife seed={heroSeed} daypart={heroDaypart} />
     <Container class="hero-content">
       <div class="h-card">
         <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
         <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
 
-        <!-- Name -->
-        <h1 class="hero-title font-heading hero-anim" style="animation-delay: 0.08s;">
-          <span class="p-name">Chris Lloyd-Jones</span>
-        </h1>
+        <div class="hero-top">
+          <div class="hero-text">
+            <!-- Name -->
+            <h1 class="hero-title font-heading hero-anim" style="animation-delay: 0.08s;">
+              <span class="p-name">Chris Lloyd-Jones</span>
+            </h1>
 
-        <!-- Subtitle -->
-        <p class="hero-subtitle font-body hero-anim" style="animation-delay: 0.16s;">
-          <span class="p-job-title">{currentRole.title}</span> &mdash; {currentRole.company}
-        </p>
+            <!-- Subtitle -->
+            <p class="hero-subtitle font-body hero-anim" style="animation-delay: 0.16s;">
+              <span class="p-job-title">{currentRole.title}</span> &mdash; {currentRole.company}
+            </p>
 
-        <!-- Bio -->
-        <p class="hero-bio font-body p-note hero-anim" style="animation-delay: 0.24s;">
-          I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. I bridge AI transformation with enterprise governance, sustainability, and open source &mdash; from green software to agentic AI. 6x Microsoft MVP, doctoral researcher in Green Software Engineering, and co-host of <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a>.
-        </p>
+            <!-- Bio -->
+            <p class="hero-bio font-body p-note hero-anim" style="animation-delay: 0.24s;">
+              I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. I bridge AI transformation with enterprise governance, sustainability, and open source &mdash; from green software to agentic AI. 6x Microsoft MVP, Data.D candidate in Green AI at the University of East London, and co-host of <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a>.
+            </p>
 
-        <!-- Expertise tags -->
-        <div class="hero-tags hero-anim" style="animation-delay: 0.28s;">
-          {expertiseTags.map((tag) => (
-            <Badge label={tag} variant="default" />
-          ))}
+            <!-- Expertise tags (topic-coloured) -->
+            <div class="hero-tags hero-anim" style="animation-delay: 0.28s;">
+              {expertiseTags.map((t) => (
+                <Badge
+                  label={t.label}
+                  variant="default"
+                  style={`--tag-color: var(--color-cat-${t.cat}); --tag-bg: var(--color-cat-${t.cat}-bg);`}
+                />
+              ))}
+            </div>
+
+            <!-- Code signature -->
+            <div class="hero-code-signature hero-anim" style="animation-delay: 0.44s;">
+              <code><span class="code-comment">// </span><span class="code-keyword">open</span>, <span class="code-living">sustainable</span>, real</code>
+            </div>
+          </div>
+
+          <!-- Visual anchor: duotone portrait over the living canopy -->
+          <div class="hero-visual hero-anim" style="animation-delay: 0.32s;" aria-hidden="true">
+            <div class="hero-portrait">
+              <Image src={portraitSrc} alt="" width={520} height={520} loading="eager" class="hero-portrait__img" />
+              <span class="hero-portrait__duotone"></span>
+              <span class="hero-portrait__ring"></span>
+            </div>
+          </div>
         </div>
 
         <!-- Bento grid: Latest Article + Next Speaking -->
         <div class="hero-bento hero-anim" style="animation-delay: 0.36s;">
           {latestPost && <LatestArticle post={latestPost} />}
           {nextTalk.length > 0 && <RecentTalks entries={nextTalk} />}
-        </div>
-
-        <!-- Code signature -->
-        <div class="hero-code-signature hero-anim" style="animation-delay: 0.44s;">
-          <code><span class="code-comment">// </span><span class="code-keyword">open</span>, sustainable, real</code>
         </div>
       </div>
     </Container>
@@ -159,12 +196,13 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   <!-- Recent Writing Section -->
   <Section bg="alt" ariaLabel="Recent writing">
     <Container>
-      <h2 class="section-title font-heading">Recent Writing</h2>
+      <div class="section-head">
+        <h2 class="section-title font-heading">Recent Writing</h2>
+      </div>
       <div class="writing-list">
         {recentPosts.map((post) => {
           const firstTag = post.data.tags?.[0]
-          const words = post.body?.split(/\s+/).length ?? 0
-          const readingTime = Math.max(1, Math.ceil(words / 200))
+          const minutes = readingTime(post.body)
           return (
             <a href={`/blog/${post.id}/`} class="writing-card">
               <div class="writing-card__row">
@@ -172,7 +210,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
                   <span class="writing-card__tag">{firstTag}</span>
                 )}
                 <FormattedDate date={post.data.pubDateTime} class="writing-card__date" />
-                <span class="writing-card__reading-time">{readingTime} min read</span>
+                <span class="writing-card__reading-time">{minutes} min read</span>
               </div>
               <h3 class="writing-card__title font-heading">{post.data.title}</h3>
             </a>
@@ -188,7 +226,9 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   <!-- Featured Projects Section -->
   <Section bg="default" ariaLabel="Featured projects">
     <Container>
-      <h2 class="section-title font-heading">Featured Projects</h2>
+      <div class="section-head">
+        <h2 class="section-title font-heading">Featured Projects</h2>
+      </div>
       {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
     </Container>
   </Section>
@@ -196,7 +236,9 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   <!-- Latest Notes Section -->
   <Section bg="alt" ariaLabel="Latest notes">
     <Container>
-      <h2 class="section-title font-heading">Latest Notes</h2>
+      <div class="section-head">
+        <h2 class="section-title font-heading">Latest Notes</h2>
+      </div>
       {dayGroups.length > 0 && (
         <LatestNotes
           dayGroups={dayGroups}
@@ -222,41 +264,93 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   .hero-section {
     position: relative;
     background: var(--gradient-hero);
-    padding-top: 2rem;
+    padding-top: 2.5rem;
     padding-bottom: 2rem;
     overflow: hidden;
   }
 
   @media (min-width: 768px) {
     .hero-section {
-      padding-top: 3.5rem;
-      padding-bottom: 2.5rem;
-    }
-  }
-
-  .hero-glow {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
-    top: -150px;
-    right: -80px;
-    pointer-events: none;
-  }
-
-  @media (max-width: 640px) {
-    .hero-glow {
-      width: 300px;
-      height: 300px;
-      top: -100px;
-      right: -100px;
+      padding-top: 4rem;
+      padding-bottom: 3rem;
     }
   }
 
   .hero-content {
     position: relative;
     z-index: 1;
+  }
+
+  /* Two-column hero: text + living visual */
+  .hero-top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .hero-top {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 2.5rem;
+    }
+  }
+
+  .hero-text {
+    min-width: 0;
+  }
+
+  /* Hidden below md — the canopy alone carries the identity on small screens */
+  .hero-visual {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .hero-portrait {
+    position: relative;
+    width: min(100%, 300px);
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 20px 55px -22px var(--hero-glow), var(--color-card-glow);
+    isolation: isolate;
+  }
+
+  .hero-portrait__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Natural photo with only a light desaturation; the overlay adds a gentle brand tint */
+    filter: saturate(0.92) contrast(1.02);
+  }
+
+  .hero-portrait__duotone {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(150deg, var(--color-primary) 0%, var(--color-living) 100%);
+    /* soft-light keeps natural skin tones, just a subtle indigo->green cast (not a full duotone) */
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  :global([data-theme='dark']) .hero-portrait__duotone {
+    opacity: 0.45;
+  }
+
+  .hero-portrait__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid var(--color-border-strong);
+    pointer-events: none;
   }
 
   .hero-tags {
@@ -267,18 +361,12 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   }
 
   .hero-title {
-    font-size: 2rem;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
+    font-size: clamp(2.25rem, 5vw + 1rem, 4.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 0.5rem;
-  }
-
-  @media (min-width: 768px) {
-    .hero-title {
-      font-size: 2.75rem;
-    }
   }
 
   .hero-subtitle {
@@ -325,6 +413,13 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-bento {
+      margin-top: 2.5rem;
+    }
   }
 
   @media (min-width: 768px) {
@@ -345,6 +440,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
     font-family: var(--font-code);
     font-size: 0.875rem;
     color: var(--color-text-muted);
+    width: fit-content;
     max-width: 100%;
   }
 
@@ -359,6 +455,11 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
 
   .code-keyword {
     color: var(--color-warm);
+    font-weight: 600;
+  }
+
+  .code-living {
+    color: var(--color-living);
     font-weight: 600;
   }
 
@@ -392,19 +493,22 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   /* ============================================================
      Section Titles
      ============================================================ */
+  .section-head {
+    margin-bottom: 1.5rem;
+  }
+
   .section-title {
     font-size: 1.375rem;
     line-height: 1.25;
     letter-spacing: -0.02em;
     font-weight: 600;
     color: var(--color-text);
-    margin: 0 0 1.5rem;
+    margin: 0;
   }
 
   @media (min-width: 768px) {
     .section-title {
       font-size: 1.75rem;
-      margin-bottom: 1.5rem;
     }
   }
 
@@ -453,7 +557,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
   .writing-card__tag {
     display: inline-flex;
     align-items: center;
-    font-size: 10px;
+    font-size: 11px;
     padding: 2px 8px;
     border-radius: 12px;
     background: var(--color-primary-muted);

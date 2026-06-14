@@ -144,7 +144,7 @@ module.exports = {
           '--tw-prose-body': 'var(--color-text)',
           '--tw-prose-headings': 'var(--color-text)',
           '--tw-prose-links': 'var(--color-primary)',
-          '--tw-prose-links-hover': 'var(--color-primary-hover)',
+          '--tw-prose-links-hover': 'var(--color-living)',
           '--tw-prose-underline': 'var(--color-primary-underline, rgba(99, 102, 241, 0.2))',
           '--tw-prose-underline-hover': 'var(--color-primary)',
           '--tw-prose-bold': 'var(--color-text)',
@@ -369,6 +369,15 @@ module.exports = {
           ':is(tbody, tfoot) td:not(:last-child)': {
             paddingRight: '0.5rem',
           },
+        },
+      },
+      // prose-lg (18px base) — single source of truth for the article heading scale.
+      // Strictly monotonic: h2 > h3 > h4 > body, fixing the old h3==body / h4>h3 inversion.
+      lg: {
+        css: {
+          h2: { fontSize: '1.55em', lineHeight: '1.25', marginTop: '2.5rem', marginBottom: '0.75rem' },
+          h3: { fontSize: '1.25em', lineHeight: '1.3', marginTop: '2rem', marginBottom: '0.5rem' },
+          h4: { fontSize: '1.08em', lineHeight: '1.4', marginTop: '1.75rem', marginBottom: '0.5rem' },
         },
       },
     }),

@@ -3,7 +3,7 @@
     id="theme-toggle"
     role="switch"
     aria-checked="false"
-    aria-label="Switch to dark mode"
+    aria-label="Dark mode"
     style="
       position: relative;
       display: inline-flex;
@@ -26,7 +26,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.45s var(--ease-spring);
     ">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="5"/>
@@ -46,7 +46,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.45s var(--ease-spring);
     ">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -124,25 +124,19 @@
         sunIcon.style.transition = "none";
         moonIcon.style.transition = "none";
         updateIcons(currentMode);
-        // Re-enable transitions after paint
+        // Re-enable transitions after paint (spring for a tasteful pop)
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             sunIcon.style.transition =
-              "opacity 0.3s ease, transform 0.3s ease";
+              "opacity 0.3s ease, transform 0.45s var(--ease-spring)";
             moonIcon.style.transition =
-              "opacity 0.3s ease, transform 0.3s ease";
+              "opacity 0.3s ease, transform 0.45s var(--ease-spring)";
           });
         });
       }
 
-      // Set initial ARIA state
-      if (currentMode === "dark") {
-        toggle.setAttribute("aria-checked", "true");
-        toggle.setAttribute("aria-label", "Switch to light mode");
-      } else {
-        toggle.setAttribute("aria-checked", "false");
-        toggle.setAttribute("aria-label", "Switch to dark mode");
-      }
+      // Set initial ARIA state (stable accessible name; aria-checked carries state)
+      toggle.setAttribute("aria-checked", currentMode === "dark" ? "true" : "false");
 
       // Hover styles
       toggle.addEventListener("mouseenter", () => {
@@ -163,12 +157,6 @@
         toggle.setAttribute(
           "aria-checked",
           currentMode === "dark" ? "true" : "false",
-        );
-        toggle.setAttribute(
-          "aria-label",
-          currentMode === "dark"
-            ? "Switch to light mode"
-            : "Switch to dark mode",
         );
 
         if (typeof window.plausible !== "undefined") {

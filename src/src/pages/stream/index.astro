@@ -350,7 +350,9 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     background: var(--color-surface);
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
   }
 
   .stream-filter-btn:hover {

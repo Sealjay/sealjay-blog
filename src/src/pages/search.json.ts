@@ -20,7 +20,7 @@ export async function GET() {
     {
       title: 'About',
       description:
-        'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, doctoral researcher, open source contributor.',
+        'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, Data.D candidate (ABD), open source contributor.',
       tags: ['about', 'bio', 'background'],
       url: '/about/',
       type: 'page' as const,
