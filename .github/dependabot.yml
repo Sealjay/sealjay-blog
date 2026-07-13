@@ -7,6 +7,16 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - 'dependencies'
+    groups:
+      npm-deps:
+        patterns:
+          - '*'
+    ignore:
+      # Tailwind majors held on v3 deliberately - see CLAUDE.md / memory
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@astrojs/tailwind'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -14,3 +24,7 @@ updates:
       interval: 'weekly'
     labels:
       - 'ci'
+    groups:
+      actions-deps:
+        patterns:
+          - '*'
