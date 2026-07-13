@@ -123,6 +123,8 @@ interface PatternElement {
   }
 }
 
+const dot = (style: Record<string, string | number>): PatternElement => ({ type: 'div', props: { style } })
+
 function seededRandom(seed: number, index: number): number {
   const x = Math.sin(seed + index * 127.1) * 43758.5453
   return x - Math.floor(x)
@@ -139,21 +141,18 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const x = seededRandom(seed, i * 3) * 300 + 880
         const y = seededRandom(seed, i * 3 + 1) * 500 + 60
         const size = 8 + seededRandom(seed, i * 3 + 2) * 24
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              borderRadius: '50%',
-              border: `2px solid ${accent}`,
-              opacity: 0.12 + seededRandom(seed, i + 100) * 0.1,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: '50%',
+            border: `2px solid ${accent}`,
+            opacity: 0.12 + seededRandom(seed, i + 100) * 0.1,
+          }),
+        )
       }
       // Connecting lines
       for (let i = 0; i < 6; i++) {
@@ -161,21 +160,18 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const y = seededRandom(seed, i * 5 + 51) * 400 + 100
         const w = 60 + seededRandom(seed, i * 5 + 52) * 120
         const rotation = seededRandom(seed, i * 5 + 53) * 360
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${w}px`,
-              height: '2px',
-              backgroundColor: accent,
-              opacity: 0.06,
-              transform: `rotate(${rotation}deg)`,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${w}px`,
+            height: '2px',
+            backgroundColor: accent,
+            opacity: 0.06,
+            transform: `rotate(${rotation}deg)`,
+          }),
+        )
       }
       break
     }
@@ -183,21 +179,18 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
       // Concentric arcs – organic/sustainability feel
       for (let i = 0; i < 8; i++) {
         const size = 100 + i * 60
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              right: `${-size / 2}px`,
-              bottom: `${-size / 2 + seededRandom(seed, i) * 40}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              borderRadius: '50%',
-              border: `2px solid ${accent}`,
-              opacity: 0.06 + (8 - i) * 0.015,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            right: `${-size / 2}px`,
+            bottom: `${-size / 2 + seededRandom(seed, i) * 40}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: '50%',
+            border: `2px solid ${accent}`,
+            opacity: 0.06 + (8 - i) * 0.015,
+          }),
+        )
       }
       break
     }
@@ -207,22 +200,19 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const x = seededRandom(seed, i * 4) * 280 + 880
         const y = seededRandom(seed, i * 4 + 1) * 450 + 80
         const size = 16 + seededRandom(seed, i * 4 + 2) * 40
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              backgroundColor: accent,
-              opacity: 0.05 + seededRandom(seed, i + 200) * 0.08,
-              transform: 'rotate(45deg)',
-              borderRadius: '4px',
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: accent,
+            opacity: 0.05 + seededRandom(seed, i + 200) * 0.08,
+            transform: 'rotate(45deg)',
+            borderRadius: '4px',
+          }),
+        )
       }
       break
     }
@@ -230,21 +220,18 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
       // Diagonal stripes – dynamic/event feel
       for (let i = 0; i < 10; i++) {
         const x = 850 + i * 35
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: '-20px',
-              width: '3px',
-              height: '700px',
-              backgroundColor: accent,
-              opacity: 0.05 + seededRandom(seed, i + 300) * 0.06,
-              transform: `rotate(${25 + seededRandom(seed, i) * 10}deg)`,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: '-20px',
+            width: '3px',
+            height: '700px',
+            backgroundColor: accent,
+            opacity: 0.05 + seededRandom(seed, i + 300) * 0.06,
+            transform: `rotate(${25 + seededRandom(seed, i) * 10}deg)`,
+          }),
+        )
       }
       break
     }
@@ -255,24 +242,21 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const y = seededRandom(seed, i * 6 + 1) * 400 + 80
         const size = 20 + seededRandom(seed, i * 6 + 2) * 30
         const isLeft = i % 2 === 0
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size * 2}px`,
-              borderLeft: isLeft ? `3px solid ${accent}` : 'none',
-              borderRight: isLeft ? 'none' : `3px solid ${accent}`,
-              borderTop: `3px solid ${accent}`,
-              borderBottom: `3px solid ${accent}`,
-              borderRadius: isLeft ? '6px 0 0 6px' : '0 6px 6px 0',
-              opacity: 0.08 + seededRandom(seed, i + 400) * 0.08,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size * 2}px`,
+            borderLeft: isLeft ? `3px solid ${accent}` : 'none',
+            borderRight: isLeft ? 'none' : `3px solid ${accent}`,
+            borderTop: `3px solid ${accent}`,
+            borderBottom: `3px solid ${accent}`,
+            borderRadius: isLeft ? '6px 0 0 6px' : '0 6px 6px 0',
+            opacity: 0.08 + seededRandom(seed, i + 400) * 0.08,
+          }),
+        )
       }
       break
     }
@@ -282,22 +266,19 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const x = seededRandom(seed, i * 7) * 280 + 880
         const y = seededRandom(seed, i * 7 + 1) * 450 + 60
         const size = 20 + seededRandom(seed, i * 7 + 2) * 35
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              border: `2px solid ${accent}`,
-              borderRadius: `${size * 0.25}px`,
-              opacity: 0.08 + seededRandom(seed, i + 500) * 0.08,
-              transform: `rotate(${30 + seededRandom(seed, i) * 30}deg)`,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            border: `2px solid ${accent}`,
+            borderRadius: `${size * 0.25}px`,
+            opacity: 0.08 + seededRandom(seed, i + 500) * 0.08,
+            transform: `rotate(${30 + seededRandom(seed, i) * 30}deg)`,
+          }),
+        )
       }
       break
     }
@@ -307,22 +288,19 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const x = seededRandom(seed, i * 8) * 250 + 900
         const y = seededRandom(seed, i * 8 + 1) * 400 + 100
         const size = 18 + seededRandom(seed, i * 8 + 2) * 28
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              borderTop: `3px solid ${accent}`,
-              borderRight: `3px solid ${accent}`,
-              opacity: 0.08 + seededRandom(seed, i + 600) * 0.08,
-              transform: `rotate(-45deg)`,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            borderTop: `3px solid ${accent}`,
+            borderRight: `3px solid ${accent}`,
+            opacity: 0.08 + seededRandom(seed, i + 600) * 0.08,
+            transform: `rotate(-45deg)`,
+          }),
+        )
       }
       break
     }
@@ -332,21 +310,18 @@ function generatePatternElements(pattern: CategoryTheme['pattern'], accent: stri
         const x = seededRandom(seed, i * 2) * 280 + 880
         const y = seededRandom(seed, i * 2 + 1) * 520 + 50
         const size = 4 + seededRandom(seed, i * 2 + 2) * 10
-        elements.push({
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              left: `${x}px`,
-              top: `${y}px`,
-              width: `${size}px`,
-              height: `${size}px`,
-              borderRadius: '50%',
-              backgroundColor: accent,
-              opacity: 0.05 + seededRandom(seed, i + 700) * 0.06,
-            },
-          },
-        })
+        elements.push(
+          dot({
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: '50%',
+            backgroundColor: accent,
+            opacity: 0.05 + seededRandom(seed, i + 700) * 0.06,
+          }),
+        )
       }
       break
     }

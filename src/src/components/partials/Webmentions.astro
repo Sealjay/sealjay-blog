@@ -9,7 +9,6 @@ interface WebmentionAuthor {
   type?: string
   name?: string
   url?: string
-  photo?: string
 }
 
 interface Webmention {
@@ -238,13 +237,6 @@ function avatarInitial(name?: string) {
     display: block;
   }
 
-  .webmentions__avatar {
-    width: 2rem;
-    height: 2rem;
-    border-radius: var(--radius-full);
-    border: 2px solid var(--color-surface);
-  }
-
   .webmentions__avatar--overlap {
     margin-right: -0.375rem;
   }
@@ -282,12 +274,6 @@ function avatarInitial(name?: string) {
 
   .webmentions__reply-avatar-link {
     flex-shrink: 0;
-  }
-
-  .webmentions__reply-avatar {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--radius-full);
   }
 
   .webmentions__reply-avatar-fallback {
@@ -365,12 +351,6 @@ function avatarInitial(name?: string) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-
-  .webmentions__mention-avatar {
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: var(--radius-full);
   }
 
   .webmentions__mention-avatar-fallback {

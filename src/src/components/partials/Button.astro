@@ -4,12 +4,7 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'ghost'
   /** Size */
   size?: 'sm' | 'md'
-  /** If provided, renders as <a> */
-  href?: string
-  /** Disabled state (only applies to <button>) */
-  disabled?: boolean
-  /** Button type attribute (only applies to <button>) */
-  type?: 'button' | 'submit' | 'reset'
+  href: string
   /** Additional CSS classes */
   class?: string
 }
@@ -18,29 +13,21 @@ const {
   variant = 'primary',
   size = 'md',
   href,
-  disabled = false,
-  type = 'button',
   class: className,
 } = Astro.props
-
-const Tag = href ? 'a' : 'button'
-const tagProps = href
-  ? { href }
-  : { type, disabled: disabled || undefined }
 ---
 
-<Tag
-  {...tagProps}
+<a
+  href={href}
   class:list={[
     'btn-component',
     `btn--${variant}`,
     `btn--${size}`,
-    disabled && 'btn--disabled',
     className,
   ]}
 >
   <slot />
-</Tag>
+</a>
 
 <style>
   .btn-component {
@@ -107,11 +94,5 @@ const tagProps = href
 
   .btn--ghost:hover {
     background: var(--color-primary-muted);
-  }
-
-  /* Disabled */
-  .btn--disabled {
-    opacity: 0.5;
-    pointer-events: none;
   }
 </style>

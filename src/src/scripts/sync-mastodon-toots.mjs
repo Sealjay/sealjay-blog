@@ -14,6 +14,9 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { decodeHtmlEntities, escapeYaml } from './lib/entities.mjs'
+import { readJson, writeJson } from './lib/json-file.mjs'
+import { mastodonGet } from './lib/mastodon.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const NOTE_DIR = join(__dirname, '..', 'content', 'note')
@@ -38,37 +41,6 @@ function compareMastodonIds(a, b) {
   if (left < right) return -1
   if (left > right) return 1
   return 0
-}
-
-// --- State management ---
-
-async function loadState() {
-  try {
-    const content = await readFile(STATE_FILE, 'utf-8')
-    return JSON.parse(content)
-  } catch {
-    return {}
-  }
-}
-
-async function saveState(state) {
-  await mkdir(DATA_DIR, { recursive: true })
-  await writeFile(STATE_FILE, `${JSON.stringify(state, null, 2)}\n`, 'utf-8')
-}
-
-// --- Mastodon API ---
-
-async function mastodonGet(path) {
-  const token = process.env.MASTODON_TOKEN
-  const instanceUrl = process.env.MASTODON_URL ?? 'https://fosstodon.org'
-
-  const res = await fetch(`${instanceUrl}${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) {
-    throw new Error(`Mastodon API error: ${res.status} ${res.statusText} for ${path}`)
-  }
-  return res.json()
 }
 
 async function downloadImage(url, tootId, index) {
@@ -222,12 +194,7 @@ function processTootHtml(html) {
     t = t.replace(/<\/p>\s*<p>/gi, '\n\n')
     t = t.replace(/<\/?p[^>]*>/gi, '')
     t = t.replace(/<[^>]+>/g, '')
-    t = t.replace(/&amp;/g, '&')
-    t = t.replace(/&lt;/g, '<')
-    t = t.replace(/&gt;/g, '>')
-    t = t.replace(/&quot;/g, '"')
-    t = t.replace(/&#39;/g, "'")
-    t = t.replace(/&nbsp;/g, ' ')
+    t = decodeHtmlEntities(t)
     t = t.replace(/\n{3,}/g, '\n\n').trim()
     t = t.replace(/@(\w+)@[\w.]+/g, '@$1')
     return t
@@ -323,10 +290,6 @@ async function removeStaleDaySummaries(existingNotes, affectedDays) {
 }
 
 // --- Note generation ---
-
-function escapeYaml(str) {
-  return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-}
 
 function generateSlug(description, date) {
   const datePrefix = date.slice(0, 10)
@@ -424,7 +387,7 @@ async function main() {
     process.exit(1)
   }
 
-  const state = await loadState()
+  const state = await readJson(STATE_FILE, {})
   const sinceId = state.sinceId ?? null
 
   console.log(`Fetching ${fetchLimit ? `up to ${fetchLimit}` : 'all available'} toots...`)
@@ -548,7 +511,7 @@ async function main() {
     const allDaysNeeding = [...new Set([...existingDaysNeeding, ...daysNeedingSummary])]
 
     const newSinceId = sorted[sorted.length - 1]?.id ?? sinceId
-    await saveState({
+    await writeJson(STATE_FILE, {
       sinceId: newSinceId,
       lastSync: new Date().toISOString(),
       daysNeedingSummary: allDaysNeeding.length > 0 ? allDaysNeeding : undefined,
@@ -556,7 +519,7 @@ async function main() {
   } else if (!dryRun) {
     // Even if nothing created, advance since_id
     const newSinceId = sorted[sorted.length - 1]?.id ?? sinceId
-    await saveState({
+    await writeJson(STATE_FILE, {
       ...state,
       sinceId: newSinceId,
       lastSync: new Date().toISOString(),

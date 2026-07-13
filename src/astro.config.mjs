@@ -27,6 +27,21 @@ function parseFrontmatter(filePath) {
   return fm
 }
 
+/** Latest `date` frontmatter value across all entries in a content dir, or null */
+function latestFrontmatterDate(dir) {
+  let latest = null
+  if (!fs.existsSync(dir)) return latest
+  for (const file of fs.readdirSync(dir)) {
+    if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue
+    const fm = parseFrontmatter(path.join(dir, file))
+    if (fm.date) {
+      const date = new Date(fm.date)
+      if (!latest || date > latest) latest = date
+    }
+  }
+  return latest
+}
+
 /** Build a map of sitemap URL -> lastmod Date by reading content frontmatter */
 function buildLastmodMap() {
   const map = new Map()
@@ -66,31 +81,9 @@ function buildLastmodMap() {
     map.set(`${siteUrl}/notes/${day}/`, date)
   }
 
-  // Speaking: use the latest speaking entry date
-  const speakingDir = path.join(contentDir, 'speaking')
-  let latestSpeakingDate = null
-  for (const file of fs.readdirSync(speakingDir)) {
-    if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue
-    const fm = parseFrontmatter(path.join(speakingDir, file))
-    if (fm.date) {
-      const date = new Date(fm.date)
-      if (!latestSpeakingDate || date > latestSpeakingDate) latestSpeakingDate = date
-    }
-  }
-
-  // Projects: use the latest project date for the index page
-  const projectDir = path.join(contentDir, 'project')
-  let latestProjectDate = null
-  if (fs.existsSync(projectDir)) {
-    for (const file of fs.readdirSync(projectDir)) {
-      if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue
-      const fm = parseFrontmatter(path.join(projectDir, file))
-      if (fm.date) {
-        const date = new Date(fm.date)
-        if (!latestProjectDate || date > latestProjectDate) latestProjectDate = date
-      }
-    }
-  }
+  // Speaking and projects: use the latest entry date for their index pages
+  const latestSpeakingDate = latestFrontmatterDate(path.join(contentDir, 'speaking'))
+  const latestProjectDate = latestFrontmatterDate(path.join(contentDir, 'project'))
 
   // Index and static pages: use latest content dates or file mtime
   if (latestBlogDate) {

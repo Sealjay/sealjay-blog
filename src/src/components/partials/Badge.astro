@@ -1,9 +1,7 @@
 ---
 interface Props {
-  /** Badge text (new API) */
+  /** Badge text */
   label?: string
-  /** Badge text (legacy API, alias for label) */
-  text?: string
   /** Visual variant */
   variant?: 'default' | 'warm' | 'success' | 'subtle'
   /** Optional link URL */
@@ -18,7 +16,6 @@ interface Props {
 
 const {
   label,
-  text,
   variant: variantProp,
   url,
   isFormerRole = false,
@@ -26,7 +23,7 @@ const {
   style,
 } = Astro.props
 
-const displayText = label ?? text ?? ''
+const displayText = label ?? ''
 
 // Resolve variant: explicit variant wins, then isFormerRole legacy mapping
 const variant = variantProp ?? (isFormerRole ? 'subtle' : 'default')

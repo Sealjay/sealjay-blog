@@ -8,7 +8,6 @@ interface Props {
   title: string
   subtitle?: string
   breadcrumbs?: BreadcrumbItem[]
-  center?: boolean
   class?: string
 }
 
@@ -16,12 +15,11 @@ const {
   title,
   subtitle,
   breadcrumbs,
-  center = true,
   class: className,
 } = Astro.props
 ---
 
-<div class:list={['page-header', center && 'page-header--center', className]}>
+<div class:list={['page-header', className]}>
   {breadcrumbs && breadcrumbs.length > 0 && (
     <nav aria-label="Breadcrumb" class="page-header__breadcrumbs">
       <ol>
@@ -40,7 +38,7 @@ const {
   )}
 
   <h1 class="page-header__title">
-    <slot name="title-prefix" />{title}<slot name="title-suffix" />
+    {title}
   </h1>
 
   {subtitle && (
@@ -60,10 +58,6 @@ const {
     .page-header {
       padding-top: 1.5rem;
     }
-  }
-
-  .page-header--center {
-    text-align: center;
   }
 
   .page-header__breadcrumbs {

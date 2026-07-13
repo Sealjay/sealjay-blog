@@ -51,7 +51,7 @@ const speaking = defineCollection({
   schema: ({ image }) =>
     z.object({
       title: z.string(),
-      eventType: z.enum(['Conference', 'Video', 'Media Mention', 'Podcast', 'Workshop', 'Webinar', 'Panel', 'Short']),
+      eventType: z.enum(['Conference', 'Video', 'Media Mention', 'Podcast', 'Workshop', 'Short']),
       description: z.string(),
       event: z.string(),
       date: z
@@ -87,7 +87,6 @@ const note = defineCollection({
       .enum(['LinkedIn', 'X', 'GitHub', 'Mastodon', 'YouTube', 'Article', 'Web', 'HuggingFace'])
       .optional(),
     isHighlight: z.boolean().default(false),
-    engagementNote: z.string().optional(),
     mastodonUrl: z.string().url().optional(),
     inReplyTo: z.string().url().optional(),
     daySummary: z.string().optional(),

@@ -1,9 +1,9 @@
 ---
 import Layout from '../../layouts/BaseLayout.astro'
+import { groupNotesByDay } from '../../lib/notes'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import { getCollection } from 'astro:content'
-import { format } from 'date-fns'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import { getYouTubeSpeakingEntries, extractYouTubeId } from '../../lib/youtube'
 import { youtubeFeeds } from '../../config/personal'
@@ -71,12 +71,7 @@ const youtubeItems: StreamItem[] = youtubeEntries
   }))
 
 // Group notes by day and emit one stream item per day
-const notesByDay = new Map<string, typeof noteEntries>()
-for (const entry of noteEntries) {
-  const dateKey = new Date(entry.data.pubDateTime).toISOString().slice(0, 10)
-  if (!notesByDay.has(dateKey)) notesByDay.set(dateKey, [])
-  notesByDay.get(dateKey)!.push(entry)
-}
+const notesByDay = groupNotesByDay(noteEntries)
 
 const noteGroupItems: StreamItem[] = [...notesByDay.entries()].map(([dateKey, dayNotes]) => {
   const sorted = [...dayNotes].sort((a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())
@@ -117,25 +112,10 @@ const allItems: StreamItem[] = [...blogItems, ...speakingItems, ...youtubeItems,
 )
 
 const groupedItems = allItems.reduce<Record<string, StreamItem[]>>((acc, item) => {
-  const key = format(item.date, 'yyyy-MM')
+  const key = `${item.date.getFullYear()}-${String(item.date.getMonth() + 1).padStart(2, '0')}`
   acc[key] = [...(acc[key] || []), item]
   return acc
 }, {})
-
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
 
 const latestDate = allItems.length > 0 ? allItems[0].date : new Date()
 
@@ -157,7 +137,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     <PageHeader
       title="Stream"
       subtitle="every article, talk, note, and project in one feed"
-      center={false}
+     
       breadcrumbs={[
         { label: 'Home', href: '/' },
         { label: 'Stream' },
@@ -178,7 +158,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
       <div class="stream-month" data-month={monthYear}>
         <h2 class="stream-month__heading font-heading">
           <span class="stream-month__bar" />
-          {monthNames[parseInt(monthYear.split('-')[1]) - 1]} {monthYear.split('-')[0]}
+          {new Date(Number(monthYear.split('-')[0]), Number(monthYear.split('-')[1]) - 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
         </h2>
         <div class="stream-month__items">
           {items.map((item) => {

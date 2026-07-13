@@ -12,6 +12,8 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { decodeHtmlEntities } from './lib/entities.mjs'
+import { mastodonGet } from './lib/mastodon.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const NOTE_DIR = join(__dirname, '..', 'content', 'note')
@@ -23,21 +25,6 @@ const DEFAULT_LIMIT = 80
 const args = process.argv.slice(2)
 const limitArg = args.find((a) => a.startsWith('--limit='))
 const fetchLimit = limitArg ? Number.parseInt(limitArg.split('=')[1], 10) : DEFAULT_LIMIT
-
-// --- Mastodon API ---
-
-async function mastodonGet(path) {
-  const token = process.env.MASTODON_TOKEN
-  const instanceUrl = process.env.MASTODON_URL ?? 'https://fosstodon.org'
-
-  const res = await fetch(`${instanceUrl}${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) {
-    throw new Error(`Mastodon API error: ${res.status} ${res.statusText} for ${path}`)
-  }
-  return res.json()
-}
 
 // --- Text processing ---
 
@@ -52,12 +39,7 @@ function stripHtml(html) {
     return linkText === href ? href : `${linkText} (${href})`
   })
   text = text.replace(/<[^>]+>/g, '')
-  text = text.replace(/&amp;/g, '&')
-  text = text.replace(/&lt;/g, '<')
-  text = text.replace(/&gt;/g, '>')
-  text = text.replace(/&quot;/g, '"')
-  text = text.replace(/&#39;/g, "'")
-  text = text.replace(/&nbsp;/g, ' ')
+  text = decodeHtmlEntities(text)
   text = text.replace(/\n{3,}/g, '\n\n').trim()
   return text
 }

@@ -73,7 +73,6 @@ jobs:
           git add -A src/src/content/note/
           git add -A src/src/content/speaking/yt-*
           git add -A src/src/data/mastodon-sync-state.json
-          git add -A src/src/data/youtube-sync-state.json
           git add src/src/data/webmentions.json
           if git diff --cached --quiet; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"

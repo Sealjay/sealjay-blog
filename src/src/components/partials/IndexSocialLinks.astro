@@ -1,8 +1,5 @@
 ---
-import Bluesky from '../socialicons/Bluesky.astro'
-import GitHub from '../socialicons/GitHub.astro'
-import LinkedIn from '../socialicons/LinkedIn.astro'
-import Mastodon from '../socialicons/Mastodon.astro'
+import SocialIcon from '../SocialIcon.astro'
 ---
 
 <nav aria-label="Social links" class="social-links">
@@ -14,7 +11,7 @@ import Mastodon from '../socialicons/Mastodon.astro'
     class="social-links__icon"
     data-social="GitHub"
   >
-    <GitHub size={24} />
+    <SocialIcon name="github" size={24} />
   </a>
 
   <a
@@ -25,7 +22,7 @@ import Mastodon from '../socialicons/Mastodon.astro'
     class="social-links__icon"
     data-social="LinkedIn"
   >
-    <LinkedIn size={24} />
+    <SocialIcon name="linkedin" size={24} />
   </a>
 
   <a
@@ -36,7 +33,7 @@ import Mastodon from '../socialicons/Mastodon.astro'
     class="social-links__icon"
     data-social="Mastodon"
   >
-    <Mastodon size={24} />
+    <SocialIcon name="mastodon" size={24} />
   </a>
 
   <a
@@ -47,7 +44,7 @@ import Mastodon from '../socialicons/Mastodon.astro'
     class="social-links__icon"
     data-social="Bluesky"
   >
-    <Bluesky size={24} />
+    <SocialIcon name="bluesky" size={24} />
   </a>
 </nav>
 

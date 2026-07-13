@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
+import { groupNotesByDay } from '../lib/notes'
 import Layout from '../layouts/BaseLayout.astro'
 
 import SocialLinks from '../components/partials/IndexSocialLinks.astro'
@@ -40,12 +41,7 @@ const featuredProjects = (() => {
 })()
 
 // --- Notes multi-day group data ---
-const notesByDay = new Map<string, typeof notes>()
-for (const n of notes) {
-  const key = new Date(n.data.pubDateTime).toISOString().slice(0, 10)
-  if (!notesByDay.has(key)) notesByDay.set(key, [])
-  notesByDay.get(key)!.push(n)
-}
+const notesByDay = groupNotesByDay(notes)
 
 const sortedDayKeys = [...notesByDay.keys()].sort((a, b) => b.localeCompare(a))
 

@@ -1,25 +1,18 @@
 ---
 import Layout from '../../layouts/BaseLayout.astro'
+import { groupNotesByDay } from '../../lib/notes'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import { getCollection } from 'astro:content'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
-import Mastodon from '../../components/socialicons/Mastodon.astro'
+import SocialIcon from '../../components/SocialIcon.astro'
 
 const notes = (await getCollection('note')).sort(
   (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf()
 )
 const lastNoteDate = notes.length > 0 ? new Date(notes[0].data.pubDateTime) : new Date()
 
-// Group notes by date (YYYY-MM-DD)
-const notesByDate = new Map<string, typeof notes>()
-for (const note of notes) {
-  const dateKey = note.data.pubDateTime.toISOString().slice(0, 10)
-  if (!notesByDate.has(dateKey)) {
-    notesByDate.set(dateKey, [])
-  }
-  notesByDate.get(dateKey)!.push(note)
-}
+const notesByDate = groupNotesByDay(notes)
 
 // Sort notes within each day oldest-first (earliest at top)
 for (const dayNotes of notesByDate.values()) {
@@ -45,7 +38,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
     <PageHeader
       title="Notes"
       subtitle="short thoughts, links, and observations"
-      center={false}
+     
       breadcrumbs={[
         { label: 'Home', href: '/' },
         { label: 'Notes' },
@@ -160,7 +153,7 @@ function getDaySummary(dayNotes: typeof notes): string | undefined {
                           class="note-card__mastodon-link"
                           title="View on Mastodon"
                         >
-                          <Mastodon class="h-4 w-4" />
+                          <SocialIcon name="mastodon" class="h-4 w-4" />
                           <span class="sr-only">View on Mastodon</span>
                         </a>
                       )}

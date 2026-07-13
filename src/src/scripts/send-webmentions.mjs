@@ -10,9 +10,10 @@
  */
 
 import { createHash } from 'node:crypto'
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readJson, writeJson } from './lib/json-file.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const DIST_DIR = join(__dirname, '..', '..', 'dist')
@@ -20,17 +21,8 @@ const TRACKING_FILE = join(__dirname, '..', 'data', 'sent-webmentions.json')
 const SITE_URL = 'https://sealjay.com'
 
 async function findHtmlFiles(dir) {
-  const files = []
-  const entries = await readdir(dir, { withFileTypes: true })
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name)
-    if (entry.isDirectory()) {
-      files.push(...(await findHtmlFiles(fullPath)))
-    } else if (entry.name.endsWith('.html')) {
-      files.push(fullPath)
-    }
-  }
-  return files
+  const entries = await readdir(dir, { recursive: true, withFileTypes: true })
+  return entries.filter((e) => e.isFile() && e.name.endsWith('.html')).map((e) => join(e.parentPath, e.name))
 }
 
 function extractLinks(html) {
@@ -94,20 +86,6 @@ async function sendWebmention(endpoint, source, target) {
   }
 }
 
-async function loadTracking() {
-  try {
-    const content = await readFile(TRACKING_FILE, 'utf-8')
-    return JSON.parse(content)
-  } catch {
-    return {}
-  }
-}
-
-async function saveTracking(data) {
-  await mkdir(join(__dirname, '..', 'data'), { recursive: true })
-  await writeFile(TRACKING_FILE, `${JSON.stringify(data, null, 2)}\n`, 'utf-8')
-}
-
 async function main() {
   console.log('Scanning built site for outgoing links...')
 
@@ -121,7 +99,7 @@ async function main() {
 
   console.log(`Found ${htmlFiles.length} HTML files.`)
 
-  const tracking = await loadTracking()
+  const tracking = await readJson(TRACKING_FILE, {})
   let sent = 0
   let skipped = 0
   let unchanged = 0
@@ -180,7 +158,7 @@ async function main() {
     }
   }
 
-  await saveTracking(tracking)
+  await writeJson(TRACKING_FILE, tracking)
   console.log(
     `\nDone. Sent: ${sent}, Skipped (no endpoint): ${skipped}, Unchanged: ${unchanged}, No h-entry: ${noHentry}, No endpoint: ${noEndpoint}`,
   )

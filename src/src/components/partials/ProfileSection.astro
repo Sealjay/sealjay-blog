@@ -63,7 +63,7 @@ const {
 
       {showBadges && professionalBadges.map(badge => (
         <Badge
-          text={badge.text}
+          label={badge.text}
           url={badge.url}
           isFormerRole={badge.isFormerRole}
         />
@@ -71,7 +71,7 @@ const {
 
       {showFormerRoles && formerRoles.map(role => (
         <Badge
-          text={role.text}
+          label={role.text}
           url={role.url}
           isFormerRole={role.isFormerRole}
         />

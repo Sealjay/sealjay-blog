@@ -13,45 +13,18 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { youtubeFeeds as FEEDS } from '../config/personal.ts'
+import { decodeHtmlEntities, escapeYaml } from './lib/entities.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const SPEAKING_DIR = join(__dirname, '..', 'content', 'speaking')
-const DATA_DIR = join(__dirname, '..', 'data')
-const STATE_FILE = join(DATA_DIR, 'youtube-sync-state.json')
-
-// Feed configuration (mirroring src/config/personal.ts)
-const FEEDS = [
-  {
-    channelId: 'UCS4KTDaZTiyiMj2yZztwmlg',
-    shortsPlaylistId: 'PLo9Ah7HeyG1Rkqq0cc1QJtttkywXKWd9g',
-    event: 'Securing the Realm',
-  },
-]
 
 // --- CLI args ---
 
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
 
-// --- State management ---
-
-async function saveState(state) {
-  await mkdir(DATA_DIR, { recursive: true })
-  await writeFile(STATE_FILE, `${JSON.stringify(state, null, 2)}\n`, 'utf-8')
-}
-
 // --- XML parsing ---
-
-/** Decode common XML/HTML entities */
-function decodeEntities(str) {
-  return str
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'")
-}
 
 /** Parse video entries from YouTube Atom XML */
 function parseVideoEntries(xml) {
@@ -65,8 +38,8 @@ function parseVideoEntries(xml) {
 
     entries.push({
       youtubeId,
-      title: decodeEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''),
-      description: decodeEntities(block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? ''),
+      title: decodeHtmlEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''),
+      description: decodeHtmlEntities(block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? ''),
       published: block.match(/<published>(.*?)<\/published>/)?.[1] ?? '',
       thumbnailUrl:
         block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ?? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
@@ -140,11 +113,6 @@ async function loadExistingYouTubeIds() {
 }
 
 // --- Content generation ---
-
-/** Escape double quotes for YAML frontmatter values */
-function escapeYaml(str) {
-  return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-}
 
 /** Truncate description to ~200 chars at a word boundary */
 function truncateDescription(text, maxLen = 200) {
@@ -268,13 +236,6 @@ async function main() {
       existingIds.add(video.youtubeId)
       created++
     }
-  }
-
-  // Save state
-  if (!dryRun) {
-    await saveState({
-      lastSync: new Date().toISOString(),
-    })
   }
 
   console.log(`\nDone. Created ${created} speaking entry/entries, skipped ${skipped}.`)

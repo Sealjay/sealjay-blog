@@ -87,9 +87,6 @@ export const formerRoles: Badge[] = [
   },
 ]
 
-// Export all badges together
-export const allBadges = [...professionalBadges, ...formerRoles]
-
 // YouTube channel feeds auto-populated as speaking entries at build time
 export const youtubeFeeds = [
   {

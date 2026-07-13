@@ -1,22 +1,17 @@
 ---
 import { getCollection, render } from 'astro:content'
+import { groupNotesByDay } from '../../lib/notes'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import Giscus from '../../components/embeds/Giscus.astro'
 import Webmentions from '../../components/partials/Webmentions.astro'
-import Mastodon from '../../components/socialicons/Mastodon.astro'
+import SocialIcon from '../../components/SocialIcon.astro'
 
 export async function getStaticPaths() {
   const allNotes = await getCollection('note')
 
-  // Group notes by date (YYYY-MM-DD)
-  const notesByDate = new Map<string, typeof allNotes>()
-  for (const note of allNotes) {
-    const dateKey = note.data.pubDateTime.toISOString().slice(0, 10)
-    if (!notesByDate.has(dateKey)) notesByDate.set(dateKey, [])
-    notesByDate.get(dateKey)!.push(note)
-  }
+  const notesByDate = groupNotesByDay(allNotes)
 
   return [...notesByDate.entries()].map(([dateKey, notes]) => ({
     params: { slug: dateKey },
@@ -202,7 +197,7 @@ const pageDescription = daySummary
                   class="note-article__mastodon"
                   title="View on Mastodon"
                 >
-                  <Mastodon class="h-4 w-4" />
+                  <SocialIcon name="mastodon" class="h-4 w-4" />
                   <span class="sr-only">View on Mastodon</span>
                 </a>
               )}

@@ -7,9 +7,9 @@
  * Usage: WEBMENTION_IO_TOKEN=xxx bun src/scripts/sync-webmentions.mjs
  */
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readJson, writeJson } from './lib/json-file.mjs'
 
 const DOMAIN = 'sealjay.com'
 const API_BASE = 'https://webmention.io/api/mentions.jf2'
@@ -61,15 +61,6 @@ function groupByTarget(mentions) {
   return grouped
 }
 
-async function loadExisting() {
-  try {
-    const content = await readFile(DATA_FILE, 'utf-8')
-    return JSON.parse(content)
-  } catch {
-    return {}
-  }
-}
-
 function mergeWebmentions(existing, fresh) {
   const merged = { ...existing }
 
@@ -110,7 +101,7 @@ async function main() {
     process.exit(1)
   }
 
-  const existing = await loadExisting()
+  const existing = await readJson(DATA_FILE, {})
   const since = findLatestTimestamp(existing)
 
   console.log(`Fetching webmentions for ${DOMAIN}...`)
@@ -132,8 +123,7 @@ async function main() {
   const totalCount = Object.values(merged).reduce((sum, arr) => sum + arr.length, 0)
   console.log(`  Total webmentions after merge: ${totalCount}`)
 
-  await mkdir(join(__dirname, '..', 'data'), { recursive: true })
-  await writeFile(DATA_FILE, `${JSON.stringify(merged, null, 2)}\n`, 'utf-8')
+  await writeJson(DATA_FILE, merged)
   console.log(`  Saved to ${DATA_FILE}`)
 }
 

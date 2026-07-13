@@ -12,6 +12,7 @@
 import { readdir, readFile, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { decodeHtmlEntities, escapeYaml } from './lib/entities.mjs'
 
 const RSS_URL = 'https://securing.quest/blog/rss.xml'
 const SITE_BASE = 'https://securing.quest'
@@ -127,11 +128,6 @@ function formatDate(dateStr) {
   return d.toISOString()
 }
 
-/** Escape double quotes for YAML frontmatter values. */
-function escapeYaml(str) {
-  return str.replace(/"/g, '\\"')
-}
-
 /** Strip HTML tags from RSS description. */
 function stripHtml(str) {
   return str.replace(/<[^>]+>/g, '').trim()
@@ -151,14 +147,7 @@ function htmlToMarkdown(html) {
 
   // Decode HTML entities FIRST so regexes can match tags.
   // Run twice to handle double-encoded entities (&amp;gt; → &gt; → >).
-  for (let i = 0; i < 2; i++) {
-    md = md.replace(/&amp;/g, '&')
-    md = md.replace(/&lt;/g, '<')
-    md = md.replace(/&gt;/g, '>')
-    md = md.replace(/&quot;/g, '"')
-    md = md.replace(/&#39;/g, "'")
-    md = md.replace(/&nbsp;/g, ' ')
-  }
+  md = decodeHtmlEntities(decodeHtmlEntities(md))
 
   // Convert headings
   md = md.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, content) => `# ${stripHtml(content)}\n\n`)

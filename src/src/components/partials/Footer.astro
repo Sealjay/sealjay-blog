@@ -1,9 +1,6 @@
 ---
 import { SITE_NAV, SITE_SECONDARY_NAV, SITE_FOOTER_NAV } from '../../consts'
-import GitHub from '../socialicons/GitHub.astro'
-import LinkedIn from '../socialicons/LinkedIn.astro'
-import Mastodon from '../socialicons/Mastodon.astro'
-import Bluesky from '../socialicons/Bluesky.astro'
+import SocialIcon from '../SocialIcon.astro'
 
 const navLinks = [
   { name: 'Writing', path: '/blog' },
@@ -68,10 +65,7 @@ const moreLinks = [
                 rel={link.rel ? `${link.rel} noopener noreferrer` : 'noopener noreferrer'}
               >
                 <span class="footer-link-icon">
-                  {link.icon === 'github' && <GitHub size={14} />}
-                  {link.icon === 'linkedin' && <LinkedIn size={14} />}
-                  {link.icon === 'mastodon' && <Mastodon size={14} />}
-                  {link.icon === 'bluesky' && <Bluesky size={14} />}
+                  <SocialIcon name={link.icon} size={14} />
                 </span>
                 {link.name}
               </a>
