@@ -3,7 +3,7 @@
 
 export const SITE_TITLE = 'Sealjay'
 export const SITE_DESCRIPTION =
-  'VP, AI Consulting Transformation at Kyndryl. 6x Microsoft AI MVP. Agentic AI, open source, and green software. // open, sustainable, real.'
+  'VP, AI Consulting Transformation at Kyndryl. 7x Microsoft MVP (AI & DevTech). Agentic AI, open source, and green software. // open, sustainable, real.'
 
 export const SITE_NAV = [
   { name: 'About', path: '/about' },
