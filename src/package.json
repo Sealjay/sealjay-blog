@@ -40,7 +40,7 @@
     "caniuse-lite": "^1.0.30001803",
     "fuse.js": "^7.4.2",
     "markdown-it": "^14.3.0",
-    "satori": "^0.26.0",
+    "satori": "^0.28.1",
     "tailwindcss": "^3.4.19",
     "unist-util-visit": "^5.1.0"
   },
