@@ -1,0 +1,40 @@
+---
+title: "One Key to the Whole Dungeon"
+description: "The first Arcane Scrolls dispatch: APIM&apos;s AI Gateway in preview, a token cache that leaks between tenants, and two retirement dates for the diary."
+pubDateTime: "2026-07-31T00:00:00.000Z"
+sourceUrl: "https://securing.quest/blog/one-key-to-the-whole-dungeon/"
+tags: ["External Media", "Securing the Realm", "Newsletter", "Azure APIM", "AI Security", "Microsoft Foundry", "AI Agents", "AI Governance", "Agent Security", "MCP Servers", "Azure", "Microsoft", "Enterprise AI"]
+---
+*This post was originally published on [Securing the Realm](https://securing.quest/blog/one-key-to-the-whole-dungeon/).*
+
+**Welcome to the first Securing the Realm newsletter.** We already cover agentic AI security on the podcast; this is the written version - what shipped this week, and what to go and check in your own estate.
+
+*This went out first to [Arcane Scrolls](https://str.riverside.com/p/one-key-to-the-whole-dungeon-1) subscribers.*
+
+## A new choice of castle gate
+
+Microsoft shipped a new choice of castle gate this week. The [AI Gateway tier of Azure API Management entered public preview on 27 July](https://techcommunity.microsoft.com/blog/integrationsonazureblog/ai-gateway-tier-of-api-management-now-in-public-preview/4540170?WT.mc_id=AI-MVP-5004204): [a fully managed gateway](https://learn.microsoft.com/azure/api-management/ai-gateway-overview?WT.mc_id=AI-MVP-5004204) in front of models from Microsoft Foundry, AWS Bedrock, Google Vertex AI, OpenAI and Anthropic, plus federated MCP servers and more than 1,400 connector-backed tools. Policies are JSON rather than policy XML, so you can manage them as code and enforce them fleet-wide with Azure Policy. Azure AI Content Safety and token quotas attach per asset, and token metrics come out on OpenTelemetry conventions, so cost attribution and anomaly detection across five providers finally run off the same telemetry.
+
+The governance gain is real. Provider keys leave application code entirely; the gateway holds backend credentials and supports API key, OAuth client credentials, managed identity and mTLS.
+
+Runtime access keys are gateway-scoped, though: one key reaches every model and every tool behind the gate. A skeleton key to the kingdom. Issue one key per application and environment, and grant least privilege deliberately, because the platform does not do it for you yet. Developers can take the OAuth 2.0 route instead. The preview covers two regions, East US 2 and Sweden Central, with no published pricing. Pilot it now, but put nothing regulated behind it this quarter.
+
+## The quieter item: check your token cache keys
+
+The quieter item requires more thought. Microsoft published [its case for Toolboxes](https://devblogs.microsoft.com/foundry/building-agents-that-act-on-your-behalf-with-toolboxes-in-foundry/?WT.mc_id=AI-MVP-5004204), now [GA in Foundry](https://azure.microsoft.com/blog/frontier-models-and-production-agents-advancing-microsoft-foundry-for-the-agentic-era/?WT.mc_id=AI-MVP-5004204), with a potential failure mode within ‘hand-rolled’ on-behalf-of authentication: a mis-partitioned token cache. Get the cache key wrong and one user’s downstream API access leaks to another user, or another tenant, silently. No error. No log line. A reportable incident waiting in code that looks like it works. If you have hand-rolled delegation anywhere, check this week that every token cache key includes both user and tenant. Highest severity-per-effort fix on the board.
+
+## Defaults that write the session down
+
+[The Agent Framework Harness](https://devblogs.microsoft.com/agent-framework/the-microsoft-agent-framework-harness-is-now-released/?WT.mc_id=AI-MVP-5004204) shipped in Python and .NET on 22 July, and the default settings have a good security story: tool approval gates, chat history persisted after every individual model call, OpenTelemetry built in. Agents built on it produce an auditable, replayable record by construction - the DM asking “are you sure?” before the barbarian pulls the lever, with the whole session written down. One survey this year put over half of production agents at zero security oversight or logging. Defaults are how that number moves.
+
+Before you upgrade, read the list of features that have been gated. Background agents, file access, automatic looping and shell tooling all sit behind opt-in warnings. Experiment today but hold off on production until the warning labels come off.
+
+## Two dates for the diary
+
+One deadline for the diary: [Foundry retires visual Workflows on 1 December 2026](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow?WT.mc_id=AI-MVP-5004204). The designer goes; exported YAML definitions keep running as hosted agents. Export your YAML now - copy those workflows as if they’re the character sheet from a treasured campaign! Then decide per workflow whether it moves to Agent Framework or Logic Apps. Pro Tip: While you’re looking at this, give the [model retirement schedule](https://learn.microsoft.com/azure/foundry/openai/concepts/model-retirement-schedule?WT.mc_id=AI-MVP-5004204) an owner.
+
+Stability AI image models retire in Foundry on 31 July [today!], and a retired model returns HTTP 410 - Gone, don’t roll a saving throw…
+
+---
+
+We have a new podcast episode out on Monday 3rd August 2026 with [Bruno Lecoq of BEMO](https://www.linkedin.com/in/brunolecoq/) - find it on Apple Podcasts, or via [securing.quest](https://securing.quest/).
