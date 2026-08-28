@@ -49,19 +49,24 @@ function parseVideoEntries(xml) {
   return entries
 }
 
-/** Fetch XML from a YouTube RSS feed URL, returning empty string on failure */
+/**
+ * Fetch XML from a YouTube RSS feed URL.
+ *
+ * Throws on failure rather than degrading: a missing shorts playlist would
+ * leave shortIds empty, so new shorts would be written as Videos and never
+ * revisited once deduplicated.
+ */
 async function fetchFeed(url, label) {
+  let res
   try {
-    const res = await fetch(url)
-    if (!res.ok) {
-      console.warn(`[youtube] Failed to fetch ${label}: ${res.status}`)
-      return ''
-    }
-    return await res.text()
+    res = await fetch(url)
   } catch (err) {
-    console.warn(`[youtube] Network error fetching ${label}:`, err)
-    return ''
+    throw new Error(`Network error fetching ${label}`, { cause: err })
   }
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${label}: ${res.status} ${res.statusText}`)
+  }
+  return await res.text()
 }
 
 // --- Deduplication ---
@@ -180,11 +185,6 @@ async function main() {
           )
         : Promise.resolve(''),
     ])
-
-    if (!channelXml) {
-      console.warn('  Failed to fetch channel feed, skipping.')
-      continue
-    }
 
     // Build set of short video IDs
     const shortIds = new Set()
