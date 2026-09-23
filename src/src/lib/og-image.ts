@@ -498,7 +498,7 @@ function buildTemplate(input: OGTemplateInput) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '20px',
-                    maxWidth: '780px',
+                    maxWidth: '800px',
                   },
                   children: [
                     // Title – Bricolage Grotesque, ~36px, colour #E0E7FF
