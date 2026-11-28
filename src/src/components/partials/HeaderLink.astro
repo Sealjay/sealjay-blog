@@ -39,6 +39,11 @@ const isActive = href === pathname || href === pathname.replace(/\/$/, '')
     background: var(--color-primary-muted);
   }
 
+  .header-link[data-active] {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
   .header-link:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;

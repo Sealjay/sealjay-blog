@@ -1,21 +1,13 @@
 import { getCollection } from 'astro:content'
-import { aboutDescription, youtubeFeeds } from '../config/personal'
-import { extractYouTubeId, getYouTubeSpeakingEntries } from '../lib/youtube'
+import { aboutDescription } from '../config/personal'
+import { getProjectLinks } from '../lib/projects'
+import { getSpeakingEntries } from '../lib/speaking'
 
 export async function GET() {
   const blogs = await getCollection('blog')
-  const speaking = await getCollection('speaking')
+  const speaking = await getSpeakingEntries()
   const notes = await getCollection('note')
   const projects = await getCollection('project')
-  const youtubeEntries = await getYouTubeSpeakingEntries(youtubeFeeds)
-
-  // YouTube IDs already covered by MDX speaking entries
-  const mdxYouTubeIds = new Set<string>()
-  for (const entry of speaking) {
-    const id = extractYouTubeId(entry.data.url) ?? extractYouTubeId(entry.data.videoEmbedUrl)
-    if (id) mdxYouTubeIds.add(id)
-  }
-
   const staticPages = [
     {
       title: 'About',
@@ -53,18 +45,9 @@ export async function GET() {
       title: `${entry.data.title} — ${entry.data.event}`,
       description: entry.data.description,
       tags: [entry.data.eventType, entry.data.event],
-      url: entry.data.url,
+      url: entry.actions[0].url,
       type: 'speaking' as const,
     })),
-    ...youtubeEntries
-      .filter((yt) => !mdxYouTubeIds.has(yt.youtubeId))
-      .map((yt) => ({
-        title: yt.title,
-        description: yt.description.slice(0, 120) || yt.title,
-        tags: [yt.eventType],
-        url: yt.url,
-        type: 'speaking' as const,
-      })),
     ...notes.map((entry) => ({
       title: entry.data.description?.slice(0, 80) ?? 'Note',
       description: entry.data.description ?? '',
@@ -76,7 +59,7 @@ export async function GET() {
       title: entry.data.title,
       description: entry.data.description,
       tags: entry.data.techStack ?? [],
-      url: entry.data.demoUrl ?? entry.data.repoUrl ?? '/projects/',
+      url: getProjectLinks(entry.data)[0]?.url ?? `/projects/#${entry.id}`,
       type: 'project' as const,
     })),
   ]

@@ -31,10 +31,10 @@ export async function getRecentWork(): Promise<WorkItem[]> {
   const podcastItems: Candidate[] = []
   const speakingItems: Candidate[] = []
 
-  for (const { id, data, youtubeId } of speaking) {
-    const { title, date, url, eventType, isFullPodcastEpisode, delivered, blogPostSlug } = data
+  for (const { id, data, youtubeId, actions } of speaking) {
+    const { title, date, eventType, isFullPodcastEpisode, delivered, blogPostSlug } = data
     const aliases = [blogPostSlug ? `/blog/${blogPostSlug}/` : undefined]
-    const item = { id: `speaking:${id}`, title, date, url, aliases, youtubeId }
+    const item = { id: `speaking:${id}`, title, date, url: actions[0].url, aliases, youtubeId }
     if (eventType === 'Podcast' && isFullPodcastEpisode && data.event === 'Securing the Realm') {
       podcastItems.push({ ...item, format: 'Podcast' })
     }

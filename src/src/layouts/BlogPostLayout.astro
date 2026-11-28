@@ -12,13 +12,18 @@ import ShareButtons from "../components/partials/ShareButtons.astro";
 import AuthorCard from "../components/partials/AuthorCard.astro";
 import PostNavigation from "../components/partials/PostNavigation.astro";
 import TableOfContents from "../components/partials/TableOfContents.astro";
-import { getTagStyle } from "../lib/tag-categories";
+import { getTagStyle, tagSlug } from "../lib/tag-categories";
 
 type Props = CollectionEntry<"blog">["data"] & { headings?: { depth: number; slug: string; text: string }[]; body?: string };
 
-const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body, additionalAuthors } = Astro.props;
+const { title, description, pubDateTime, updatedDate, heroImage, tags, inReplyTo, headings, body, additionalAuthors, sourceUrl, sourceLabel, archivedSourceUrl } = Astro.props;
 const words = body?.split(/\s+/).length ?? 0;
 const readingTime = Math.max(1, Math.ceil(words / 200));
+// The syndicated articles already lead with a linked attribution in their MDX and feeds.
+const hasAttribution = sourceUrl && body?.split('\n').some((line) =>
+  line.includes('This post was originally published on [') && line.includes(`](${sourceUrl})`),
+)
+const showSource = sourceUrl && tags?.includes('External Media') && !hasAttribution
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Compute slug from the URL pathname for OG image path
@@ -136,12 +141,12 @@ const breadcrumbJsonLd = JSON.stringify({
     {tags && tags.length > 0 && (
       <div class="article-tags" data-tag-count={tags.length}>
         {tags.slice(0, 3).map((tag: string) => (
-          <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag" style={getTagStyle(tag)}>{tag}</a>
+          <a href={`/blog/tag/${tagSlug(tag)}/`} class="p-category article-tag" style={getTagStyle(tag)}>{tag}</a>
         ))}
         {tags.length > 3 && (
           <>
             {tags.slice(3).map((tag: string) => (
-              <a href={`/blog/tag/${tag.toLowerCase()}/`} class="p-category article-tag article-tag--collapsed" style={getTagStyle(tag)}>{tag}</a>
+              <a href={`/blog/tag/${tagSlug(tag)}/`} class="p-category article-tag article-tag--collapsed" style={getTagStyle(tag)}>{tag}</a>
             ))}
             <button class="article-tags-toggle" type="button" aria-expanded="false">
               +{tags.length - 3} more
@@ -235,8 +240,12 @@ const breadcrumbJsonLd = JSON.stringify({
       )
     })()}
 
-    <!-- Share buttons -->
-    <ShareButtons url={canonicalURL.href} title={title} />
+    {showSource && (
+      <p class="article-source">
+        {archivedSourceUrl && <><a href={archivedSourceUrl}>Read the archived publication</a> · </>}
+        <a href={sourceUrl}>{sourceLabel ?? (archivedSourceUrl ? 'Original publication link' : 'Read the original publication')}</a>
+      </p>
+    )}
 
     <!-- Separator -->
     <hr class="article-separator" />
@@ -255,6 +264,8 @@ const breadcrumbJsonLd = JSON.stringify({
         <TableOfContents headings={headings} variant="desktop" />
       )}
     </div>
+
+    <ShareButtons url={canonicalURL.href} title={title} />
 
     <!-- Author(s) -->
     {additionalAuthors?.map((a: { name: string; title?: string; bio?: string; url?: string; avatar?: string; social?: { github?: string; linkedin?: string; mastodon?: string; bluesky?: string } }) => (
@@ -353,7 +364,8 @@ const breadcrumbJsonLd = JSON.stringify({
 
   .article-tag:hover {
     background: var(--tag-color, var(--color-primary));
-    color: #fff;
+    color: var(--color-on-primary);
+    text-decoration: underline;
   }
 
   .article-tag--collapsed {
@@ -373,7 +385,7 @@ const breadcrumbJsonLd = JSON.stringify({
     padding: 0.25rem 0.75rem;
     background: var(--color-surface);
     color: var(--color-text-muted);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-control-border);
     border-radius: var(--radius-full);
     font-family: var(--font-heading);
     font-size: 0.6875rem;
@@ -516,6 +528,16 @@ const breadcrumbJsonLd = JSON.stringify({
     text-decoration: underline;
   }
 
+  .article-source {
+    margin-block: 0.75rem;
+  }
+
+  .article-source a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+
   /* Header/body separator */
   .article-separator {
     border: 0;
@@ -532,6 +554,7 @@ const breadcrumbJsonLd = JSON.stringify({
   }
 
   .article-grid > .prose {
+    max-width: 68ch;
     min-inline-size: 0;
     overflow-wrap: anywhere;
   }

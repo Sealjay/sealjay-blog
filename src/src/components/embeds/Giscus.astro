@@ -1,165 +1,118 @@
 ---
+interface Props {
+  heading?: string
+}
+
+const { heading = 'Discussion' } = Astro.props
 ---
 
-<section class="giscus-wrapper">
-  <h2 class="giscus-heading">
-    <svg xmlns="http://www.w3.org/2000/svg" class="giscus-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-    </svg>
-    Discussion
-  </h2>
-
-  <div class="giscus-card">
-    <p class="giscus-description">
-      Have thoughts or questions? Join the conversation below.
-    </p>
-
-    <div class="giscus-container">
-      <script
-        is:inline
-        id="giscus-script"
-        src="https://giscus.app/client.js"
-        data-repo="Sealjay/sealjay-blog"
-        data-repo-id="R_kgDOIFGusQ"
-        data-category="Comments"
-        data-category-id="DIC_kwDOIFGusc4CWbkg"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="light"
-        data-theme-dark="dark_dimmed"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async
-      ></script>
-      <script is:inline>
-        (function() {
-          var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          var giscusScript = document.getElementById('giscus-script');
-          if (giscusScript) {
-            giscusScript.setAttribute('data-theme', isDark ? 'dark_dimmed' : 'light');
-          }
-        })();
-      </script>
-    </div>
+<section class="discussion">
+  <h2>{heading}</h2>
+  <div class="discussion-actions">
+    <button type="button" data-load-discussion hidden>Load discussion</button>
+    <a href="https://github.com/Sealjay/sealjay-blog/discussions/categories/comments">Browse discussions on GitHub</a>
   </div>
+  <p role="status" class="discussion-status"></p>
+  <div class="giscus"></div>
 </section>
 
 <style>
-  .giscus-wrapper {
-    margin-top: 0;
-  }
-
-  .giscus-heading {
-    font-size: 1.25rem;
-    font-weight: 700;
+  .discussion h2 {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 650;
     color: var(--color-text);
-    margin-bottom: 1.5rem;
+  }
+
+  .discussion-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 0.5rem 1rem;
   }
 
-  @media (min-width: 640px) {
-    .giscus-heading {
-      font-size: 1.5rem;
-    }
-
-    .giscus-wrapper {
-      margin-top: 0;
-    }
-
-  }
-
-  .giscus-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-right: 0.5rem;
+  .discussion button {
+    min-height: 2.75rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-control-border);
+    border-radius: var(--radius-sm);
     color: var(--color-primary);
-  }
-
-  .giscus-card {
     background: var(--color-surface);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    padding: 1rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
   }
 
-  @media (min-width: 640px) {
-    .giscus-card {
-      padding: 1.5rem;
-    }
+  .discussion a {
+    color: var(--color-primary);
+    text-decoration: underline;
   }
 
-  .giscus-description {
+  .discussion-status {
     color: var(--color-text-muted);
-    margin-bottom: 1rem;
   }
 
-  /* Ensure the giscus container adapts to mobile screens properly */
-  .giscus-container {
+  .discussion :global(.giscus-frame) {
     width: 100%;
-    overflow: hidden;
-  }
-
-  /* Ensure giscus iframe is responsive */
-  :global(.giscus-frame) {
-    width: 100%;
-    border: 0 !important;
+    border: 0;
   }
 </style>
 
 <script>
-  // Handle theme changes for giscus using data-theme attribute
-  const setupGiscusThemeSync = () => {
-    const getTheme = () => {
-      return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark_dimmed' : 'light'
-    }
+  const button = document.querySelector<HTMLButtonElement>('[data-load-discussion]')
+  const container = document.querySelector<HTMLElement>('.giscus')
+  const status = document.querySelector<HTMLElement>('.discussion-status')
 
-    const updateGiscusTheme = () => {
-      const theme = getTheme()
-      const iframe = document.querySelector<HTMLIFrameElement>('.giscus-frame')
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage(
-          {
-            giscus: {
-              setConfig: {
-                theme,
-              },
-            },
-          },
+  if (button && container && status) {
+    const theme = () => document.documentElement.dataset.theme === 'dark' ? 'dark_dimmed' : 'light'
+    button.hidden = false
+    button.addEventListener('click', () => {
+      if (button.disabled) return
+      button.disabled = true
+      status.textContent = 'Loading discussion…'
+      const script = document.createElement('script')
+      script.src = 'https://giscus.app/client.js'
+      script.crossOrigin = 'anonymous'
+      script.async = true
+      Object.assign(script.dataset, {
+        repo: 'Sealjay/sealjay-blog',
+        repoId: 'R_kgDOIFGusQ',
+        category: 'Comments',
+        categoryId: 'DIC_kwDOIFGusc4CWbkg',
+        mapping: 'pathname',
+        strict: '0',
+        reactionsEnabled: '1',
+        emitMetadata: '0',
+        inputPosition: 'bottom',
+        theme: theme(),
+        lang: 'en',
+      })
+      script.addEventListener('error', () => {
+        script.remove()
+        button.disabled = false
+        status.textContent = 'Could not load the discussion. Try again or open GitHub.'
+      })
+      script.addEventListener('load', () => {
+        const frame = container.querySelector<HTMLIFrameElement>('.giscus-frame')
+        if (!frame) {
+          script.remove()
+          button.disabled = false
+          status.textContent = 'Could not load the discussion. Try again or open GitHub.'
+          return
+        }
+        button.hidden = true
+        status.textContent = ''
+        const syncTheme = () => frame.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: theme() } } },
           'https://giscus.app',
         )
-      }
-    }
-
-    // Watch for the giscus iframe to appear in the DOM
-    const bodyObserver = new MutationObserver(() => {
-      if (document.querySelector('.giscus-frame')) {
-        updateGiscusTheme()
-        bodyObserver.disconnect()
-
-        // Now watch for data-theme attribute changes on <html>
-        const themeObserver = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-              updateGiscusTheme()
-            }
-          }
-        })
-
-        themeObserver.observe(document.documentElement, {
+        frame.addEventListener('load', syncTheme)
+        new MutationObserver(syncTheme).observe(document.documentElement, {
           attributes: true,
           attributeFilter: ['data-theme'],
         })
-      }
+      })
+      container.append(script)
     })
-
-    bodyObserver.observe(document.body, { childList: true, subtree: true })
   }
-
-  // Setup when the DOM is ready
-  document.addEventListener('DOMContentLoaded', setupGiscusThemeSync)
 </script>

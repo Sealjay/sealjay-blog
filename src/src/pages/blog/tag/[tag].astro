@@ -4,6 +4,7 @@ import Container from '../../../components/containers/Container.astro'
 import PageHeader from '../../../components/partials/PageHeader.astro'
 import BlogList from '../../../components/partials/BlogList.astro'
 import { getCollection } from 'astro:content'
+import { tagSlug } from '../../../lib/tag-categories'
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog')
@@ -32,7 +33,7 @@ export async function getStaticPaths() {
   })
 
   return [...tagSet].map((tag) => {
-    const slug = tag.toLowerCase().replace(/\s+/g, '-')
+    const slug = tagSlug(tag)
     const filteredPosts = allPosts
       .filter((post) => post.data.tags?.includes(tag))
       .sort((b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf())

@@ -18,17 +18,17 @@ const dayFormat = new Intl.DateTimeFormat('en-GB', {
   {dayGroups.map(([dateKey, notes]) => {
     const dayUrl = `/notes/${dateKey}/`
     const summary = notes.find((note) => note.data.daySummary)?.data.daySummary
-    const previews = notes.slice(-3).reverse()
+    const previews = notes.slice(0, 3)
     return (
       <div class="note-day">
         <h3><a href={dayUrl}><time datetime={dateKey}>{dayFormat.format(new Date(dateKey))}</time></a></h3>
         <div class="note-day__content">
-          {summary && <p class="note-day__summary">{summary}</p>}
           <ul>
             {previews.map(({ id, data }) => (
               <li><a href={`${dayUrl}#${id}`}>{data.description || data.title || 'Read note'}</a></li>
             ))}
           </ul>
+          {summary && <p class="note-day__summary">AI summary · {summary}</p>}
           {notes.length > previews.length && <a class="note-day__more" href={dayUrl}>All notes from this day</a>}
         </div>
       </div>
@@ -73,7 +73,8 @@ const dayFormat = new Intl.DateTimeFormat('en-GB', {
   }
 
   .note-day__summary {
-    margin-bottom: 0.35rem;
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
     color: var(--color-text-muted);
     font-style: italic;
   }

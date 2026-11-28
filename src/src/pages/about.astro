@@ -29,6 +29,7 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
       <p class="about-intro">
         I started writing IRC bots at nine. Today I'm a Seattle-area {profileRole}. I went into law before returning to engineering, and my legal training still shapes what I ask when an AI agent can act on someone's behalf. Who gave it permission, what can it do, and who's accountable for the result?
       </p>
+      <p class="about-podcast">I co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald, where we talk about AI governance and AI-driven development.</p>
       <a href="/speaking/kit/" class="about-speaker-link plausible-event-name=Speaker+Kit+Click plausible-event-source=about">
         View the speaker kit <span aria-hidden="true">→</span>
       </a>
@@ -56,7 +57,10 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
       <section aria-labelledby="research-and-community">
         <h2 id="research-and-community">Research and community</h2>
         <p>
-          I'm a doctoral candidate at the University of East London, where I research Green AI and green software engineering. I previously served as Steering Committee Vice-Chair of the Green Software Foundation and contributed to <a href="https://www.iso.org/standard/86612.html">ISO/IEC 21031:2024</a>, the international standard for Software Carbon Intensity. My research profile is on <a href="https://orcid.org/0000-0001-7995-7865">ORCID</a>.
+          I'm a doctoral candidate at the University of East London, where I research Green AI and green software engineering. My research profile is on <a href="https://orcid.org/0000-0001-7995-7865">ORCID</a>.
+        </p>
+        <p>
+          I previously served as Steering Committee Vice-Chair of the Green Software Foundation and contributed to <a href="https://www.iso.org/standard/86612.html">ISO/IEC 21031:2024</a>, the international standard for Software Carbon Intensity.
         </p>
         <p>
           I'm a <a href={mvp?.url}>seven-time Microsoft MVP in AI and Developer Technologies</a> and a member of the Institution of Engineering and Technology (MIET). I co-lead the <a href="https://globalai.community/chapters/seattle/">Seattle chapter of Global AI Community</a>. Global AI Community named me <a href={globalAiOrganizerAward.url}>{globalAiOrganizerAward.title}</a> for the week of {globalAiOrganizerAward.weekOf}.
@@ -68,9 +72,6 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
 
       <section aria-labelledby="connect">
         <h2 id="connect">Connect</h2>
-        <p>
-          I co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald, where we talk about AI governance and AI-driven development.
-        </p>
         <SocialLinks />
       </section>
     </div>
@@ -84,6 +85,19 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
     line-height: 1.55;
   }
 
+  .about-podcast {
+    max-width: 65ch;
+    margin-top: 1rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .about-podcast a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+
   .about-speaker-link {
     display: inline-flex;
     align-items: center;
@@ -91,7 +105,7 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
     min-height: 44px;
     margin-top: 0.75rem;
     padding: 0.4rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--color-control-border);
     border-radius: var(--radius-sm);
     background: var(--color-surface);
     color: var(--color-text);
@@ -128,7 +142,7 @@ const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Mi
   .about-sections details {
     margin-top: 0.75rem;
     color: var(--color-text);
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     line-height: 1.7;
     overflow-wrap: anywhere;
   }

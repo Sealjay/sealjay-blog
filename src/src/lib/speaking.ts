@@ -1,10 +1,12 @@
 import { type CollectionEntry, getCollection } from 'astro:content'
 import { youtubeFeeds } from '../config/personal'
+import { describeAppearance } from './appearance'
 import { extractYouTubeId, getYouTubeSpeakingEntries } from './youtube'
 
 export interface SpeakingEntry {
   id: string
   data: CollectionEntry<'speaking'>['data']
+  actions: { url: string; label: string }[]
   youtubeId?: string
   tags?: string[]
 }
@@ -20,13 +22,7 @@ export async function getSpeakingEntries(): Promise<SpeakingEntry[]> {
     const youtubeId = extractYouTubeId(data.url) ?? extractYouTubeId(data.videoEmbedUrl) ?? undefined
     if (youtubeId) covered.add(youtubeId)
     const feedEntry = youtubeId ? byRecording.get(youtubeId) : undefined
-    const isShort = data.eventType === 'Short' || feedEntry?.eventType === 'Short'
-    const isFullPodcastEpisode =
-      !isShort &&
-      data.event === 'Securing the Realm' &&
-      (data.isFullPodcastEpisode ?? feedEntry?.isFullPodcastEpisode) === true
-    const eventType = isShort ? 'Short' : isFullPodcastEpisode ? 'Podcast' : data.eventType
-    return { id, youtubeId, data: { ...data, eventType, isFullPodcastEpisode } }
+    return { id, youtubeId, ...describeAppearance(data, feedEntry) }
   })
 
   for (const { youtubeId, tags, ...data } of discovered) {
@@ -34,7 +30,7 @@ export async function getSpeakingEntries(): Promise<SpeakingEntry[]> {
     covered.add(youtubeId)
     entries.push({
       id: `yt-${youtubeId}`,
-      data: { ...data, description: data.description.slice(0, 200) || data.title, featured: false },
+      ...describeAppearance({ ...data, description: data.description || data.title, featured: false }),
       youtubeId,
       tags,
     })

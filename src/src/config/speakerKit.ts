@@ -67,4 +67,20 @@ export const logistics: LogisticsItem[] = [
   { label: 'Recording', value: 'Happy to be recorded and for talks to be published online' },
 ]
 
+export const selectedAppearances = [
+  {
+    id: 'scottish-summit-2026-ai-superhighway',
+    annotation:
+      'The programme and preview cover the gateway Chris and Josh McDonald built with participants using Azure API Management.',
+  },
+  {
+    id: 'yt-9ngj7bauuwo',
+    annotation: 'A podcast discussion about the legal and security questions behind AI governance.',
+  },
+  {
+    id: 'environmental-variables-podcast-2022',
+    annotation: 'Hear Chris as a guest explaining how open source can help reduce software emissions.',
+  },
+]
+
 export const contactCta = { url: 'https://uk.linkedin.com/in/chrislloydjones' }

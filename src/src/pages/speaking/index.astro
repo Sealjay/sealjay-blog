@@ -4,20 +4,16 @@ import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import Badge from '../../components/partials/Badge.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
+import { splitAppearances } from '../../lib/appearance'
 import { getSpeakingEntries } from '../../lib/speaking'
 
-const sortedSpeakingSlots = (await getSpeakingEntries()).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id),
-)
-
-const now = new Date()
-const upcomingTalks = sortedSpeakingSlots.filter((s) => s.data.date > now)
-const pastTalks = sortedSpeakingSlots.filter((s) => s.data.date <= now)
+const { upcoming: upcomingTalks, past: pastTalks } = splitAppearances(await getSpeakingEntries())
+const sortedSpeakingSlots = [...upcomingTalks, ...pastTalks]
 
 // Group past talks by year
 const pastByYear = pastTalks.reduce(
   (acc, slot) => {
-    const year = slot.data.date.getFullYear().toString()
+    const year = slot.data.date.getUTCFullYear().toString()
     if (!acc[year]) acc[year] = []
     acc[year].push(slot)
     return acc
@@ -36,7 +32,6 @@ const speakingPageJsonLd = JSON.stringify({
   url: new URL('/speaking/', Astro.site).href,
   mainEntity: {
     '@type': 'ItemList',
-    itemListOrder: 'https://schema.org/ItemListOrderDescending',
     numberOfItems: sortedSpeakingSlots.length,
     itemListElement: sortedSpeakingSlots.map((slot, i) => ({
       '@type': 'ListItem',
@@ -66,7 +61,7 @@ const speakingPageJsonLd = JSON.stringify({
   title="Speaking"
   description="Talks, workshops, recordings and interviews on AI engineering, open source and green software"
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={sortedSpeakingSlots[0]?.data.date}
+  updatedDate={pastTalks[0]?.data.date}
 >
   <script type="application/ld+json" set:html={speakingPageJsonLd} />
   <Container>
@@ -90,7 +85,7 @@ const speakingPageJsonLd = JSON.stringify({
       <section class="speaking-section">
         <h2>Upcoming appearances</h2>
         <div class="speaking-entries">
-          {upcomingTalks.map(({ data }) => (
+          {upcomingTalks.map(({ data, actions }) => (
             <div class="speaking-entry speaking-entry--upcoming">
               <h3>{data.title}</h3>
               <div class="speaking-entry__meta">
@@ -99,9 +94,9 @@ const speakingPageJsonLd = JSON.stringify({
                 <Badge label={data.eventType} variant="subtle" />
               </div>
               <div class="speaking-entry__actions">
-                <a href={data.url} target="_blank" rel="noopener noreferrer">
-                  {data.cta} <span class="sr-only">for {data.title} (opens in new tab)</span>
-                </a>
+                {actions.map(({ url, label }) => (
+                  <a href={url}>{label}<span class="sr-only"> for {data.title}</span></a>
+                ))}
               </div>
               {data.description && (
                 <details>
@@ -133,7 +128,7 @@ const speakingPageJsonLd = JSON.stringify({
           <div class="speaking-year">
             <h3 class="speaking-year__heading">{year}</h3>
             <div class="speaking-entries">
-              {pastByYear[year].map(({ data }) => (
+              {pastByYear[year].map(({ data, actions }) => (
                 <div class="speaking-entry" data-event-type={data.eventType}>
                   <h4>{data.title}</h4>
                   <div class="speaking-entry__meta">
@@ -142,17 +137,9 @@ const speakingPageJsonLd = JSON.stringify({
                     <Badge label={data.eventType} variant="subtle" />
                   </div>
                   <div class="speaking-entry__actions">
-                    <a href={data.url} target="_blank" rel="noopener noreferrer">
-                      {data.cta} <span class="sr-only">for {data.title} (opens in new tab)</span>
-                    </a>
-                    {data.previewUrl && (
-                      <a href={data.previewUrl} target="_blank" rel="noopener noreferrer">
-                        Watch the preview <span class="sr-only">for {data.title} (opens in new tab)</span>
-                      </a>
-                    )}
-                    {data.blogPostSlug && (
-                      <a href={`/blog/${data.blogPostSlug}/`}>Related blog post <span class="sr-only">for {data.title}</span></a>
-                    )}
+                    {actions.map(({ url, label }) => (
+                      <a href={url}>{label}<span class="sr-only"> for {data.title}</span></a>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -236,7 +223,7 @@ const speakingPageJsonLd = JSON.stringify({
 
   .speaking-entry h3,
   .speaking-entry h4 {
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     line-height: 1.35;
   }
 
@@ -282,7 +269,7 @@ const speakingPageJsonLd = JSON.stringify({
     min-height: 40px;
     padding: 0.375rem 0.875rem;
     background: var(--color-surface);
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--color-control-border);
     border-radius: var(--radius-full);
     font-family: var(--font-heading);
     font-size: 0.875rem;
@@ -294,6 +281,8 @@ const speakingPageJsonLd = JSON.stringify({
   }
 
   .speaking-filter__buttons button[aria-pressed='true'] {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--color-on-primary, #fff);

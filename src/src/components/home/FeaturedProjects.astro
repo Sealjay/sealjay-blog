@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+import { getProjectLinks } from '../../lib/projects'
 
 interface Props {
   projects: CollectionEntry<'project'>[]
@@ -9,23 +10,20 @@ const { projects } = Astro.props
 ---
 
 <div class="projects-grid">
-  {projects.map(({ data }) => (
-    <article class="project-card">
-      <h3>{data.title}</h3>
-      <p>{data.description}</p>
-      {(data.demoUrl || data.repoUrl) && (
-        <div class="project-actions">
-          {data.demoUrl && (
-            <a href={data.demoUrl}>
-              {new URL(data.demoUrl).hostname === 'orcid.org' ? 'Research profile' : 'Visit project'}
-              <span class="sr-only"> for {data.title}</span>
-            </a>
-          )}
-          {data.repoUrl && <a href={data.repoUrl}>GitHub<span class="sr-only"> for {data.title}</span></a>}
-        </div>
-      )}
-    </article>
-  ))}
+  {projects.map(({ data }) => {
+    const links = getProjectLinks(data)
+    return (
+      <article class="project-card">
+        <h3>{data.title}</h3>
+        <p>{data.description}</p>
+        {links.length > 0 && (
+          <div class="project-actions">
+            {links.map(({ url, label }) => <a href={url}>{label}</a>)}
+          </div>
+        )}
+      </article>
+    )
+  })}
 </div>
 
 <style>
@@ -75,6 +73,11 @@ const { projects } = Astro.props
     font-size: 0.9375rem;
     text-decoration: underline;
     text-underline-offset: 0.16em;
+  }
+
+  .project-actions a + a {
+    font-weight: 500;
+    color: var(--color-text-muted);
   }
 
   @media (min-width: 900px) {
