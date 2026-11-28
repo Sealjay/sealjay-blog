@@ -1,3 +1,5 @@
+import { profileRole } from './personal'
+
 export interface SpeakerTopic {
   title: string
   description: string
@@ -23,9 +25,8 @@ export interface LogisticsItem {
 }
 
 export const speakerBio = {
-  short:
-    'Chris Lloyd-Jones (Sealjay) is VP of AI Consulting Transformation at Kyndryl, where he created the Forward Deployed Engineering capability \u2014 engineers embedded with clients to build, ship, and own outcomes, now scaling to 22,000 engineers. A seven-time Microsoft MVP in AI & Developer Technologies, ISO/IEC 21031:2024 contributor, and a Data.D candidate (ABD) researching Green AI, he co-hosts Securing the Realm (securing.quest) and speaks on agentic AI, open source, and governance that ships rather than stalls. // open, sustainable, real.',
-  long: 'Chris Lloyd-Jones (Sealjay) is VP of AI Consulting Transformation at Kyndryl, where he created the Forward Deployed Engineering capability \u2014 engineers embedded with clients to build, ship, and own outcomes rather than advise from a distance, now scaling to 22,000 engineers. He previously launched Avanade\u2019s AI platform and led their Platforms & Incubation practice. A seven-time Microsoft MVP in AI and Developer Technologies, he contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation, where he served as Steering Committee Vice-Chair, and is completing a Data.D in Data Science at the University of East London (2022\u20132027, ABD), researching Green AI and Green Software Engineering. With a background spanning law, engineering, and open source leadership, he treats regulation, liability, and compliance as design constraints rather than afterthoughts. He co-hosts Securing the Realm, a D&D-inspired podcast on AI governance and AI-driven development (securing.quest), has shared insights with the BBC, and was recognised in the OpenUK New Year\u2019s Honours 2025/26.',
+  short: `Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole} and a seven-time Microsoft MVP in AI and Developer Technologies. He speaks about taking AI agents into production, governing what they can do and assessing the environmental impact of software. He leads the Seattle chapter of Global AI Community and co-hosts Securing the Realm with Josh McDonald.`,
+  long: `Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole}, a seven-time Microsoft MVP in AI and Developer Technologies and a member of the Institution of Engineering and Technology (MIET). At Kyndryl, he created the Forward Deployed Engineering capability so engineers could build alongside clients and remain responsible for the software they built together. At Avanade, he founded Platforms & Incubation and hired the product team for Avanade.ai. His background in law informs how he thinks about agent permissions and accountability. He is a Green AI doctoral candidate at the University of East London and contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation, where he served as Steering Committee Vice-Chair. He leads the Seattle chapter of Global AI Community and co-hosts Securing the Realm, a podcast on AI governance and AI-driven development, with Josh McDonald.`,
 }
 
 export const topics: SpeakerTopic[] = [
@@ -102,8 +103,8 @@ export const testimonials: Testimonial[] = [
 ]
 
 export const logistics: LogisticsItem[] = [
-  { label: 'Based in', value: 'London, UK (available globally)' },
-  { label: 'Timezone', value: 'GMT/BST (UK)' },
+  { label: 'Based in', value: 'Seattle area, Washington (available globally)' },
+  { label: 'Timezone', value: 'Pacific Time (PT)' },
   { label: 'Languages', value: 'English (native)' },
   {
     label: 'AV requirements',

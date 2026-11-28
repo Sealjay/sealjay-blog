@@ -11,6 +11,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 
 import avatarImage from '../../assets/chris/avatar.jpg'
+import { profileRole } from '../../config/personal'
 
 export interface Props {
   title: string;
@@ -42,11 +43,7 @@ const personJsonLd = JSON.stringify({
   'alternateName': 'Sealjay',
   'url': 'https://sealjay.com',
   'image': avatarAbsoluteUrl,
-  'jobTitle': 'VP, AI Consulting Transformation',
-  'worksFor': {
-    '@type': 'Organization',
-    'name': 'Kyndryl',
-  },
+  'jobTitle': profileRole,
   'sameAs': [
     'https://github.com/sealjay',
     'https://bsky.app/profile/sealjay.com',

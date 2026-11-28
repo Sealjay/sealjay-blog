@@ -1,7 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro'
 import { Image } from 'astro:assets'
-import { currentRole, location as configLocation, professionalBadges, formerRoles } from "../../config/personal";
+import { profileRole, professionalBadges, formerRoles } from "../../config/personal";
 import SocialLinks from "./IndexSocialLinks.astro";
 import Badge from "./Badge.astro";
 
@@ -10,7 +10,6 @@ interface Props {
   imageAlt: string;
   title?: string;
   job?: string;
-  location?: string;
   showBadges?: boolean;
   showFormerRoles?: boolean;
 }
@@ -47,7 +46,7 @@ const {
   <!-- Content (Mobile: bottom, Desktop: left) -->
   <div class="profile-section__content">
     <div class="profile-section__role-badge">
-      <span>{currentRole.displayText}</span>
+      <span>{profileRole}</span>
     </div>
 
     <h2 class="profile-section__name">

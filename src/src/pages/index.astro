@@ -13,7 +13,7 @@ import LatestNotes from '../components/home/LatestNotes.astro'
 import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
 import FormattedDate from '../components/partials/FormattedDate.astro'
-import { currentRole } from '../config/personal'
+import { profileRole } from '../config/personal'
 
 // --- Data fetching ---
 const posts = (await getCollection('blog')).sort(
@@ -99,7 +99,7 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
 
 <Layout
   title="Chris Lloyd-Jones, Sealjay"
-  description="AI transformation, green software, and open source | Chris Lloyd-Jones (Sealjay), VP at Kyndryl and 7x Microsoft MVP (AI & DevTech)"
+  description={`Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole} and seven-time Microsoft MVP in AI and Developer Technologies.`}
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('1 March 2026')}
 >
@@ -119,12 +119,12 @@ const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI
 
         <!-- Subtitle -->
         <p class="hero-subtitle font-body hero-anim" style="animation-delay: 0.16s;">
-          <span class="p-job-title">{currentRole.title}</span> &mdash; {currentRole.company}
+          Engineering AI that works in the real world
         </p>
 
         <!-- Bio -->
         <p class="hero-bio font-body p-note hero-anim" style="animation-delay: 0.24s;">
-          I'm Chris &mdash; or <span class="p-nickname">Sealjay</span>. I bridge AI transformation with enterprise governance, sustainability, and open source &mdash; from green software to agentic AI. 7x Microsoft MVP, Data.D candidate in Green AI at the University of East London, and co-host of <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a>.
+          I'm Chris Lloyd-Jones (<span class="p-nickname">Sealjay</span>), a Seattle-area <span class="p-job-title">{profileRole}</span>. I work on getting AI into production with clear permissions and accountability. I research Green AI and co-host <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a> with Josh McDonald.
         </p>
 
         <!-- Expertise tags -->

@@ -1,9 +1,10 @@
+import { profileRole } from './config/personal'
+
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 export const SITE_TITLE = 'Sealjay'
-export const SITE_DESCRIPTION =
-  'VP, AI Consulting Transformation at Kyndryl. 7x Microsoft MVP (AI & DevTech). Agentic AI, open source, and green software. // open, sustainable, real.'
+export const SITE_DESCRIPTION = `Chris Lloyd-Jones (Sealjay), Seattle-area ${profileRole}. Writing on agentic AI, open source and green software.`
 
 export const SITE_NAV = [
   { name: 'About', path: '/about' },
