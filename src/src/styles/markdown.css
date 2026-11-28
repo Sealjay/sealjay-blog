@@ -8,7 +8,7 @@
 
 /* Base Typography — max-width only (color & line-height from Tailwind) */
 .prose {
-  max-width: 75ch;
+  max-width: 68ch;
 }
 
 /* Headings — font-family, letter-spacing, and word-wrap (Tailwind handles margins, font-size, weight) */

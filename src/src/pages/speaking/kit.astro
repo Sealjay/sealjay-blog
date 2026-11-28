@@ -1,19 +1,19 @@
 ---
 import { Image } from 'astro:assets'
-import { getEntry } from 'astro:content'
+import { getSpeakingEntries } from '../../lib/speaking'
 import Layout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import Button from '../../components/partials/Button.astro'
 import { globalAiOrganizerAward } from '../../config/personal'
-import { speakerBio, topics, talkFormats, logistics, contactCta } from '../../config/speakerKit'
+import { speakerBio, topics, talkFormats, logistics, contactCta, selectedAppearances } from '../../config/speakerKit'
 import headshotImage from '../../assets/chris/avatar.jpg'
 
-const selectedAppearances = await Promise.all([
-  getEntry('speaking', 'scottish-summit-2026-ai-superhighway'),
-  getEntry('speaking', 'yt-9ngj7bauuwo'),
-  getEntry('speaking', 'environmental-variables-podcast-2022'),
-])
+const appearances = await getSpeakingEntries()
+const examples = selectedAppearances.flatMap(({ id, annotation }) => {
+  const entry = appearances.find((appearance) => appearance.id === id)
+  return entry ? [{ ...entry, annotation }] : []
+})
 ---
 
 <Layout
@@ -89,13 +89,13 @@ const selectedAppearances = await Promise.all([
     <section class="kit-section">
       <h2>Selected appearances</h2>
       <div class="kit-grid">
-        {selectedAppearances.map((slot) => slot && (
+        {examples.map((slot) => (
           <div class="kit-appearance">
             <h3>{slot.data.title}</h3>
-            <p>{slot.data.event} · {slot.data.eventType}</p>
+            <p class="kit-appearance-meta">{slot.data.event} · {slot.data.eventType}</p>
+            <p>{slot.annotation}</p>
             <ul class="kit-appearance-links">
-              <li><a href={slot.data.url}>{slot.data.cta}</a></li>
-              {slot.data.previewUrl && <li><a href={slot.data.previewUrl}>Watch the preview</a></li>}
+              {slot.actions.map((action) => <li><a href={action.url}>{action.label}</a></li>)}
             </ul>
           </div>
         ))}
@@ -188,7 +188,7 @@ const selectedAppearances = await Promise.all([
   .kit-bio button {
     min-height: 44px;
     padding-inline: 0.75rem;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--color-control-border);
     border-radius: var(--radius-sm);
     font-family: var(--font-heading);
     font-weight: 600;
@@ -244,6 +244,11 @@ const selectedAppearances = await Promise.all([
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem 1.5rem;
+  }
+
+  .kit-appearance-meta {
+    font-size: 0.875rem;
+    margin-block: 0.3rem 0.5rem;
   }
 
   .kit-appearance-links {

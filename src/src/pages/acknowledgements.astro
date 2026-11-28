@@ -1,246 +1,110 @@
 ---
 import type { ImageMetadata } from 'astro'
 import { Image } from 'astro:assets'
-import Layout from '../layouts/BaseLayout.astro'
+import { getCollection } from 'astro:content'
 import Container from '../components/containers/Container.astro'
 import PageHeader from '../components/partials/PageHeader.astro'
-import { getCollection } from 'astro:content'
+import Layout from '../layouts/BaseLayout.astro'
 
-const acknowledgements = await getCollection('acknowledgement')
+const credits = (await getCollection('acknowledgement')).sort((a, b) => a.data.title.localeCompare(b.data.title))
+const sections = [
+  { title: 'Type and visual identity', ids: ['bricolage-grotesque', 'source-serif-4', 'ibm-plex-mono', 'seal-icon', 'x-icon'] },
+  { title: 'Pages, search and publishing', ids: ['astro', 'astro-mdx', 'astro-rss', 'astro-sitemap', 'date-fns', 'fuse-js', 'markdown-it', 'open-graph', 'resvg-js', 'satori', 'tailwind', 'tailwind-typography'] },
+  { title: 'Discussion and syndication', ids: ['bridgy-fed', 'giscus', 'indieweb', 'webmention-io'] },
+  { title: 'Development, hosting and analytics', ids: ['azure-cli', 'azure-swa', 'biome', 'bun', 'claude-code', 'github-actions', 'github-copilot', 'plausible'] },
+]
+const groups = sections.map(({ title, ids }) => ({ title, entries: credits.filter(({ id }) => ids.includes(id)) }))
+const otherCredits = credits.filter(({ id }) => !sections.some(({ ids }) => ids.includes(id)))
+if (otherCredits.length) groups.push({ title: 'Other credits', entries: otherCredits })
 
-const ackImages = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/images/acknowledgements/*.svg',
-  { eager: true },
-)
+const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/acknowledgements/*.svg', { eager: true })
 ---
 
 <Layout
   title="Colophon"
-  description="The open-source projects, tools, and resources this site is built with"
-  pubDateTime={new Date('11 May 2023')}
-  updatedDate={new Date('01 March 2026')}
+  description="The typefaces, tools and people behind sealjay.com."
+  pubDateTime={new Date('2023-05-11')}
+  updatedDate={new Date('2026-11-27')}
 >
   <Container>
     <PageHeader
       title="Colophon"
-      subtitle="the open source tools, knowledge, and resources behind this site"
-      breadcrumbs={[
-        { label: 'Home', href: '/' },
-        { label: 'Colophon' },
-      ]}
-     
-    >
-      <p class="colophon-source-link">
-        The <a href="https://github.com/Sealjay/sealjay-blog" target="_blank" rel="noopener noreferrer">source code</a> is available on GitHub.
-      </p>
-    </PageHeader>
+      breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Colophon' }]}
+    />
 
-    <div class="ack-grid">
-      {acknowledgements.map((acknowledgement) => (
-        <div class="ack-card">
-          <div class="ack-card__header">
-            {(() => {
-              const imgPath = `/src/assets/images/acknowledgements/${acknowledgement.data.image}`
-              const imgModule = ackImages[imgPath]
-              return imgModule ? (
-                <Image
-                  src={imgModule.default}
-                  alt={acknowledgement.data.title}
-                  width={32}
-                  height={32}
-                  layout="fixed"
-                  class="ack-card__icon"
-                />
-              ) : (
-                <img
-                  class="ack-card__icon"
-                  src={`/images/acknowledgements/${acknowledgement.data.image}`}
-                  alt={acknowledgement.data.title}
-                />
-              )
-            })()}
-            <span class="ack-card__title">
-              {acknowledgement.data.title}
-            </span>
-          </div>
-          <p class="ack-card__description">
-            {acknowledgement.data.description}
-          </p>
-          {acknowledgement.data.notes && (
-            <p class="ack-card__notes">
-              {acknowledgement.data.notes}
-            </p>
-          )}
-          <div class="ack-card__footer">
-            <div class="ack-card__licence">
-              <span>Licence:</span>
-              <a href={acknowledgement.data.licenceUrl}>
-                {acknowledgement.data.licence}
-              </a>
-            </div>
-            {acknowledgement.data.url && (
-              <a
-                href={acknowledgement.data.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="ack-card__link"
-              >
-                Visit project
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </a>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
+    <section class="colophon-intro">
+      <h2>How this site is made</h2>
+      <p>My portrait is on the About page. The small face beside my name stays with you as you move around the site. On the homepage, a single SVG draws the fir trees and their reflections in a Pacific Northwest lake in both themes.</p>
+      <p>Astro builds these pages into static HTML. I aim to keep each page’s initial download under 250&nbsp;kB, including fonts and images. The <a href="https://github.com/Sealjay/sealjay-blog">source code is on GitHub</a>.</p>
+    </section>
 
+    {groups.map(({ title, entries }) => (
+      <section class="credit-group">
+        <h2>{title}</h2>
+        <ul>
+          {entries.map(({ data }) => {
+            const logo = data.image && logos[`/src/assets/images/acknowledgements/${data.image}`]?.default
+            return (
+              <li>
+                {logo && <Image src={logo} alt="" width={28} height={28} layout="fixed" loading="lazy" class="credit-logo" />}
+                <div>
+                  <h3><a href={data.url}>{data.title}</a></h3>
+                  <p>{data.description}</p>
+                  {data.notes && <p>{data.notes}</p>}
+                  <p class="credit-licence">
+                    Licence: <a href={data.licenceUrl}>{data.licence}</a>
+                    {data.originalUrl && <> · <a href={data.originalUrl}>Previous project link (unavailable)</a></>}
+                    {data.archivedUrl && <> · <a href={data.archivedUrl}>Archived {data.title} reference</a></>}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+    ))}
   </Container>
 </Layout>
 
 <style>
-  .colophon-source-link {
-    margin-top: 0.75rem;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.75;
-    color: var(--color-text-muted);
+  section {
+    max-width: 68ch;
+    margin-bottom: 2.25rem;
   }
-
-  .colophon-source-link a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
+  h2 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.375rem, 3vw, 1.75rem);
+    line-height: 1.3;
   }
-
-  .colophon-source-link a:hover {
-    text-decoration: underline;
+  h3 {
+    font-size: 1.1875rem;
+    font-weight: 650;
+    line-height: 1.4;
   }
-
-  .ack-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 640px) {
-    .ack-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .ack-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .ack-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--color-card-glow);
-    overflow: hidden;
-    transition: border-color var(--duration-normal) var(--ease-out),
-                transform var(--duration-normal) var(--ease-out);
-  }
-
-  .ack-card:hover {
-    border-color: var(--color-border-strong);
-    transform: translateY(-2px);
-  }
-
-  .ack-card__header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: var(--color-bg-alt);
-  }
-
-  .ack-card__icon {
-    width: 2rem;
-    height: 2rem;
-    flex-shrink: 0;
-  }
-
-  .ack-card__title {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--color-text);
-  }
-
-  .ack-card__description {
-    padding: 0.75rem 1rem 0;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
+  p {
+    margin-top: 0.375rem;
+    font-size: 1.125rem;
     line-height: 1.6;
-    color: var(--color-text-muted);
-    flex-grow: 1;
+    overflow-wrap: anywhere;
   }
-
-  .ack-card__notes {
-    padding: 0.25rem 1rem 0;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: var(--color-text-subtle);
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
   }
-
-  .ack-card__footer {
+  li {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1rem;
-    margin-top: auto;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 0;
     border-top: 1px solid var(--color-border);
   }
-
-  .ack-card__licence {
-    font-size: 0.75rem;
-    color: var(--color-text-subtle);
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+  .credit-logo {
+    flex: none;
+    margin-top: 0.15rem;
   }
-
-  .ack-card__licence a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
+  .credit-licence {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
   }
-
-  .ack-card__licence a:hover {
-    text-decoration: underline;
-  }
-
-  .ack-card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: background var(--duration-fast) var(--ease-out);
-  }
-
-  .ack-card__link:hover {
-    background: var(--color-primary-muted);
-  }
-
-  .ack-card__link svg {
-    transition: transform var(--duration-normal) var(--ease-out);
-  }
-
-  .ack-card:hover .ack-card__link svg {
-    transform: translateX(4px);
-  }
-
 </style>

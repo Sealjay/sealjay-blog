@@ -1,6 +1,6 @@
 ---
 import { Picture } from 'astro:assets'
-import SocialIcon from '../../components/SocialIcon.astro'
+import { getProjectLinks } from '../../lib/projects'
 import Layout from '../../layouts/BaseLayout.astro'
 import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
@@ -51,8 +51,9 @@ const latestProject = sortedProjects.reduce((prev, current) =>
       <div class="projects-featured-grid">
         {featuredProjects.map((project) => {
           const status = statusConfig[project.data.status] ?? { variant: 'subtle' as const, label: project.data.status }
+          const links = getProjectLinks(project.data)
           return (
-            <div class="project-card project-card--featured group">
+            <div class="project-card project-card--featured group" id={project.id}>
               {/* Hero Image */}
               {project.data.heroImage && (
                 <div class="project-card__image">
@@ -101,52 +102,15 @@ const latestProject = sortedProjects.reduce((prev, current) =>
                 <div class="flex-grow" />
               </div>
 
-              {/* Footer CTAs */}
-              <div class="project-card__footer">
-                {project.data.repoUrl && (
-                  <a
-                    href={project.data.repoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="project-card__link project-card__link--primary"
-                  >
-                    <SocialIcon name="github" class="project-card__link-icon" />
-                    GitHub
-                    <svg xmlns="http://www.w3.org/2000/svg" class="project-card__arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                )}
-
-                {project.data.demoUrl && (
-                  <a
-                    href={project.data.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class:list={[
-                      'project-card__link',
-                      project.data.repoUrl ? 'project-card__link--secondary' : 'project-card__link--primary',
-                    ]}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="project-card__link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    {project.data.demoUrl.includes('orcid.org/') ? 'Research profile' : 'Visit project'}
-                  </a>
-                )}
-
-                {project.data.blogPostSlug && (
-                  <a
-                    href={`/blog/${project.data.blogPostSlug}/`}
-                    class="project-card__link project-card__link--secondary"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="project-card__link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                    </svg>
-                    Read the article
-                  </a>
-                )}
-              </div>
+              {links.length > 0 && (
+                <div class="project-card__footer">
+                  {links.map(({ url, label, kind }, index) => (
+                    <a href={url} data-link-type={kind} class:list={[
+                      'project-card__link', index === 0 ? 'project-card__link--primary' : 'project-card__link--secondary',
+                    ]}>{label}</a>
+                  ))}
+                </div>
+              )}
             </div>
           )
         })}
@@ -160,17 +124,9 @@ const latestProject = sortedProjects.reduce((prev, current) =>
         <div class="projects-other__list">
           {otherProjects.map((project) => {
             const status = statusConfig[project.data.status] ?? { variant: 'subtle' as const, label: project.data.status }
-            const links = [
-              { url: project.data.repoUrl, label: 'GitHub', external: true },
-              { url: project.data.demoUrl, label: 'Visit project', external: true },
-              {
-                url: project.data.blogPostSlug ? `/blog/${project.data.blogPostSlug}/` : undefined,
-                label: 'Read the article',
-                external: false,
-              },
-            ].filter((link) => link.url)
+            const links = getProjectLinks(project.data)
             return (
-              <div class="project-compact">
+              <div class="project-compact" id={project.id}>
                 <div class="project-compact__main">
                   <div class="project-compact__header">
                     <Badge label={status.label} variant={status.variant} />
@@ -187,15 +143,8 @@ const latestProject = sortedProjects.reduce((prev, current) =>
                 </div>
                 {links.length > 0 && (
                   <div class="project-compact__links">
-                    {links.map(({ url, label, external }) => (
-                      <a
-                        href={url}
-                        target={external ? '_blank' : undefined}
-                        rel={external ? 'noopener noreferrer' : undefined}
-                        class="project-compact__link"
-                      >
-                        {label}<span class="sr-only"> for {project.data.title}{external ? ' (opens in new tab)' : ''}</span>
-                      </a>
+                    {links.map(({ url, label, kind }) => (
+                      <a href={url} data-link-type={kind} class="project-compact__link">{label}</a>
                     ))}
                   </div>
                 )}
@@ -215,10 +164,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
           if (typeof window.plausible === 'undefined') return
           const card = link.closest('.project-card, .project-compact')
           const project = card?.querySelector('h2, h3')?.textContent?.trim() ?? 'Unknown'
-          const text = link.textContent?.trim().toLowerCase() ?? ''
-          let linkType = 'other'
-          if (text.includes('github')) linkType = 'repo'
-          else if (text.includes('demo') || text.includes('website')) linkType = 'demo'
+          const linkType = link.dataset.linkType ?? 'other'
           window.plausible('Project Click', { props: { project, linkType } })
         })
       }
@@ -260,7 +206,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
                 box-shadow var(--duration-normal) var(--ease-out);
   }
 
-  .project-card:hover {
+  .project-card:has(a):hover {
     border-color: var(--color-border-strong);
     transform: translateY(-2px);
   }
@@ -301,7 +247,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
   }
 
   .project-card__desc {
-    font-size: 0.875rem;
+    font-size: 1.125rem;
     line-height: 1.6;
     color: var(--color-text-muted);
     margin: 0 0 1rem;
@@ -320,7 +266,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     border-radius: var(--radius-full);
     padding: 2px 8px;
     font-family: var(--font-heading);
-    font-size: 0.6875rem;
+    font-size: 0.875rem;
     font-weight: 500;
     background: var(--color-bg-alt);
     color: var(--color-text-subtle);
@@ -358,11 +304,14 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     font-family: var(--font-heading);
     font-size: 0.875rem;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
     transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .project-card__link--primary {
+  .project-card__link--primary,
+  .project-compact__link:first-child {
+    font-weight: 650;
     color: var(--color-primary);
   }
 
@@ -376,21 +325,6 @@ const latestProject = sortedProjects.reduce((prev, current) =>
 
   .project-card__link--secondary:hover {
     color: var(--color-text);
-  }
-
-  .project-card__link-icon {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .project-card__arrow {
-    width: 0.75rem;
-    height: 0.75rem;
-    transition: transform var(--duration-normal) var(--ease-out);
-  }
-
-  .project-card:hover .project-card__arrow {
-    transform: translateX(2px);
   }
 
   /* Other projects section */
@@ -426,7 +360,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
                 transform var(--duration-normal) var(--ease-out);
   }
 
-  .project-compact:hover {
+  .project-compact:has(a):hover {
     border-color: var(--color-border-strong);
   }
 
@@ -443,7 +377,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
   }
 
   .project-compact__title {
-    font-size: 0.9375rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text);
     margin: 0;
@@ -451,7 +385,7 @@ const latestProject = sortedProjects.reduce((prev, current) =>
   }
 
   .project-compact__desc {
-    font-size: 0.8125rem;
+    font-size: 1rem;
     color: var(--color-text-muted);
     margin: 0;
     line-height: 1.5;
@@ -480,6 +414,10 @@ const latestProject = sortedProjects.reduce((prev, current) =>
     font-size: 0.875rem;
     text-decoration: underline;
     text-underline-offset: 0.15em;
+  }
+
+  .project-compact__link + .project-compact__link {
+    color: var(--color-text-muted);
   }
 
   .project-compact__link:hover {

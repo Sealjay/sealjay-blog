@@ -85,3 +85,7 @@ export function getTagStyle(tag: string): string | undefined {
   if (!cssVar) return undefined
   return `--tag-color: var(--color-cat-${cssVar}); --tag-bg: var(--color-cat-${cssVar}-bg)`
 }
+
+export function tagSlug(tag: string): string {
+  return tag.toLowerCase().replace(/\s+/g, '-')
+}

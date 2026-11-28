@@ -145,7 +145,7 @@ module.exports = {
           '--tw-prose-headings': 'var(--color-text)',
           '--tw-prose-links': 'var(--color-primary)',
           '--tw-prose-links-hover': 'var(--color-primary-hover)',
-          '--tw-prose-underline': 'var(--color-primary-underline, rgba(99, 102, 241, 0.2))',
+          '--tw-prose-underline': 'var(--color-primary)',
           '--tw-prose-underline-hover': 'var(--color-primary)',
           '--tw-prose-bold': 'var(--color-text)',
           '--tw-prose-counters': 'var(--color-text)',
@@ -163,7 +163,7 @@ module.exports = {
 
           // Base
           color: 'var(--tw-prose-body)',
-          lineHeight: '1.75',
+          lineHeight: '1.6',
           '> *': {
             marginTop: '1.25rem',
             marginBottom: '1.25rem',

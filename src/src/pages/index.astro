@@ -66,7 +66,6 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
           {recentWork.map((item) => <RecentWorkRow {...item} />)}
         </ul>
       )}
-      <a class="archive-link" href="/stream/">View the Stream <span aria-hidden="true">→</span></a>
     </Container>
   </Section>
 
@@ -89,6 +88,9 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
       </Container>
     </Section>
   )}
+  <Container>
+    <a class="archive-link full-stream" href="/stream/">View the full stream <span aria-hidden="true">→</span></a>
+  </Container>
 </Layout>
 
 <style>
@@ -269,6 +271,8 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
   :global(.home-page .projects-band) {
     border-block: 1px solid var(--color-border);
   }
+
+  .full-stream { margin-bottom: 2rem; }
 
   .archive-link {
     display: inline-flex;

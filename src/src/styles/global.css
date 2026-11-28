@@ -16,10 +16,11 @@
   --color-text: #1E1B3A;
   --color-text-muted: #4B4772;
   --color-text-subtle: #69638F;
-  --color-primary: #4F46E5;
+  --color-primary: #5B3696;
+  --color-control-border: #82739D;
   --color-on-primary: #FFFFFF;
   --color-primary-muted: rgba(79, 70, 229, 0.08);
-  --color-accent: #6366F1;
+  --color-accent: var(--color-primary);
   --color-warm: #BE185D;
   --color-warm-muted: rgba(219, 39, 119, 0.08);
   --color-success: #047857;
@@ -62,7 +63,7 @@
   --color-cat-green-bg: rgba(4, 120, 87, 0.08);
   --color-cat-security: #BE185D;
   --color-cat-security-bg: rgba(190, 24, 93, 0.08);
-  --color-cat-events: #B45309;
+  --color-cat-events: #984306;
   --color-cat-events-bg: rgba(180, 83, 9, 0.08);
   --color-cat-dev: #0E7490;
   --color-cat-dev-bg: rgba(14, 116, 144, 0.08);
@@ -84,10 +85,11 @@
   --color-text: #E0E7FF;
   --color-text-muted: #9BA3CF;
   --color-text-subtle: #8994C0;
-  --color-primary: #818CF8;
+  --color-primary: #DAC0FF;
+  --color-control-border: #927FA9;
   --color-on-primary: #0C0A1D;
   --color-primary-muted: rgba(129, 140, 248, 0.15);
-  --color-accent: #6366F1;
+  --color-accent: var(--color-primary);
   --color-warm: #F472B6;
   --color-warm-muted: rgba(244, 114, 182, 0.15);
   --color-success: #34D399;
@@ -129,6 +131,8 @@
   }
 
   body {
+    font-size: 1.125rem;
+    line-height: 1.6;
     background: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-body);
@@ -193,7 +197,7 @@
    Selection colour
    ============================================================ */
 ::selection {
-  background: rgba(99, 102, 241, 0.25);
+  background: color-mix(in srgb, var(--color-primary) 24%, var(--color-bg));
   color: var(--color-text);
 }
 

@@ -34,17 +34,22 @@ const blog = defineCollection({
         .optional()
         .transform((str) => (str ? new Date(str) : undefined)),
       heroImage: image().optional(),
+      listingThumbnail: image().optional(),
       tags: z.array(z.string()).optional(),
       sourceUrl: z
         .string()
         .url()
         .optional()
         .transform((u) => (u ? tagMvpUrl(u) : u)),
+      sourceLabel: z.string().optional(),
+      archivedSourceUrl: z.string().url().optional(),
       featured: z.boolean().default(false),
       inReplyTo: z.string().url().optional(),
       additionalAuthors: z.array(authorSchema).optional(),
     }),
 })
+
+const additionalLinks = z.array(z.object({ label: z.string(), url: z.string().url().transform(tagMvpUrl) })).optional()
 
 const speaking = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/speaking' }),
@@ -65,6 +70,7 @@ const speaking = defineCollection({
       thumbnail: image().optional(),
       blogPostSlug: z.string().optional(),
       previewUrl: z.string().url().transform(tagMvpUrl).optional(),
+      additionalLinks,
       featured: z.boolean().default(false),
       videoEmbedUrl: z.string().url().optional(),
       isFullPodcastEpisode: z.boolean().optional(),
@@ -92,6 +98,7 @@ const note = defineCollection({
     isHighlight: z.boolean().default(false),
     mastodonUrl: z.string().url().optional(),
     inReplyTo: z.string().url().optional(),
+    bodyIsSupplement: z.boolean().optional(),
     daySummary: z.string().optional(),
   }),
 })
@@ -104,6 +111,8 @@ const project = defineCollection({
       description: z.string(),
       repoUrl: z.string().url().optional(),
       demoUrl: z.string().url().optional(),
+      primaryDemoLabel: z.string().optional(),
+      additionalLinks,
       heroImage: image().optional(),
       techStack: z.array(z.string()),
       status: z.enum(['Active', 'Maintained', 'Archived', 'Contribution']),
@@ -124,8 +133,10 @@ const acknowledgement = defineCollection({
     title: z.string(),
     description: z.string(),
     notes: z.string(),
-    image: z.string(),
+    image: z.string().optional(),
     url: z.string().url().transform(tagMvpUrl),
+    originalUrl: z.string().url().optional(),
+    archivedUrl: z.string().url().optional(),
     licence: z.string(),
     licenceUrl: z.string().url(),
   }),
