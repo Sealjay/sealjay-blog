@@ -30,13 +30,12 @@ const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/a
     <PageHeader
       title="Colophon"
       breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Colophon' }]}
-    />
-
-    <section class="colophon-intro">
-      <h2>How this site is made</h2>
-      <p>My portrait is on the About page. The small face beside my name stays with you as you move around the site. On the homepage, a single SVG draws the fir trees and their reflections in a Pacific Northwest lake in both themes.</p>
-      <p>Astro builds these pages into static HTML. I aim to keep each page’s initial download under 250&nbsp;kB, including fonts and images. The <a href="https://github.com/Sealjay/sealjay-blog">source code is on GitHub</a>.</p>
-    </section>
+    >
+      <div class="colophon-intro">
+        <p>These are the tools, libraries, knowledge and resources I draw on to build this site. I aim to keep each page’s first download under 250&nbsp;kB, including fonts and images.</p>
+        <p><a href="https://github.com/Sealjay/sealjay-blog">View the source on GitHub</a></p>
+      </div>
+    </PageHeader>
 
     {groups.map(({ title, entries }) => (
       <section class="credit-group">
@@ -67,8 +66,11 @@ const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/a
 </Layout>
 
 <style>
-  section {
+  section,
+  .colophon-intro {
     max-width: 68ch;
+  }
+  section {
     margin-bottom: 2.25rem;
   }
   h2 {
