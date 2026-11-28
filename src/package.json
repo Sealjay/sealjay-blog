@@ -42,7 +42,7 @@
     "caniuse-lite": "^1.0.30001803",
     "fuse.js": "^7.4.2",
     "markdown-it": "^15.0.1",
-    "parse5": "7.3.0",
+    "parse5": "8.1.1",
     "satori": "^0.33.4",
     "tailwindcss": "^3.4.19",
     "unist-util-visit": "^5.1.0"
