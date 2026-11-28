@@ -3,8 +3,7 @@
  *
  * Fetches recent toots (including replies), filters for replies to other
  * accounts, fetches parent context, and outputs candidates that aren't
- * already synced. Designed to be called by the review-mastodon-replies
- * Claude Code skill.
+ * already synced.
  *
  * Usage: MASTODON_TOKEN=xxx bun src/scripts/review-mastodon-replies.mjs [--limit=N]
  */

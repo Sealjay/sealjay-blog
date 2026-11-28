@@ -38,7 +38,7 @@
           aria-expanded="false"
           aria-haspopup="listbox"
         />
-        <kbd class="search-kbd">Esc</kbd>
+        <button type="button" id="search-close-button" class="search-action search-close">Close</button>
       </div>
 
       <div class="search-divider"></div>
@@ -49,7 +49,10 @@
         <p id="search-initial" class="search-status">
           Start typing to search...
         </p>
+        <p id="search-loading" class="search-status hidden">Loading search…</p>
+        <p id="search-error" class="search-status hidden">Search is unavailable.</p>
       </div>
+      <button type="button" id="search-retry-button" class="search-action search-retry hidden">Try again</button>
       <ul
         id="search-results"
         role="listbox"
@@ -176,9 +179,10 @@
   }
 
   .search-input {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     height: 48px;
-    padding: 0 48px 0 48px;
+    padding: 0 12px 0 48px;
     border: none;
     background: var(--color-bg);
     border-radius: var(--radius-md);
@@ -198,27 +202,28 @@
     outline-offset: 2px;
   }
 
-  /* Escape key badge */
-  .search-kbd {
-    display: none;
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    align-items: center;
-    padding: 2px 8px;
+  .search-action {
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0 12px;
     border: 1px solid var(--color-border-strong);
-    border-radius: 6px;
-    font-family: var(--font-code);
-    font-size: 0.6875rem;
-    color: var(--color-text-subtle);
-    line-height: 1.4;
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    cursor: pointer;
   }
 
-  @media (min-width: 640px) {
-    .search-kbd {
-      display: inline-flex;
-    }
+  .search-action:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .search-close {
+    margin-right: 8px;
+  }
+
+  .search-retry {
+    display: block;
+    margin: 0 auto;
   }
 
   /* Divider between input and results */
@@ -265,11 +270,15 @@
 
   class SiteSearch extends HTMLElement {
     private fuse: Fuse<SearchItem> | null = null
+    private loading = false
     private dialog: HTMLDialogElement | null = null
     private input: HTMLInputElement | null = null
     private resultsList: HTMLElement | null = null
     private emptyState: HTMLElement | null = null
     private initialState: HTMLElement | null = null
+    private loadingState: HTMLElement | null = null
+    private errorState: HTMLElement | null = null
+    private retryButton: HTMLButtonElement | null = null
     private activeIndex = -1
     private searchTrackTimeout: ReturnType<typeof setTimeout> | null = null
     private previouslyFocused: HTMLElement | null = null
@@ -282,10 +291,18 @@
       this.resultsList = this.querySelector('#search-results')
       this.emptyState = this.querySelector('#search-empty')
       this.initialState = this.querySelector('#search-initial')
+      this.loadingState = this.querySelector('#search-loading')
+      this.errorState = this.querySelector('#search-error')
+      this.retryButton = this.querySelector('#search-retry-button')
 
       const openButton = this.querySelector('#search-open-button')
 
       openButton?.addEventListener('click', () => this.openDialog())
+      this.querySelector('#search-close-button')?.addEventListener('click', () => this.closeDialog())
+      this.retryButton?.addEventListener('click', () => {
+        this.input?.focus()
+        void this.loadIndex()
+      })
 
       // Global keyboard shortcut: Ctrl/Cmd + K
       document.addEventListener('keydown', (e) => {
@@ -302,8 +319,9 @@
         if (e.target === this.dialog) this.closeDialog()
       })
 
-      this.dialog?.addEventListener('close', () => {
-        this.resetSearch()
+      this.dialog?.addEventListener('cancel', (event) => {
+        event.preventDefault()
+        this.closeDialog()
       })
 
       this.input?.addEventListener('input', () => {
@@ -312,6 +330,7 @@
 
       this.input?.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          e.preventDefault()
           this.closeDialog()
         } else if (e.key === 'ArrowDown') {
           e.preventDefault()
@@ -328,9 +347,8 @@
       // Focus trap within dialog
       this.dialog?.addEventListener('keydown', (e) => {
         if (e.key !== 'Tab') return
-        const focusable = this.dialog!.querySelectorAll<HTMLElement>(
-          'input, button, a[href], [tabindex]:not([tabindex="-1"])'
-        )
+        const focusable = Array.from(this.dialog!.querySelectorAll<HTMLElement>('input, button, a[href]'))
+          .filter((element) => element.getClientRects().length > 0)
         if (focusable.length === 0) return
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
@@ -350,77 +368,89 @@
 
     async loadIndex() {
       if (this.fuse) return
-      const res = await fetch('/search.json')
-      const data: SearchItem[] = await res.json()
-      this.fuse = new Fuse(data, {
-        keys: [
-          { name: 'title', weight: 2 },
-          { name: 'description', weight: 1 },
-          { name: 'tags', weight: 0.5 },
-        ],
-        threshold: 0.3,
-        includeMatches: true,
-      })
+      this.showStatus('loading')
+      if (this.loading) return
+
+      this.loading = true
+      try {
+        const response = await fetch('/search.json', { signal: AbortSignal.timeout(10000) })
+        if (!response.ok) throw new Error(`Search index returned ${response.status}`)
+        const data: SearchItem[] = await response.json()
+        const searchable = data.filter((item) => /^(?:\/(?!\/)|https?:\/\/)/i.test(item.url))
+        this.fuse = new Fuse(searchable, {
+          keys: [
+            { name: 'title', weight: 2 },
+            { name: 'description', weight: 1 },
+            { name: 'tags', weight: 0.5 },
+          ],
+          threshold: 0.3,
+          ignoreLocation: true,
+        })
+        if (this.dialog?.open) this.search(this.input?.value ?? '')
+      } catch {
+        if (this.dialog?.open) this.showStatus('error')
+      } finally {
+        this.loading = false
+      }
+    }
+
+    showStatus(status: 'initial' | 'empty' | 'loading' | 'error' | 'results') {
+      this.initialState?.classList.toggle('hidden', status !== 'initial')
+      this.emptyState?.classList.toggle('hidden', status !== 'empty')
+      this.loadingState?.classList.toggle('hidden', status !== 'loading')
+      this.errorState?.classList.toggle('hidden', status !== 'error')
+      this.retryButton?.classList.toggle('hidden', status !== 'error')
+      this.input?.setAttribute('aria-expanded', String(status === 'results'))
     }
 
     openDialog() {
+      if (!this.dialog || this.dialog.open) return
       this.previouslyFocused = document.activeElement as HTMLElement | null
-      this.loadIndex()
-      this.dialog?.showModal()
+      this.dialog.showModal()
       this.input?.focus()
+      void this.loadIndex()
     }
 
     closeDialog() {
       this.dialog?.close()
+      this.resetSearch()
       this.previouslyFocused?.focus()
       this.previouslyFocused = null
     }
 
     resetSearch() {
       if (this.input) this.input.value = ''
-      this.activeIndex = -1
       this.clearResults()
-      if (this.initialState) this.initialState.classList.remove('hidden')
-      if (this.emptyState) this.emptyState.classList.add('hidden')
-      this.input?.setAttribute('aria-expanded', 'false')
+      this.showStatus('initial')
     }
 
     clearResults() {
+      this.activeIndex = -1
+      this.input?.removeAttribute('aria-activedescendant')
       if (!this.resultsList) return
       const items = this.resultsList.querySelectorAll('[data-search-result]')
       for (const item of items) item.remove()
     }
 
     search(query: string) {
+      if (!this.fuse) return
+      if (this.searchTrackTimeout) clearTimeout(this.searchTrackTimeout)
+      this.clearResults()
       if (!query.trim()) {
-        this.resetSearch()
+        this.showStatus('initial')
         return
       }
-
-      if (!this.fuse) return
 
       const results = this.fuse.search(query, { limit: 10 })
 
-      // Track search queries in Plausible (debounced to avoid firing on every keystroke)
-      if (this.searchTrackTimeout) clearTimeout(this.searchTrackTimeout)
+      // Report the result count after the visitor stops typing.
       this.searchTrackTimeout = setTimeout(() => {
         if (typeof window.plausible !== 'undefined') {
-          window.plausible('Search', { props: { query, resultCount: String(results.length) } })
+          window.plausible('Search', { props: { resultCount: String(results.length) } })
         }
       }, 1000)
 
-      this.clearResults()
-      this.activeIndex = -1
-      if (this.initialState) this.initialState.classList.add('hidden')
-
-      if (results.length === 0) {
-        if (this.emptyState) this.emptyState.classList.remove('hidden')
-        this.input?.setAttribute('aria-expanded', 'false')
-        return
-      }
-
-      if (this.emptyState) this.emptyState.classList.add('hidden')
-      this.input?.setAttribute('aria-expanded', 'true')
+      this.showStatus(results.length > 0 ? 'results' : 'empty')
 
       for (const [i, result] of results.entries()) {
         const item = result.item
@@ -449,7 +479,7 @@
         const typeLabel = `<span class="search-badge search-badge--${badgeInfo.cssVar}">${badgeInfo.label}</span>`
 
         li.innerHTML = `
-          <a href="${item.url}"${rel} class="search-result-link">
+          <a${rel} class="search-result-link">
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 ${typeLabel}
@@ -464,6 +494,7 @@
           </a>
         `
 
+        li.querySelector('a')?.setAttribute('href', item.url)
         this.resultsList?.appendChild(li)
       }
     }

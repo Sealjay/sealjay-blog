@@ -9,28 +9,23 @@ on:
       - ".github/workflows/swa-deploy.yml"
   workflow_dispatch:
   workflow_call:
-    inputs:
-      checkout_ref:
-        description: Git ref (branch, tag, or SHA) to checkout for build/deploy
-        required: false
-        type: string
 
 permissions:
   contents: write
 
-concurrency:
-  group: swa-deploy
-  cancel-in-progress: true
-
 jobs:
   build_and_deploy_job:
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: swa-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: true
-          ref: ${{ inputs.checkout_ref || github.sha }}
+          ref: refs/heads/main
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -58,24 +53,6 @@ jobs:
         working-directory: src
         run: bun run build
 
-      - name: Send webmentions
-        if: github.event_name == 'push'
-        working-directory: src
-        run: bun run send:webmentions
-
-      - name: Commit sent webmentions tracking
-        if: github.event_name == 'push'
-        run: |
-          git add src/src/data/sent-webmentions.json
-          if git diff --cached --quiet; then
-            echo "No new webmentions sent"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: update sent webmentions tracking [skip ci]"
-            git push
-          fi
-
       - name: Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -87,3 +64,22 @@ jobs:
           ###### Repository/Build Configurations ######
           app_location: "src/dist"
           ###### End of Repository/Build Configurations ######
+
+      - name: Send webmentions
+        working-directory: src
+        run: bun run send:webmentions
+
+      - name: Commit sent webmentions tracking
+        run: |
+          git add -- src/src/data/sent-webmentions.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update sent webmentions tracking [skip ci]"
+          if ! git push origin HEAD:refs/heads/main; then
+            git fetch origin refs/heads/main
+            git rebase FETCH_HEAD
+            git push origin HEAD:refs/heads/main
+          fi

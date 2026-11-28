@@ -85,7 +85,7 @@ function buildLastmodMap() {
   const latestSpeakingDate = latestFrontmatterDate(path.join(contentDir, 'speaking'))
   const latestProjectDate = latestFrontmatterDate(path.join(contentDir, 'project'))
 
-  // Index and static pages: use latest content dates or file mtime
+  // Index pages: use latest content dates
   if (latestBlogDate) {
     map.set(`${siteUrl}/`, latestBlogDate)
     map.set(`${siteUrl}/blog/`, latestBlogDate)
@@ -96,19 +96,6 @@ function buildLastmodMap() {
     map.set(`${siteUrl}/speaking/kit/`, latestSpeakingDate)
   }
   if (latestProjectDate) map.set(`${siteUrl}/projects/`, latestProjectDate)
-
-  // Static pages: use file modification time
-  const staticPages = {
-    about: './src/pages/about.astro',
-    acknowledgements: './src/pages/acknowledgements.astro',
-    privacy: './src/pages/privacy.astro',
-  }
-  for (const [slug, filePath] of Object.entries(staticPages)) {
-    const resolved = path.resolve(filePath)
-    if (fs.existsSync(resolved)) {
-      map.set(`${siteUrl}/${slug}/`, fs.statSync(resolved).mtime)
-    }
-  }
 
   return map
 }

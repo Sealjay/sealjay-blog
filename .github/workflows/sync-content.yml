@@ -11,6 +11,10 @@ permissions:
 
 jobs:
   sync:
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: sync-content
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -68,12 +72,28 @@ jobs:
 
       - name: Check for changes
         id: changes
+        env:
+          SECURING_QUEST: ${{ steps.sync_str.outcome }}
+          WEBMENTIONS: ${{ steps.sync_webmentions.outcome }}
+          MASTODON: ${{ steps.sync_mastodon.outcome }}
+          YOUTUBE: ${{ steps.sync_youtube.outcome }}
         run: |
-          git add -A src/src/content/blog/str-*
-          git add -A src/src/content/note/
-          git add -A src/src/content/speaking/yt-*
-          git add -A src/src/data/mastodon-sync-state.json
-          git add src/src/data/webmentions.json
+          stage_source() {
+            local outcome="$1" source="$2"
+            shift 2
+            if [ "$outcome" = "success" ]; then
+              git add -A -- "$@"
+            else
+              echo "::warning::Skipping $source output ($outcome)"
+              echo "- $source: $outcome" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          }
+
+          echo "## Content sync" >> "$GITHUB_STEP_SUMMARY"
+          stage_source "$SECURING_QUEST" "Securing Quest" 'src/src/content/blog/str-*'
+          stage_source "$WEBMENTIONS" "Webmentions" src/src/data/webmentions.json
+          stage_source "$MASTODON" "Mastodon" src/src/content/note/ src/public/images/mastodon/ src/src/data/mastodon-sync-state.json
+          stage_source "$YOUTUBE" "YouTube" 'src/src/content/speaking/yt-*'
           if git diff --cached --quiet; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
@@ -95,6 +115,4 @@ jobs:
     needs: sync
     if: needs.sync.outputs.has_changes == 'true'
     uses: ./.github/workflows/swa-deploy.yml
-    with:
-      checkout_ref: main
     secrets: inherit
