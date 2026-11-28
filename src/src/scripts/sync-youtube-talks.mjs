@@ -1,8 +1,7 @@
 /**
- * Sync YouTube channel videos and shorts as speaking entry MDX files.
+ * Sync YouTube videos, podcast episodes and shorts as speaking entry MDX files.
  *
- * Fetches RSS feeds from the configured YouTube channel and shorts
- * playlist, deduplicates against existing speaking entries, and
+ * Fetches Atom feeds from the configured YouTube channel and playlists, deduplicates against existing speaking entries, and
  * creates MDX files in src/content/speaking/. Each synced file is
  * named yt-{videoId}.mdx to enable deduplication in the speaking
  * page.
@@ -14,7 +13,8 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { youtubeFeeds as FEEDS } from '../config/personal.ts'
-import { decodeHtmlEntities, escapeYaml } from './lib/entities.mjs'
+import { extractYouTubeId, readYouTubeSpeakingFeed } from '../lib/youtube.ts'
+import { escapeYaml } from './lib/entities.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const SPEAKING_DIR = join(__dirname, '..', 'content', 'speaking')
@@ -24,97 +24,57 @@ const SPEAKING_DIR = join(__dirname, '..', 'content', 'speaking')
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
 
-// --- XML parsing ---
-
-/** Parse video entries from YouTube Atom XML */
-function parseVideoEntries(xml) {
-  const entries = []
-  const entryRegex = /<entry>([\s\S]*?)<\/entry>/g
-
-  for (const match of xml.matchAll(entryRegex)) {
-    const block = match[1]
-    const youtubeId = block.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1] ?? ''
-    if (!youtubeId) continue
-
-    entries.push({
-      youtubeId,
-      title: decodeHtmlEntities(block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''),
-      description: decodeHtmlEntities(block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? ''),
-      published: block.match(/<published>(.*?)<\/published>/)?.[1] ?? '',
-      thumbnailUrl:
-        block.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ?? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
-    })
-  }
-
-  return entries
-}
-
-/**
- * Fetch XML from a YouTube RSS feed URL.
- *
- * Throws on failure rather than degrading: a missing shorts playlist would
- * leave shortIds empty, so new shorts would be written as Videos and never
- * revisited once deduplicated.
- */
-async function fetchFeed(url, label) {
-  let res
-  try {
-    res = await fetch(url)
-  } catch (err) {
-    throw new Error(`Network error fetching ${label}`, { cause: err })
-  }
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${label}: ${res.status} ${res.statusText}`)
-  }
-  return await res.text()
-}
-
-// --- Deduplication ---
-
-/** Extract YouTube video ID from a URL */
-function extractYouTubeId(url) {
-  const patterns = [
-    /youtube\.com\/shorts\/([A-Za-z0-9_-]+)/,
-    /youtube\.com\/watch\?v=([A-Za-z0-9_-]+)/,
-    /youtu\.be\/([A-Za-z0-9_-]+)/,
-  ]
-  for (const pattern of patterns) {
-    const match = url.match(pattern)
-    if (match) return match[1]
-  }
-  return null
-}
-
-/** Load existing YouTube IDs from speaking entries */
-async function loadExistingYouTubeIds() {
-  const ids = new Set()
+/** Map each recording to its existing speaking file, including curated entries. */
+async function loadExistingYouTubeFiles() {
+  const recordings = new Map()
   let files
   try {
     files = await readdir(SPEAKING_DIR)
-  } catch {
-    return ids
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+    return recordings
   }
 
   for (const file of files) {
     if (!file.endsWith('.mdx')) continue
-
-    // Quick check for yt- prefixed files
-    if (file.startsWith('yt-')) {
-      const videoId = file.replace(/^yt-/, '').replace(/\.mdx$/, '')
-      ids.add(videoId)
+    const isGenerated = /^yt-[\w-]{11}\.mdx$/.test(file)
+    if (isGenerated) {
+      recordings.set(file.slice(3, -4), file)
       continue
     }
 
-    // Also check URL in frontmatter of non-yt files
     const content = await readFile(join(SPEAKING_DIR, file), 'utf-8')
-    const urlMatch = content.match(/url:\s*"([^"]+)"/)
-    if (urlMatch) {
-      const id = extractYouTubeId(urlMatch[1])
-      if (id) ids.add(id)
-    }
+    const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? ''
+    const fields = [...frontmatter.matchAll(/^(?:url|videoEmbedUrl):\s*['"]?([^'"\s]+)['"]?$/gm)]
+    const id = fields.map(([, url]) => extractYouTubeId(url)).find(Boolean)
+    if (id && !recordings.has(id)) recordings.set(id, file)
   }
 
-  return ids
+  return recordings
+}
+
+async function markFullEpisode(file, event) {
+  const path = join(SPEAKING_DIR, file)
+  const content = await readFile(path, 'utf-8')
+  const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1]
+  const existingEvent = frontmatter?.match(/^event: *["']?([^"'\r\n]+)["']?$/m)?.[1]?.trim()
+  if (
+    !frontmatter ||
+    existingEvent !== event ||
+    /^isFullPodcastEpisode:/m.test(frontmatter) ||
+    /^eventType: *["']?Short["']?$/m.test(frontmatter)
+  ) {
+    return false
+  }
+
+  const newline = content.includes('\r\n') ? '\r\n' : '\n'
+  if (dryRun) {
+    console.log(`  [UPDATE] ${file} (full podcast episode)`)
+  } else {
+    await writeFile(path, content.replace(/^---\r?\n/, `---${newline}isFullPodcastEpisode: true${newline}`), 'utf-8')
+    console.log(`  Updated: ${file} (full podcast episode)`)
+  }
+  return true
 }
 
 // --- Content generation ---
@@ -135,13 +95,8 @@ function truncateDescription(text, maxLen = 200) {
 }
 
 /** Generate MDX content for a YouTube speaking entry */
-function generateMDX(video, { isShort, event }) {
-  const date = new Date(video.published).toISOString().slice(0, 10)
-  const url = isShort
-    ? `https://www.youtube.com/shorts/${video.youtubeId}`
-    : `https://www.youtube.com/watch?v=${video.youtubeId}`
-  const eventType = isShort ? 'Short' : 'Video'
-  const cta = isShort ? 'Watch short' : 'Watch video'
+function generateMDX(video) {
+  const { date, url, eventType, cta, event, isFullPodcastEpisode } = video
   const description = truncateDescription(video.description) || video.title
 
   const lines = [
@@ -150,7 +105,8 @@ function generateMDX(video, { isShort, event }) {
     `eventType: "${eventType}"`,
     `description: "${escapeYaml(description)}"`,
     `event: "${escapeYaml(event)}"`,
-    `date: "${date}"`,
+    `date: "${date.toISOString()}"`,
+    ...(isFullPodcastEpisode ? ['isFullPodcastEpisode: true'] : []),
     `cta: "${cta}"`,
     `url: "${url}"`,
     `videoEmbedUrl: "https://www.youtube.com/embed/${video.youtubeId}"`,
@@ -166,79 +122,41 @@ function generateMDX(video, { isShort, event }) {
 async function main() {
   console.log('Syncing YouTube speaking entries...')
 
-  const existingIds = await loadExistingYouTubeIds()
-  console.log(`Found ${existingIds.size} existing YouTube speaking entries.`)
+  const existing = await loadExistingYouTubeFiles()
+  console.log(`Found ${existing.size} existing YouTube speaking entries.`)
 
   let created = 0
+  let updated = 0
   let skipped = 0
 
-  for (const feed of FEEDS) {
-    console.log(`\nFetching feeds for channel ${feed.channelId}...`)
-
-    // Fetch channel feed and shorts playlist in parallel
-    const [channelXml, shortsXml] = await Promise.all([
-      fetchFeed(`https://www.youtube.com/feeds/videos.xml?channel_id=${feed.channelId}`, `channel ${feed.channelId}`),
-      feed.shortsPlaylistId
-        ? fetchFeed(
-            `https://www.youtube.com/feeds/videos.xml?playlist_id=${feed.shortsPlaylistId}`,
-            `shorts playlist ${feed.shortsPlaylistId}`,
-          )
-        : Promise.resolve(''),
-    ])
-
-    // Build set of short video IDs
-    const shortIds = new Set()
-    if (shortsXml) {
-      for (const entry of parseVideoEntries(shortsXml)) {
-        shortIds.add(entry.youtubeId)
-      }
-      console.log(`  Found ${shortIds.size} short(s) in shorts playlist.`)
-    }
-
-    // Parse all channel videos
-    const channelVideos = parseVideoEntries(channelXml)
-    console.log(`  Found ${channelVideos.length} video(s) in channel feed.`)
-
-    // Also include shorts-only videos not in channel feed
-    const channelVideoIds = new Set(channelVideos.map((v) => v.youtubeId))
-    const shortsOnlyVideos = shortsXml
-      ? parseVideoEntries(shortsXml).filter((v) => !channelVideoIds.has(v.youtubeId))
-      : []
-    if (shortsOnlyVideos.length > 0) {
-      console.log(`  Found ${shortsOnlyVideos.length} additional short(s) not in channel feed.`)
-    }
-
-    const allVideos = [...channelVideos, ...shortsOnlyVideos]
-
-    for (const video of allVideos) {
-      // Dedup check
-      if (existingIds.has(video.youtubeId)) {
-        skipped++
-        continue
-      }
-
-      const isShort = shortIds.has(video.youtubeId)
-      const content = generateMDX(video, {
-        isShort,
-        event: feed.event,
-      })
-      const filename = `yt-${video.youtubeId}.mdx`
-
-      if (dryRun) {
-        const eventType = isShort ? 'Short' : 'Video'
-        console.log(`  [CREATE] ${filename} (${eventType}): ${video.title}`)
+  // Get all configured feeds before writing. An unavailable playlist could
+  // otherwise lead to persisting a Short or full episode as a regular video.
+  const feeds = await Promise.all(FEEDS.map((feed) => readYouTubeSpeakingFeed(feed, { strict: true })))
+  for (const video of feeds.flat()) {
+    const existingFile = existing.get(video.youtubeId)
+    const filename = `yt-${video.youtubeId}.mdx`
+    if (existingFile) {
+      if (existingFile === filename && video.isFullPodcastEpisode && (await markFullEpisode(filename, video.event))) {
+        updated++
       } else {
-        await mkdir(SPEAKING_DIR, { recursive: true })
-        await writeFile(join(SPEAKING_DIR, filename), content, 'utf-8')
-        console.log(`  Created: ${filename}`)
+        skipped++
       }
-
-      existingIds.add(video.youtubeId)
-      created++
+      continue
     }
+
+    if (dryRun) {
+      console.log(`  [CREATE] ${filename} (${video.eventType}): ${video.title}`)
+    } else {
+      await mkdir(SPEAKING_DIR, { recursive: true })
+      await writeFile(join(SPEAKING_DIR, filename), generateMDX(video), 'utf-8')
+      console.log(`  Created: ${filename}`)
+    }
+
+    existing.set(video.youtubeId, filename)
+    created++
   }
 
-  console.log(`\nDone. Created ${created} speaking entry/entries, skipped ${skipped}.`)
+  console.log(`\nDone. Created ${created}, updated ${updated}, skipped ${skipped} speaking entries.`)
   if (dryRun) console.log('(Dry run — no files were written.)')
 }
 

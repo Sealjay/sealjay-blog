@@ -1,0 +1,82 @@
+---
+interface Props {
+  format: 'Podcast' | 'Writing' | 'Speaking'
+  title: string
+  date: Date
+  url: string
+}
+
+const { format, title, date, url } = Astro.props
+const displayDate = date.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'UTC',
+})
+---
+
+<li class="work-row">
+  <div class="work-meta">
+    <span>{format}</span>
+    <time datetime={date.toISOString()}>{displayDate}</time>
+  </div>
+  <h3><a href={url}>{title}</a></h3>
+</li>
+
+<style>
+  .work-row {
+    display: grid;
+    gap: 0.15rem 1.5rem;
+    padding-block: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .work-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.125rem 0.65rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .work-meta span {
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .work-row h3 {
+    min-width: 0;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 650;
+    font-size: clamp(1rem, 1.7vw, 1.125rem);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .work-row a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-strong);
+    text-underline-offset: 0.16em;
+  }
+
+  .work-row a:hover,
+  .work-row a:focus-visible {
+    color: var(--color-primary);
+    text-decoration-color: currentColor;
+  }
+
+  @media (min-width: 40rem) {
+    .work-row {
+      grid-template-columns: 7rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+
+    .work-meta {
+      display: grid;
+    }
+  }
+</style>
