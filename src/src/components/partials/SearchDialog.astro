@@ -7,6 +7,7 @@
     class="search-trigger"
     aria-label="Search site"
     id="search-open-button"
+    hidden
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -29,14 +30,9 @@
           type="search"
           id="search-input"
           class="search-input"
-          placeholder="Search posts, notes, projects..."
+          placeholder="Search the site…"
           autocomplete="off"
           aria-label="Search query"
-          aria-controls="search-results"
-          aria-autocomplete="list"
-          role="combobox"
-          aria-expanded="false"
-          aria-haspopup="listbox"
         />
         <button type="button" id="search-close-button" class="search-action search-close">Close</button>
       </div>
@@ -47,15 +43,16 @@
           No results found.
         </p>
         <p id="search-initial" class="search-status">
-          Start typing to search...
+          Find posts, talks, notes and projects.
         </p>
+        <p id="search-count" class="search-status search-count hidden"></p>
         <p id="search-loading" class="search-status hidden">Loading search…</p>
         <p id="search-error" class="search-status hidden">Search is unavailable.</p>
       </div>
       <button type="button" id="search-retry-button" class="search-action search-retry hidden">Try again</button>
       <ul
         id="search-results"
-        role="listbox"
+        role="list"
         aria-label="Search results"
         class="search-results"
       >
@@ -90,6 +87,10 @@
   .search-trigger:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  .search-trigger[hidden] {
+    display: none;
   }
 
   .search-shortcut {
@@ -252,6 +253,11 @@
     margin: 0;
   }
 
+  .search-count {
+    padding: 8px 16px 0;
+    text-align: left;
+  }
+
   .hidden {
     display: none;
   }
@@ -279,7 +285,7 @@
     private loadingState: HTMLElement | null = null
     private errorState: HTMLElement | null = null
     private retryButton: HTMLButtonElement | null = null
-    private activeIndex = -1
+    private resultCount: HTMLElement | null = null
     private searchTrackTimeout: ReturnType<typeof setTimeout> | null = null
     private previouslyFocused: HTMLElement | null = null
 
@@ -294,10 +300,18 @@
       this.loadingState = this.querySelector('#search-loading')
       this.errorState = this.querySelector('#search-error')
       this.retryButton = this.querySelector('#search-retry-button')
+      this.resultCount = this.querySelector('#search-count')
 
-      const openButton = this.querySelector('#search-open-button')
-
-      openButton?.addEventListener('click', () => this.openDialog())
+      const openButton = this.querySelector<HTMLButtonElement>('#search-open-button')
+      if (openButton) {
+        openButton.addEventListener('click', () => this.openDialog(openButton))
+        openButton.hidden = false
+      }
+      const notFoundButton = document.querySelector<HTMLButtonElement>('[data-open-search]')
+      if (notFoundButton) {
+        notFoundButton.addEventListener('click', () => this.openDialog(notFoundButton))
+        notFoundButton.hidden = false
+      }
       this.querySelector('#search-close-button')?.addEventListener('click', () => this.closeDialog())
       this.retryButton?.addEventListener('click', () => {
         this.input?.focus()
@@ -308,12 +322,11 @@
       document.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
           e.preventDefault()
-          this.openDialog()
+          const focused = document.activeElement
+          const opener = focused instanceof HTMLElement && focused !== document.body ? focused : openButton
+          this.openDialog(opener)
         }
       })
-
-      // Custom event: allow other components (e.g. 404 page) to open search
-      document.addEventListener('open-search', () => this.openDialog())
 
       this.dialog?.addEventListener('click', (e) => {
         if (e.target === this.dialog) this.closeDialog()
@@ -328,19 +341,35 @@
         this.search(this.input!.value)
       })
 
-      this.input?.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          e.preventDefault()
+      this.input?.addEventListener('keydown', (event) => {
+        if (event.isComposing || event.key !== 'Enter') return
+        event.preventDefault()
+        this.resultsList?.querySelector<HTMLAnchorElement>('a[href]')?.click()
+      })
+
+      this.dialog?.addEventListener('keydown', (event) => {
+        if (event.isComposing) return
+        if (event.key === 'Escape') {
+          event.preventDefault()
           this.closeDialog()
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault()
-          this.moveSelection(1)
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault()
-          this.moveSelection(-1)
-        } else if (e.key === 'Enter') {
-          e.preventDefault()
-          this.selectCurrent()
+          return
+        }
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+        const links = Array.from(this.resultsList?.querySelectorAll<HTMLAnchorElement>('a[href]') ?? [])
+        if (links.length === 0) return
+        const target = event.target
+        const current = target instanceof HTMLAnchorElement ? links.indexOf(target) : -1
+        if (target !== this.input && current === -1) return
+        event.preventDefault()
+        const step = event.key === 'ArrowDown' ? 1 : -1
+        const start = current === -1 && step === -1 ? 0 : current
+        const next = (start + step + links.length) % links.length
+        links[next]?.focus()
+      })
+
+      this.resultsList?.addEventListener('click', (event) => {
+        if (event.target instanceof Element && event.target.closest('a[href]')) {
+          setTimeout(() => this.closeDialog(), 0)
         }
       })
 
@@ -400,42 +429,39 @@
       this.loadingState?.classList.toggle('hidden', status !== 'loading')
       this.errorState?.classList.toggle('hidden', status !== 'error')
       this.retryButton?.classList.toggle('hidden', status !== 'error')
-      this.input?.setAttribute('aria-expanded', String(status === 'results'))
+      this.resultCount?.classList.toggle('hidden', status !== 'results')
     }
 
-    openDialog() {
+    openDialog(opener: HTMLElement | null) {
       if (!this.dialog || this.dialog.open) return
-      this.previouslyFocused = document.activeElement as HTMLElement | null
+      this.previouslyFocused = opener
       this.dialog.showModal()
       this.input?.focus()
       void this.loadIndex()
     }
 
     closeDialog() {
-      this.dialog?.close()
+      if (!this.dialog?.open) return
+      this.dialog.close()
       this.resetSearch()
-      this.previouslyFocused?.focus()
+      if (this.previouslyFocused?.getClientRects().length) {
+        this.previouslyFocused.focus()
+      } else {
+        this.querySelector<HTMLButtonElement>('#search-open-button')?.focus()
+      }
       this.previouslyFocused = null
     }
 
     resetSearch() {
       if (this.input) this.input.value = ''
-      this.clearResults()
+      this.resultsList?.replaceChildren()
       this.showStatus('initial')
-    }
-
-    clearResults() {
-      this.activeIndex = -1
-      this.input?.removeAttribute('aria-activedescendant')
-      if (!this.resultsList) return
-      const items = this.resultsList.querySelectorAll('[data-search-result]')
-      for (const item of items) item.remove()
     }
 
     search(query: string) {
       if (!this.fuse) return
       if (this.searchTrackTimeout) clearTimeout(this.searchTrackTimeout)
-      this.clearResults()
+      this.resultsList?.replaceChildren()
       if (!query.trim()) {
         this.showStatus('initial')
         return
@@ -450,15 +476,14 @@
         }
       }, 1000)
 
+      if (this.resultCount) {
+        this.resultCount.textContent = results.length === 1 ? '1 result' : `${results.length} results`
+      }
       this.showStatus(results.length > 0 ? 'results' : 'empty')
 
-      for (const [i, result] of results.entries()) {
+      for (const result of results) {
         const item = result.item
         const li = document.createElement('li')
-        li.setAttribute('data-search-result', '')
-        li.setAttribute('role', 'option')
-        li.setAttribute('aria-selected', 'false')
-        li.id = `search-result-${i}`
 
         const isExternal = item.type === 'speaking' || item.type === 'project' || item.type === 'short' || (item.type === 'page' && item.url.startsWith('http'))
         const rel = isExternal ? ' rel="noopener noreferrer" target="_blank"' : ''
@@ -499,39 +524,6 @@
       }
     }
 
-    moveSelection(direction: number) {
-      const items = this.resultsList?.querySelectorAll('[data-search-result]')
-      if (!items || items.length === 0) return
-
-      // Deselect current
-      if (this.activeIndex >= 0 && this.activeIndex < items.length) {
-        items[this.activeIndex].setAttribute('aria-selected', 'false')
-        const link = items[this.activeIndex].querySelector('a') as HTMLElement
-        if (link) link.style.background = ''
-      }
-
-      this.activeIndex += direction
-      if (this.activeIndex < 0) this.activeIndex = items.length - 1
-      if (this.activeIndex >= items.length) this.activeIndex = 0
-
-      const active = items[this.activeIndex]
-      active.setAttribute('aria-selected', 'true')
-      const activeLink = active.querySelector('a') as HTMLElement
-      if (activeLink) activeLink.style.background = 'var(--color-primary-muted)'
-      active.scrollIntoView({ block: 'nearest' })
-      this.input?.setAttribute('aria-activedescendant', active.id)
-    }
-
-    selectCurrent() {
-      const items = this.resultsList?.querySelectorAll('[data-search-result]')
-      if (!items || this.activeIndex < 0 || this.activeIndex >= items.length) return
-      const link = items[this.activeIndex].querySelector('a') as HTMLAnchorElement
-      if (link) {
-        this.closeDialog()
-        link.click()
-      }
-    }
-
     escapeHtml(str: string) {
       const div = document.createElement('div')
       div.textContent = str
@@ -558,7 +550,8 @@
     transition: background-color var(--duration-fast) var(--ease-out);
   }
 
-  .search-result-link:hover {
+  .search-result-link:hover,
+  .search-result-link:focus-visible {
     background: var(--color-surface-hover);
   }
 
@@ -568,9 +561,7 @@
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   /* Result description */
