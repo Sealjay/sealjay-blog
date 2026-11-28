@@ -9,6 +9,11 @@ export interface Badge {
 
 export const profileRole = 'AI transformation and platform engineering executive'
 export const aboutDescription = `Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole}, a seven-time Microsoft MVP and a Green AI doctoral candidate.`
+export const globalAiOrganizerAward = {
+  title: 'Organizer of the Week',
+  weekOf: '23 November 2026',
+  url: 'https://globalai.community/awards/organizer-of-the-week/2026-W48',
+}
 
 export const professionalBadges: Badge[] = [
   {
@@ -17,7 +22,7 @@ export const professionalBadges: Badge[] = [
   },
   { text: 'Member of the Institution of Engineering and Technology (MIET)' },
   {
-    text: 'Seattle Chapter Lead, Global AI Community',
+    text: 'Seattle Chapter Co-Lead, Global AI Community',
     url: 'https://globalai.community/chapters/seattle/',
   },
   {

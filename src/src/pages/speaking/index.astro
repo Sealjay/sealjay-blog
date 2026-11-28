@@ -4,7 +4,7 @@ import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import Badge from '../../components/partials/Badge.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
-import { getCollection } from 'astro:content'
+import { type CollectionEntry, getCollection } from 'astro:content'
 import { getYouTubeSpeakingEntries, extractYouTubeId } from '../../lib/youtube'
 import { youtubeFeeds } from '../../config/personal'
 
@@ -22,12 +22,11 @@ for (const entry of mdxEntries) {
 // Add YouTube entries that don't have MDX overrides
 const autoEntries = youtubeEntries
   .filter((yt) => !mdxYouTubeIds.has(yt.youtubeId))
-  .map((yt) => ({
-    slug: `yt-${yt.youtubeId}`,
+  .map((yt): Pick<CollectionEntry<'speaking'>, 'data'> => ({
     data: {
       title: yt.title,
       description: yt.description.slice(0, 200) || yt.title,
-      eventType: yt.eventType as 'Short' | 'Podcast',
+      eventType: yt.eventType,
       event: yt.event,
       date: yt.date,
       cta: yt.cta,
@@ -203,10 +202,20 @@ const speakingPageJsonLd = JSON.stringify({
                   </div>
                   <span class="sr-only">(opens in new tab)</span>
                 </a>
+                {slot.data.previewUrl && (
+                  <a
+                    href={slot.data.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="past-entry__secondary-link"
+                  >
+                    Watch the preview <span class="sr-only">(opens in new tab)</span>
+                  </a>
+                )}
                 {slot.data.blogPostSlug && (
                   <a
                     href={`/blog/${slot.data.blogPostSlug}`}
-                    class="past-entry__blog-link"
+                    class="past-entry__secondary-link"
                   >
                     Related blog post
                   </a>
@@ -514,7 +523,7 @@ const speakingPageJsonLd = JSON.stringify({
     flex-shrink: 0;
   }
 
-  .past-entry__blog-link {
+  .past-entry__secondary-link {
     display: inline-block;
     margin-left: 0.75rem;
     padding-bottom: 0.375rem;
@@ -525,7 +534,7 @@ const speakingPageJsonLd = JSON.stringify({
     transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .past-entry__blog-link:hover {
+  .past-entry__secondary-link:hover {
     color: var(--color-text);
   }
 

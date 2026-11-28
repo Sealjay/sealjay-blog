@@ -8,6 +8,7 @@ import Badge from '../../components/partials/Badge.astro'
 import SpeakerUl from '../../components/partials/SpeakerUl.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
 import { getCollection } from 'astro:content'
+import { globalAiOrganizerAward } from '../../config/personal'
 import { speakerBio, topics, talkFormats, testimonials, logistics, contactCta } from '../../config/speakerKit'
 import headshotImage from '../../assets/chris/avatar.jpg'
 
@@ -89,7 +90,7 @@ const featuredSpeaking = (await getCollection('speaking'))
               Copy
             </button>
           </div>
-          <p class="kit-bio-block__text" id="bio-long">{speakerBio.long}</p>
+          <p class="kit-bio-block__text" id="bio-long">{speakerBio.long}{' Global AI Community named him '}<a href={globalAiOrganizerAward.url}>{globalAiOrganizerAward.title}</a>{` for the week of ${globalAiOrganizerAward.weekOf}.`}</p>
         </div>
       </div>
     </section>
