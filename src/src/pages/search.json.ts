@@ -1,5 +1,5 @@
 import { getCollection } from 'astro:content'
-import { youtubeFeeds } from '../config/personal'
+import { aboutDescription, youtubeFeeds } from '../config/personal'
 import { extractYouTubeId, getYouTubeSpeakingEntries } from '../lib/youtube'
 
 export async function GET() {
@@ -12,16 +12,15 @@ export async function GET() {
   // YouTube IDs already covered by MDX speaking entries
   const mdxYouTubeIds = new Set<string>()
   for (const entry of speaking) {
-    const id = extractYouTubeId(entry.data.url)
+    const id = extractYouTubeId(entry.data.url) ?? extractYouTubeId(entry.data.videoEmbedUrl)
     if (id) mdxYouTubeIds.add(id)
   }
 
   const staticPages = [
     {
       title: 'About',
-      description:
-        'Chris Lloyd-Jones (Sealjay) — VP, AI Consulting Transformation at Kyndryl. Microsoft MVP, Data.D candidate (ABD), open source contributor.',
-      tags: ['about', 'bio', 'background'],
+      description: aboutDescription,
+      tags: ['about', 'bio', 'background', 'Seattle'],
       url: '/about/',
       type: 'page' as const,
     },

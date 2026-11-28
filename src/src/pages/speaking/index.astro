@@ -15,7 +15,7 @@ const youtubeEntries = await getYouTubeSpeakingEntries(youtubeFeeds)
 // Build set of YouTube IDs that have MDX overrides
 const mdxYouTubeIds = new Set<string>()
 for (const entry of mdxEntries) {
-  const id = extractYouTubeId(entry.data.url)
+  const id = extractYouTubeId(entry.data.url) ?? extractYouTubeId(entry.data.videoEmbedUrl)
   if (id) mdxYouTubeIds.add(id)
 }
 

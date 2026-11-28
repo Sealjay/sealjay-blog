@@ -1,187 +1,134 @@
-# Platform Profiles for Chris Lloyd-Jones (Sealjay)
+# Platform profiles for Chris Lloyd-Jones (Sealjay)
 
-**Last updated:** 14 June 2026
-
----
+The checks below record what each platform made publicly visible.
 
 ## 1. Sessionize
 
+[Speaker profile](https://sessionize.com/chris-lloyd-jones/)
+
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The tagline and bio were visible.
+
 ### Tagline
 
-> VP, AI Consulting Transformation at Kyndryl | Created Kyndryl's FDE capability - scaling to 22,000 engineers | 7x Microsoft MVP (AI & DevTech) | Data.D candidate (ABD) in Data Science, UEL
+> AI transformation and platform engineering executive | 7x Microsoft MVP (AI & DevTech) | Seattle Chapter Lead, Global AI Community
 
 ### Bio
 
-I'm VP of AI Consulting Transformation at Kyndryl, where I created the Forward Deployed Engineering capability - engineers embedded with clients to build, ship, and own outcomes, not just advise; now scaling to 22,000. I focus on agentic AI, open source, and governance that ships rather than stalls.
+I speak about what AI agents should have permission to do, who is accountable for their actions, and how teams can measure the carbon impact of the software they build. My legal training informs how I approach agent permissions and accountability.
 
-I've been recognised seven times as a Microsoft MVP in AI and Developer Technologies, and I'm a contributor to ISO/IEC 21031:2024 (Software Carbon Intensity) through my work with the Green Software Foundation, where I formerly served as Steering Committee Vice-Chair. I'm currently completing a Data.D in Data Science at the University of East London (2022-2027, ABD), researching Green AI, and was an OpenUK New Year's Honours 2025/26 recipient for contributions to open source.
+I lead AI transformation and platform engineering in the Seattle area. At Kyndryl, I created Forward Deployed Engineering so engineers could build alongside clients and stay responsible for what they shipped. At Avanade, I founded Platforms & Incubation and hired the product team for Avanade.ai.
 
-I co-host Securing the Realm, a D&D-inspired podcast on AI governance and AI-driven development (securing.quest). My background spans law, engineering, and open source leadership - I think about regulation, liability, and compliance as design constraints, not afterthoughts. I stay hands-on, building with agentic AI, open source tooling, and green software.
+I'm a seven-time Microsoft MVP in AI and Developer Technologies, MIET and Seattle Chapter Lead for the Global AI Community. I contributed to the Software Carbon Intensity standard, ISO/IEC 21031:2024, through the Green Software Foundation. I'm researching Green AI at the University of East London and co-host Securing the Realm (securing.quest) with Josh McDonald.
 
----
+## 2. Microsoft MVP
 
-## 2. MVP Profile
+[Microsoft MVP profile](https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4?WT.mc_id=AI-MVP-5004204)
 
-### Tagline (80 char limit)
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The page loaded a JavaScript shell. The live tagline and bio are unverified.
 
-> Securing the realm of AI with open source and sustainable code
+### Tagline (80-character working limit)
 
-### Bio (1000 char limit)
+> AI platform engineering, open source and responsible AI
 
-I'm Chris Lloyd-Jones, Vice President for AI Consulting Transformation at Kyndryl and seven-time Microsoft MVP in AI and Developer Technologies. Created and leading Kyndryl's Forward Deployed Engineering capability - engineers embedded with clients to build, ship, and own outcomes; scaling to 22,000 engineers.
+### Bio (1,000-character working limit)
 
-I contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation, where I served as Steering Committee Vice-Chair. I was recognised as an OpenUK New Year's Honours 2025/26 recipient for open source contributions. I'm completing a Data.D in Data Science at the University of East London (2022-2027, ABD), researching Green AI.
+I'm Chris Lloyd-Jones, a Seattle-area AI transformation and platform engineering executive and seven-time Microsoft MVP in AI and Developer Technologies. At Kyndryl, I created Forward Deployed Engineering, bringing engineers alongside clients to build software and take responsibility for it after launch. At Avanade, I founded Platforms & Incubation and hired the product team for Avanade.ai.
 
-I co-host Securing the Realm, a D&D-inspired podcast on AI governance and AI-driven development (securing.quest), and have shared insights with the BBC and Telegraph. With a background spanning law, engineering, and open source, I focus on turning emerging ideas into real-world systems - always open, sustainable, and real.
-
----
+I lead the Seattle chapter of the Global AI Community and co-host Securing the Realm (securing.quest) with Josh McDonald. I contributed to ISO/IEC 21031:2024 on Software Carbon Intensity through the Green Software Foundation, where I served as Steering Committee Vice-Chair. I'm completing a Data.D in Data Science at the University of East London, researching Green AI. My legal training informs my work on agent permissions and accountability.
 
 ## 3. LinkedIn
 
+[LinkedIn profile](https://www.linkedin.com/in/chrislloydjones/)
+
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The name and Seattle-area location were visible. The full headline and About are unverified.
+
 ### Headline
 
-> Started with IRC bots at 9, now bridging AI transformation with green software and open source at Kyndryl | VP | 7x MVP (AI & DevTech) // open, sustainable, real
+> I wrote IRC bots at 9. Now I lead AI transformation and platform engineering | 7x Microsoft MVP (AI & Developer Technologies) | Seattle Chapter Lead, Global AI Community | Open source & green software | MIET
 
 ### About
 
-I lead AI consulting transformation at Kyndryl as Vice President - building the systems, teams, and governance that make AI adoption stick in large enterprises. I created our Forward Deployed Engineering capability: engineers embedded with clients to build, ship and own outcomes, not just advise - now scaling to 22,000 engineers. My focus is making AI adoption real and repeatable, from agentic systems to responsible governance.
+I wrote IRC bots at nine and built a browser game at thirteen. I went on to study law, then returned to building software. Today I lead AI transformation and platform engineering from the Seattle area.
 
-I stay hands-on. I build with open source, contribute to international standards (ISO/IEC 21031:2024 on Software Carbon Intensity), and experiment with emerging approaches in agentic AI and AI governance. I'm completing a Data.D in Data Science at the University of East London, researching Green AI (now at the dissertation stage), and I was recognised as an OpenUK New Year's Honours 2025/26 recipient for contributions to open source. Seven times a Microsoft MVP in AI and Developer Technologies.
+At Kyndryl, I created Forward Deployed Engineering. Engineers worked alongside clients to build and ship software, and stayed responsible for what they put into production. At Avanade, I founded Platforms & Incubation and hired the product team for Avanade.ai.
 
-My journey started young: IRC bots and MUD servers at nine, a browser game at thirteen, a law degree, then back to tech for good. My legal background gives me a different lens on AI governance - I think about regulation, liability, and compliance as design constraints, not afterthoughts. I formerly served as Steering Committee Vice-Chair at the Green Software Foundation and led platform strategy and incubations at Avanade.
+I still build with open source. My legal training shapes how I design agent permissions and assign accountability for what agents do. I'm completing a Data.D in Data Science at the University of East London, researching Green AI. I helped develop ISO/IEC 21031:2024, the Software Carbon Intensity standard, through the Green Software Foundation, where I served as Steering Committee Vice-Chair.
 
-AI that only works in a lab is not AI that matters. I co-host Securing the Realm (securing.quest) - a D&D-inspired podcast on AI governance and AI-driven development. // open, sustainable, real.
+I'm a seven-time Microsoft MVP in AI and Developer Technologies, a member of the Institution of Engineering and Technology (MIET), and Seattle Chapter Lead for the Global AI Community. I co-host Securing the Realm (securing.quest) with Josh McDonald. We use D&D and practical examples to talk through AI governance and what it takes to put AI to work.
 
----
+## 4. Fosstodon
 
-## 4. Fosstodon (Mastodon)
+[Fosstodon profile](https://fosstodon.org/@sealjay)
 
-### Bio (~280 char limit)
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The public bio was visible.
 
-> VP, AI Consulting Transformation at Kyndryl. 7x Microsoft MVP (AI & DevTech). Data.D candidate (ABD) in Data Science at UEL. OpenUK Honours 2025/26 recipient. Open source advocate. Co-host of Securing the Realm. // open, sustainable, real. Views my own.
+### Bio ([500 characters by default on Mastodon](https://docs.joinmastodon.org/user/profile/#bio))
 
----
+> AI transformation and platform engineering in the Seattle area. Open source, green software and Green AI research at UEL. 7x Microsoft MVP (AI & DevTech), MIET. Seattle Chapter Lead, Global AI Community. Co-host of Securing the Realm. Views my own.
 
 ## 5. YouTube
 
-### About
+[Sealjay channel](https://www.youtube.com/@sealjay/about)
 
-I'm Chris - or Sealjay. VP, AI Consulting Transformation at Kyndryl, based in London.
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The full channel description was visible.
 
-I created Kyndryl's Forward Deployed Engineering capability - engineers embedded with clients to build, ship, and own outcomes, not just advise; now scaling to 22,000 engineers. I'm a seven-time Microsoft MVP in AI & Developer Technologies, completing a Data.D (ABD) in Data Science at UEL, and an OpenUK Honours 2025/26 recipient.
+### About ([1,000-character limit](https://developers.google.com/youtube/data/reference/rest/v3/channels))
 
-On this channel: agentic AI, AI governance, sustainable software, and honest takes on what is actually working in enterprise AI adoption.
+I'm Chris, or Sealjay. On this channel I test agent permissions, demo browser automation with Microsoft Foundry and look at what AI gateways do when an agent tries to call a tool. I also share what I learn building with open source and researching Green AI.
 
-Co-host of Securing the Realm (securing.quest) - a D&D-inspired podcast on AI governance and AI-driven development.
+I lead AI transformation and platform engineering in the Seattle area. At Kyndryl I created Forward Deployed Engineering so engineers could build alongside clients and stay responsible for the software they shipped.
+
+I'm a seven-time Microsoft MVP in AI and Developer Technologies and Seattle Chapter Lead for the Global AI Community. I'm completing a doctorate in Data Science at the University of East London, researching Green AI. I co-host Securing the Realm (securing.quest) with Josh McDonald, where we use D&D to talk about AI governance and development.
 
 // open, sustainable, real
 
----
+------
+Splash Photo by Tomasz Frankowski on Unsplash.
 
 ## 6. Meetup
 
-### Bio (~250 char limit)
+[Meetup member profile](https://www.meetup.com/members/215305832/)
 
-> VP, AI Consulting Transformation at Kyndryl. 7x Microsoft MVP (AI & DevTech), Data.D candidate (ABD) in Data Science at UEL. Co-host of Securing the Realm (securing.quest). Happy to chat about agentic AI, sustainable software, or your favourite tabletop RPG.
+Copy revised 27 November 2026. Live profile check attempted 27 November 2026. The OpenUK group identified the member. The live bio is unverified behind sign-in.
 
----
+### Bio ([250-character limit](https://www.meetup.com/blog/new-and-improved-member-profiles/))
+
+> Seattle Chapter Lead, Global AI Community. I work on AI transformation and platform engineering, and research Green AI at UEL. 7x Microsoft MVP (AI & DevTech). Happy to talk AI agents, sustainable software or tabletop RPGs.
 
 ## 7. ORCID
 
-### Bio
+[ORCID record](https://orcid.org/0000-0001-7995-7865)
 
-Chris Lloyd-Jones (Sealjay) is a Data.D candidate (ABD) in Data Science at the University of East London (2022-2027), researching Green AI — investigating how software design decisions affect carbon emissions across the development lifecycle. He is Vice President of AI Consulting Transformation at Kyndryl, where he created the Forward Deployed Engineering capability - placing engineers directly with clients to build, ship, and own outcomes rather than solely advise, now scaling to 22,000 engineers. A seven-time Microsoft MVP in AI and Developer Technologies, he contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the Green Software Foundation, where he formerly served as Steering Committee Vice-Chair. An OpenUK Honours 2025/26 recipient, Chris co-hosts Securing the Realm, a podcast on AI governance and AI-driven development (securing.quest).
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The public biography was visible.
 
----
+### Bio ([5,000-character limit](https://support.orcid.org/hc/en-us/articles/360006971513-Add-a-biography-to-your-ORCID-record))
 
-## 8. GitHub README
+Chris Lloyd-Jones (Sealjay) is a Data.D candidate in Data Science at the University of East London. His Green AI research examines how software design and engineering decisions affect carbon emissions across the development lifecycle. He contributed to ISO/IEC 21031:2024, the Software Carbon Intensity standard, through the Green Software Foundation, where he served as Steering Committee Vice-Chair.
 
-```markdown
-### Hi there
+He is an AI transformation and platform engineering executive in the Seattle area, a seven-time Microsoft MVP in AI and Developer Technologies and a member of the Institution of Engineering and Technology (MIET). He leads the Seattle chapter of the Global AI Community and co-hosts Securing the Realm, a podcast on AI governance and development, with Josh McDonald.
 
-I'm Chris Lloyd-Jones! I'm the Vice President of AI Consulting Transformation at Kyndryl, a seven-time Microsoft MVP in AI & Developer Technologies, and a Data.D candidate in Data Science at the University of East London, researching Green AI. I bridge AI transformation with enterprise governance, sustainability, and open source.
+## 8. GitHub profile README
 
-- I created and lead Kyndryl's Forward Deployed Engineering capability - engineers who build with clients, scaling to 22,000 engineers.
-- 🔭 I'm currently working on AI governance, explainability frameworks, and building AI maturity assessment tools.
-- 🌱 I'm researching sustainable LLMs and SLMs as part of my Doctoral research in Green AI.
-- 🔌 I'm building [MCP servers](#mcp-servers) that give AI assistants access to real-world communication and productivity tools.
-- I contributed to ISO/IEC 21031:2024 (Software Carbon Intensity) through the [Green Software Foundation](https://greensoftware.foundation/), where I served as Steering Committee Vice-Chair.
-- ✍️ I write about [AI security, agent governance, and organisational transformation](https://sealjay.com/blog/).
-- 🎙️ I'm a co-host of [Securing the Realm](https://securing.quest/) - a D&D-inspired podcast on AI governance and AI-driven development.
-- I'm an [OpenUK New Year's Honours 2025/26](https://openuk.uk/honours/) recipient and OpenUK Ambassador, and I lead the [OpenUK Data Centre Advisory Group](https://openuk.uk/datacentregroup/).
-- 📫 [Contact me on LinkedIn](https://linkedin.com/in/chrislloydjones/) to get in touch!
-- Pronouns: he/him
+[Canonical README in Sealjay/Sealjay](https://github.com/Sealjay/sealjay/blob/main/README.md)
 
-// open, sustainable, real
+Live profile README checked 27 November 2026.
 
-#### Recent writing
+## 9. GitHub bio
 
-- [Compliance Is Just Rules: The Company as a Codebase](https://sealjay.com/blog/compliance-is-just-rules/)
-- [Your AI Agents Need a Bouncer](https://sealjay.com/blog/str-your-ai-agents-need-a-bouncer/)
-- [AI Browser Automation with Microsoft Foundry and Browser Use](https://sealjay.com/blog/foundry-browser-use/)
-- [AI AppSec Is Still AppSec](https://sealjay.com/blog/str-ai-appsec-is-still-appsec/)
+[GitHub profile](https://github.com/Sealjay)
 
-More at [sealjay.com/blog](https://sealjay.com/blog/).
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The public bio was visible.
 
-Here are some of my public projects.
+### Bio ([160-character limit](https://docs.github.com/en/account-and-profile/tutorials/personalize-your-profile))
 
-#### MCP Servers
-
-I build [Model Context Protocol](https://modelcontextprotocol.io/) servers that give AI assistants access to real-world communication and productivity tools.
-
-- [![Go](https://img.shields.io/badge/--3178C6?logo=go&logoColor=ffffff)](https://go.dev/) [mcp-whatsapp](https://github.com/Sealjay/mcp-whatsapp) - Single-binary Go MCP server for WhatsApp with 41 tools (messaging, groups, polls, media, privacy)
-- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [mcp-hey](https://github.com/Sealjay/mcp-hey) - MCP server for Hey.com email with full-text search and SQLite caching
-- [![Swift](https://img.shields.io/badge/--3178C6?logo=swift&logoColor=ffffff)](https://swift.org/) [mcp-ical-swift](https://github.com/Sealjay/mcp-ical-swift) - Apple Calendar MCP server using compiled Swift to bypass macOS TCC restrictions
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [mcp-signal](https://github.com/Sealjay/mcp-signal) - Local Signal MCP server (reads via Signal Desktop, sends via signal-cli)
-
-#### Current Projects
-
-- 🎙️ [Securing the Realm](https://securing.quest/) - Podcast on AI security and governance
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [str-agentic-adventures](https://github.com/SecuringTheRealm/str-agentic-adventures) - AI-powered web app for tabletop RPGs replacing the human Dungeon Master
-
-#### Proof of concepts for blog posts
-
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [foundry-browser-use](https://github.com/Sealjay/foundry-browser-use) - Interactive AI browser automation using Browser Use + Microsoft Foundry
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [str-mcp-purview](https://github.com/SecuringTheRealm/str-mcp-purview) - MCP implementation for Microsoft Purview
-- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [str-foundry-local](https://github.com/SecuringTheRealm/str-foundry-local) - Example of Azure Foundry Local running for content creation
-
-#### Archive - no longer maintained, previous projects
-
-- [![Docker](https://img.shields.io/badge/--3178C6?logo=docker&logoColor=ffffff)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [Distributed Data](https://github.com/Avanade/emtech-distributed-data) - Exploring SQL Ledger, Confidential Ledger and other technologies
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [PyCognitiveSearch](https://github.com/Sealjay/py-cognitive-search) - Python SDK for Azure Cognitive Search
-- [![Python](https://img.shields.io/badge/--3178C6?logo=python&logoColor=ffffff)](https://www.python.org/) [![Power BI](https://custom-icon-badges.demolab.com/badge/-F2C811?logo=powerbi&logoColor=black)](https://learn.microsoft.com/en-us/power-bi/?WT.mc_id=AI-MVP-5004204) [powerbi-adt](https://github.com/Sealjay/powerbi-adt) - Querying Azure Digital Twins with PowerBI ([blog post](https://www.sealjay.com/querying-azure-digital-twins-with-powerbi/))
-- [![TypeScript](https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff)](https://www.typescriptlang.org/) [PolicyForge](https://devpost.com/software/policyforge-ai-automation-policy-simulator) - Autonomous agent monitoring AI regulations worldwide, simulating policy impacts, and generating implementation roadmaps (Gemini 3 hackathon)
-```
-
----
-
-## 9. GitHub Bio
-
-### Bio (~160 char limit)
-
-> VP AI Consulting Transformation @ Kyndryl. 7x @Microsoft MVP (AI & DevTech). Data.D candidate in Green AI. // open, sustainable, real
-
----
+> AI platform engineering, MCP servers and green software. 7x Microsoft MVP in AI & DevTech. Seattle Chapter Lead, Global AI Community.
 
 ## 10. Credly
 
-### Bio (~600 char limit)
+[Credly profile](https://www.credly.com/users/chris-lloyd-jones/badges)
 
-I'm Chris Lloyd-Jones (Sealjay) - Vice President of AI Consulting Transformation at Kyndryl. Created and leading Kyndryl's Forward Deployed Engineering capability - engineers embedded with clients to build, ship, and own outcomes; scaling to 22,000 engineers. Seven-time Microsoft MVP in AI & Developer Technologies, Data.D candidate (ABD) in Data Science at the University of East London, and OpenUK Honours 2025/26 recipient. I co-host Securing the Realm (securing.quest), a D&D-inspired podcast on AI governance and AI-driven development.
+Copy revised 27 November 2026. Live profile checked 27 November 2026. The public bio was visible.
 
----
+### Bio ([500-character limit](https://support.credly.com/hc/en-us/articles/360038029671-Why-Should-I-Personalize-My-Profile))
 
-## Quick-Reference Summary
-
-| Platform      | FDE?                       | Ethos tag? | StR description | Key changes                                               |
-| ------------- | -------------------------- | ---------- | --------------- | --------------------------------------------------------- |
-| Sessionize    | Yes - tagline + bio        | No         | Full            | FDE leads bio, law-as-governance lens added               |
-| MVP Profile   | Yes - medium               | No         | Full            | Vague OpenUK line fixed                                   |
-| LinkedIn      | Yes - long-form            | Yes        | Full            | FDE in para 1, law lens in para 3, cut "future-ready"     |
-| Fosstodon     | No                         | Yes        | Short           | No changes                                                |
-| YouTube       | Yes - varied               | Yes        | Full            | Channel description added, GSF dropped                    |
-| Meetup        | No                         | No         | Short           | No changes                                                |
-| ORCID         | Yes - varied, third person | No         | Full            | Research identity leads, not corporate title              |
-| GitHub README | Yes - bullet               | Yes        | Full            | "Earlier work" replaces "Archive", breakage notes removed |
-| GitHub Bio    | No                         | Yes        | N/A             | No changes                                                |
-| Credly        | Yes - medium               | No         | Full            | Standardised StR description                              |
+I'm Chris Lloyd-Jones (Sealjay), a Seattle-area AI transformation and platform engineering executive. I'm a seven-time Microsoft MVP in AI and Developer Technologies, a member of the Institution of Engineering and Technology (MIET) and Seattle Chapter Lead for the Global AI Community. I contributed to ISO/IEC 21031:2024 on Software Carbon Intensity and am completing a Data.D in Data Science at the University of East London, researching Green AI.

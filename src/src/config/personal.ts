@@ -7,21 +7,18 @@ export interface Badge {
   isFormerRole?: boolean
 }
 
-// Current role information
-export const currentRole = {
-  title: 'VP, AI Consulting Transformation',
-  company: 'Kyndryl',
-  displayText: 'VP, AI Consulting Transformation at Kyndryl',
-}
-
-// Location
-export const location = 'London'
+export const profileRole = 'AI transformation and platform engineering executive'
+export const aboutDescription = `Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole}, a seven-time Microsoft MVP and a Green AI doctoral candidate.`
 
 export const professionalBadges: Badge[] = [
-  // Homepage badges (first 3 shown on homepage, all shown on About)
   {
-    text: '7x Microsoft MVP in AI & DevTech',
+    text: 'Seven-time Microsoft MVP in AI and Developer Technologies',
     url: tagMvpUrl('https://mvp.microsoft.com/en-US/mvp/profile/224176f9-f3a7-eb11-b1ac-000d3a53daf4'),
+  },
+  { text: 'Member of the Institution of Engineering and Technology (MIET)' },
+  {
+    text: 'Seattle Chapter Lead, Global AI Community',
+    url: 'https://globalai.community/chapters/seattle/',
   },
   {
     text: 'Data.D Candidate (ABD), Green AI (UEL, 2022\u20132027)',

@@ -2,6 +2,7 @@
 // Author bio aligned with docs/platform-profiles.md
 import { Image } from 'astro:assets'
 import avatarSrc from '../../assets/chris/avatar.jpg'
+import { profileRole } from '../../config/personal'
 
 interface Author {
   name: string
@@ -26,8 +27,10 @@ const { author } = Astro.props
 // Default author is Chris
 const isDefault = !author
 const name = author?.name ?? 'Chris Lloyd-Jones'
-const authorTitle = author?.title ?? 'VP, AI Consulting Transformation at Kyndryl'
-const bio = author?.bio ?? '7x Microsoft MVP (AI & DevTech). Background in law, engineering, and open source. Data.D candidate (ABD) in Data Science at UEL. OpenUK Honours 2025/26. Co-hosts <a href="https://securing.quest/" target="_blank" rel="noopener noreferrer">Securing the Realm</a>. // open, sustainable, real'
+const authorTitle = author?.title ?? (isDefault ? profileRole : undefined)
+const bio = author?.bio ?? (isDefault
+  ? 'Seven-time Microsoft MVP in AI and Developer Technologies and a Green AI doctoral candidate at the University of East London. Co-hosts <a href="https://securing.quest/" target="_blank" rel="noopener noreferrer">Securing the Realm</a> with Josh McDonald.'
+  : undefined)
 const url = author?.url
 const social = author?.social ?? (isDefault ? {
   github: 'sealjay',

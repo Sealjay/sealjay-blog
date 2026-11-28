@@ -142,10 +142,11 @@ export async function getYouTubeSpeakingEntries(feeds: YouTubeFeedConfig[]): Pro
   return allEntries
 }
 
-/** Extract YouTube video ID from a URL (watch, shorts, or youtu.be) */
-export function extractYouTubeId(url: string): string | null {
+/** Extract YouTube video ID from a URL (watch, shorts, embed, or youtu.be) */
+export function extractYouTubeId(url: string | undefined): string | null {
+  if (!url) return null
   const patterns = [
-    /youtube\.com\/shorts\/([A-Za-z0-9_-]+)/,
+    /youtube\.com\/(?:shorts|embed)\/([A-Za-z0-9_-]+)/,
     /youtube\.com\/watch\?v=([A-Za-z0-9_-]+)/,
     /youtu\.be\/([A-Za-z0-9_-]+)/,
   ]
