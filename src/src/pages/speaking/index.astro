@@ -37,7 +37,6 @@ const autoEntries = youtubeEntries
 
 const speakingSlots = [...mdxEntries, ...autoEntries]
 const sortedSpeakingSlots = [...speakingSlots].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-const lastConferenceSlot = speakingSlots.reduce((prev, current) => (prev.data.date > current.data.date ? prev : current))
 
 const now = new Date()
 const upcomingTalks = sortedSpeakingSlots.filter((s) => s.data.date > now)
@@ -55,7 +54,7 @@ const pastByYear = pastTalks.reduce(
 )
 const pastYears = Object.keys(pastByYear).sort((a, b) => Number(b) - Number(a))
 
-const eventTypes = [...new Set(speakingSlots.map((s) => s.data.eventType))].sort()
+const eventTypes = [...new Set(pastTalks.map((s) => s.data.eventType))].sort()
 
 const speakingPageJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -93,561 +92,283 @@ const speakingPageJsonLd = JSON.stringify({
 
 <Layout
   title="Speaking"
-  description="Conference talks, videos, podcasts, and media mentions on Microsoft AI, open source, and green software"
+  description="Talks, workshops, recordings and interviews on AI engineering, open source and green software"
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={lastConferenceSlot.data.date}
+  updatedDate={sortedSpeakingSlots[0]?.data.date}
 >
   <script type="application/ld+json" set:html={speakingPageJsonLd} />
   <Container>
     <PageHeader
       title="Speaking"
-      subtitle="conference talks, videos, and podcasts on Microsoft AI and open source"
-     
+      subtitle="Talks, workshops, recordings and interviews on AI engineering, open source and green software."
       breadcrumbs={[
         { label: 'Home', href: '/' },
         { label: 'Speaking' },
       ]}
     >
-      <p class="speaking-kit-toplink">
-        <a href="/speaking/kit" class="speaking-kit-toplink__anchor plausible-event-name=Speaker+Kit+Click plausible-event-source=speaking-top">
-          View my speaker kit
-          <svg xmlns="http://www.w3.org/2000/svg" class="speaking-kit-toplink__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
-      </p>
+      <a
+        href="/speaking/kit/"
+        class="speaking-kit-link plausible-event-name=Speaker+Kit+Click plausible-event-source=speaking-top"
+      >
+        Speaker kit and booking
+      </a>
     </PageHeader>
 
-    {/* Upcoming Talks */}
     {upcomingTalks.length > 0 && (
-      <section class="speaking-upcoming">
-        <h2 class="speaking-section-label">Upcoming</h2>
-        <div class="upcoming-list">
-          {upcomingTalks.map((slot) => (
-            <a
-              href={slot.data.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="upcoming-card group"
-            >
-              <div class="upcoming-card__header">
-                <span class="upcoming-card__event font-heading">{slot.data.event}</span>
-                <div class="upcoming-card__badges">
-                  <Badge label={slot.data.eventType} />
-                  <Badge label="Upcoming" variant="warm" />
-                </div>
+      <section class="speaking-section">
+        <h2>Upcoming appearances</h2>
+        <div class="speaking-entries">
+          {upcomingTalks.map(({ data }) => (
+            <div class="speaking-entry speaking-entry--upcoming">
+              <h3>{data.title}</h3>
+              <div class="speaking-entry__meta">
+                <span>{data.event}</span>
+                <FormattedDate date={data.date} />
+                <Badge label={data.eventType} variant="subtle" />
               </div>
-              <h3 class="upcoming-card__title">{slot.data.title}</h3>
-              <div class="upcoming-card__meta">
-                <FormattedDate date={slot.data.date} />
+              <div class="speaking-entry__actions">
+                <a href={data.url} target="_blank" rel="noopener noreferrer">
+                  {data.cta} <span class="sr-only">for {data.title} (opens in new tab)</span>
+                </a>
               </div>
-              {slot.data.description && (
-                <details class="upcoming-card__details">
-                  <summary class="upcoming-card__summary">Abstract</summary>
-                  <p class="upcoming-card__abstract">{slot.data.description}</p>
+              {data.description && (
+                <details>
+                  <summary>Abstract</summary>
+                  <p>{data.description}</p>
                 </details>
               )}
-              <span class="sr-only">(opens in new tab)</span>
-            </a>
+            </div>
           ))}
         </div>
       </section>
     )}
 
-    {/* Filter Pills */}
-    <div class="speaking-filters" id="speaking-filters">
-      <button
-        data-filter="all"
-        class="speaking-filter-btn active"
-      >
-        All
-      </button>
-      {eventTypes.map((type) => (
-        <button
-          data-filter={type}
-          class="speaking-filter-btn"
-        >
-          {type}
-        </button>
-      ))}
-    </div>
-
-    {/* Past Talks grouped by year */}
-    <section class="speaking-past" id="speaking-grid">
-      {pastYears.map((year) => (
-        <div class="speaking-year-group" data-year={year}>
-          <h2 class="speaking-year-heading">{year}</h2>
-          <div class="past-entries">
-            {pastByYear[year].map((slot) => (
-              <div class="past-entry speaking-card" data-event-type={slot.data.eventType}>
-                <a
-                  href={slot.data.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="past-entry__link"
-                >
-                  <div class="past-entry__main">
-                    <span class="past-entry__event font-heading">{slot.data.event}</span>
-                    <span class="past-entry__title">{slot.data.title}</span>
+    {pastTalks.length > 0 && (
+      <section class="speaking-section" aria-labelledby="past-appearances">
+        <h2 id="past-appearances">Past appearances</h2>
+        {eventTypes.length > 1 && (
+          <div class="speaking-filter" hidden>
+            <div class="speaking-filter__buttons" role="group" aria-label="Filter past appearances">
+              <button type="button" data-filter="all" aria-pressed="true">All</button>
+              {eventTypes.map((type) => (
+                <button type="button" data-filter={type} aria-pressed="false">{type}</button>
+              ))}
+            </div>
+            <p role="status" class="speaking-filter__count">{pastTalks.length} appearances</p>
+          </div>
+        )}
+        {pastYears.map((year) => (
+          <div class="speaking-year">
+            <h3 class="speaking-year__heading">{year}</h3>
+            <div class="speaking-entries">
+              {pastByYear[year].map(({ data }) => (
+                <div class="speaking-entry" data-event-type={data.eventType}>
+                  <h4>{data.title}</h4>
+                  <div class="speaking-entry__meta">
+                    <span>{data.event}</span>
+                    <FormattedDate date={data.date} />
+                    <Badge label={data.eventType} variant="subtle" />
                   </div>
-                  <div class="past-entry__end">
-                    <Badge label={slot.data.eventType} variant="subtle" />
-                    <FormattedDate date={slot.data.date} />
-                    {(slot.data.eventType === 'Video' || slot.data.eventType === 'Short' || slot.data.eventType === 'Podcast' || slot.data.videoEmbedUrl) && (
-                      <svg xmlns="http://www.w3.org/2000/svg" class="past-entry__video-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="Has video">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                  <div class="speaking-entry__actions">
+                    <a href={data.url} target="_blank" rel="noopener noreferrer">
+                      {data.cta} <span class="sr-only">for {data.title} (opens in new tab)</span>
+                    </a>
+                    {data.previewUrl && (
+                      <a href={data.previewUrl} target="_blank" rel="noopener noreferrer">
+                        Watch the preview <span class="sr-only">for {data.title} (opens in new tab)</span>
+                      </a>
+                    )}
+                    {data.blogPostSlug && (
+                      <a href={`/blog/${data.blogPostSlug}/`}>Related blog post <span class="sr-only">for {data.title}</span></a>
                     )}
                   </div>
-                  <span class="sr-only">(opens in new tab)</span>
-                </a>
-                {slot.data.previewUrl && (
-                  <a
-                    href={slot.data.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="past-entry__secondary-link"
-                  >
-                    Watch the preview <span class="sr-only">(opens in new tab)</span>
-                  </a>
-                )}
-                {slot.data.blogPostSlug && (
-                  <a
-                    href={`/blog/${slot.data.blogPostSlug}`}
-                    class="past-entry__secondary-link"
-                  >
-                    Related blog post
-                  </a>
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </section>
+        ))}
+      </section>
+    )}
 
-    {/* Speaker Kit CTA */}
-    <div class="speaking-cta-card">
-      <div class="speaking-cta-card__content">
-        <h2 class="speaking-cta-card__heading font-heading">Want me to speak at your event?</h2>
-        <p class="speaking-cta-card__text">View my speaker kit for topics, formats, and booking info.</p>
-      </div>
+    <p class="speaking-footer">
       <a
-        href="/speaking/kit"
-        class="speaking-cta-card__button plausible-event-name=Speaker+Kit+Click plausible-event-source=speaking-cta"
+        href="/speaking/kit/"
+        class="plausible-event-name=Speaker+Kit+Click plausible-event-source=speaking-cta"
       >
-        Speaker Kit
-        <svg xmlns="http://www.w3.org/2000/svg" class="speaking-cta-card__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
+        Speaker kit and booking
       </a>
-    </div>
+    </p>
   </Container>
 </Layout>
 
 <style>
-  /* Top speaker kit link */
-  .speaking-kit-toplink {
-    margin: 0.75rem 0 0;
-  }
-
-  .speaking-kit-toplink__anchor {
+  .speaking-kit-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    font-family: var(--font-heading);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .speaking-kit-toplink__anchor:hover {
-    color: var(--color-accent);
-  }
-
-  .speaking-kit-toplink__icon {
-    width: 0.875rem;
-    height: 0.875rem;
-  }
-
-  /* Upcoming section */
-  .speaking-upcoming {
-    margin-bottom: 3rem;
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    background: var(--color-warm-muted);
-    border: 1px solid color-mix(in srgb, var(--color-warm) 20%, transparent);
-  }
-
-  .speaking-section-label {
-    font-family: var(--font-heading);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-warm);
-    margin-bottom: 1rem;
-  }
-
-  .upcoming-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .upcoming-card {
-    display: block;
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--color-card-glow);
-    padding: 1rem 1.25rem;
-    text-decoration: none;
-    transition: transform var(--duration-normal) var(--ease-out),
-                border-color var(--duration-normal) var(--ease-out),
-                box-shadow var(--duration-normal) var(--ease-out);
-  }
-
-  .upcoming-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-border-strong);
-    box-shadow: var(--color-card-glow), 0 4px 20px color-mix(in srgb, var(--color-warm) 15%, transparent);
-  }
-
-  .upcoming-card__header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.375rem;
-  }
-
-  .upcoming-card__event {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: var(--color-text);
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .upcoming-card:hover .upcoming-card__event {
-    color: var(--color-warm);
-  }
-
-  .upcoming-card__badges {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-  }
-
-  .upcoming-card__title {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--color-text-muted);
-    margin: 0 0 0.375rem 0;
-  }
-
-  .upcoming-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .upcoming-card__details {
-    margin-top: 0.75rem;
-    border-top: 1px solid var(--color-border);
-    padding-top: 0.75rem;
-  }
-
-  .upcoming-card__summary {
-    cursor: pointer;
-    font-family: var(--font-heading);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    user-select: none;
-    list-style: none;
-  }
-
-  .upcoming-card__summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .upcoming-card__summary::before {
-    content: '+ ';
-  }
-
-  details[open] > .upcoming-card__summary::before {
-    content: '- ';
-  }
-
-  .upcoming-card__abstract {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.65;
-    color: var(--color-text-muted);
-  }
-
-  /* Filter pills */
-  .speaking-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .speaking-filter-btn {
-    display: inline-flex;
-    align-items: center;
-    border-radius: var(--radius-full);
+    min-height: 44px;
+    margin-top: 1rem;
     padding: 0.5rem 1rem;
     font-family: var(--font-heading);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    transition: background var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out),
-                border-color var(--duration-fast) var(--ease-out);
-  }
-
-  .speaking-filter-btn:hover {
-    background: var(--color-bg-alt);
-    border-color: var(--color-border-strong);
-    color: var(--color-text);
-  }
-
-  .speaking-filter-btn.active {
+    font-weight: 650;
+    color: var(--color-on-primary, #fff);
     background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: #ffffff;
+    border-radius: var(--radius-md);
   }
 
-  /* Past talks */
-  .speaking-past {
+  .speaking-kit-link:hover {
+    text-decoration: underline;
+  }
+
+  .speaking-section {
     margin-bottom: 3rem;
   }
 
-  .speaking-year-group {
-    margin-bottom: 3rem;
-  }
-
-  .speaking-year-heading {
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 650;
     color: var(--color-text);
+  }
+
+  h2 {
     margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .speaking-year {
+    margin-top: 1.75rem;
+  }
+
+  .speaking-year__heading {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  .speaking-entry {
+    padding: 0.875rem 0;
     border-bottom: 1px solid var(--color-border);
+    overflow-wrap: anywhere;
   }
 
-  .past-entries {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .past-entry {
-    border-radius: var(--radius-sm);
-    transition: background var(--duration-fast) var(--ease-out);
-  }
-
-  .past-entry:hover {
-    background: var(--color-bg-alt);
-  }
-
-  .past-entry__link {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    padding: 0.625rem 0.75rem;
-    text-decoration: none;
-  }
-
-  @media (min-width: 640px) {
-    .past-entry__link {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-  }
-
-  .past-entry__main {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .past-entry__event {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .past-entry:hover .past-entry__event {
-    color: var(--color-primary);
-  }
-
-  .past-entry__title {
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .past-entry__end {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
-  }
-
-  .past-entry__video-icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--color-primary);
-    flex-shrink: 0;
-  }
-
-  .past-entry__secondary-link {
-    display: inline-block;
-    margin-left: 0.75rem;
-    padding-bottom: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .past-entry__secondary-link:hover {
-    color: var(--color-text);
-  }
-
-  /* Hidden state for filter */
-  .speaking-card.hidden {
-    display: none;
-  }
-
-  .speaking-year-group.hidden {
-    display: none;
-  }
-
-  /* Speaker Kit CTA card */
-  .speaking-cta-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
+  .speaking-entry--upcoming {
+    padding: 0.875rem 1rem;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    box-shadow: var(--color-card-glow);
-    margin-top: 1rem;
-    margin-bottom: 3rem;
+    border-radius: var(--radius-md);
   }
 
-  @media (min-width: 640px) {
-    .speaking-cta-card {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
+  .speaking-entry--upcoming + .speaking-entry--upcoming {
+    margin-top: 0.75rem;
   }
 
-  .speaking-cta-card__content {
-    flex: 1;
+  .speaking-entry h3,
+  .speaking-entry h4 {
+    font-size: 1.0625rem;
+    line-height: 1.35;
   }
 
-  .speaking-cta-card__heading {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 0.25rem 0;
+  .speaking-entry__meta,
+  .speaking-entry__actions,
+  .speaking-filter__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem 0.75rem;
   }
 
-  .speaking-cta-card__text {
-    font-size: 0.875rem;
+  .speaking-entry__meta {
+    margin-top: 0.375rem;
     color: var(--color-text-muted);
-    margin: 0;
+    font-size: 0.875rem;
   }
 
-  .speaking-cta-card__button {
+  .speaking-entry__actions a,
+  .speaking-footer a {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--color-primary);
-    color: #ffffff;
-    padding: 0.5rem 1.25rem;
+    min-height: 36px;
     font-family: var(--font-heading);
     font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .speaking-entry summary {
+    cursor: pointer;
     font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: filter var(--duration-fast) var(--ease-out);
   }
 
-  .speaking-cta-card__button:hover {
-    filter: brightness(1.1);
+  .speaking-entry details p {
+    max-width: 68ch;
+    margin-top: 0.5rem;
+    color: var(--color-text-muted);
   }
 
-  .speaking-cta-card__icon {
-    width: 1rem;
-    height: 1rem;
+  .speaking-filter__buttons button {
+    min-height: 40px;
+    padding: 0.375rem 0.875rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+
+  .speaking-filter__buttons button:hover {
+    text-decoration: underline;
+  }
+
+  .speaking-filter__buttons button[aria-pressed='true'] {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary, #fff);
+  }
+
+  .speaking-filter__count {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .speaking-footer {
+    margin-bottom: 2rem;
   }
 </style>
 
 <script>
   function initSpeakingFilters() {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.speaking-filter-btn')
-    const cards = document.querySelectorAll<HTMLElement>('.speaking-card')
-    const yearGroups = document.querySelectorAll<HTMLElement>('.speaking-year-group')
+    const filterPanel = document.querySelector<HTMLElement>('.speaking-filter[hidden]')
+    const count = filterPanel?.querySelector('[role="status"]')
+    if (!filterPanel || !count) return
+    const buttons = filterPanel.querySelectorAll<HTMLButtonElement>('button[data-filter]')
+    const years = document.querySelectorAll<HTMLElement>('.speaking-year')
 
-    function setFilter(filter: string) {
-      for (const btn of buttons) {
-        const isActive = btn.dataset.filter === filter
-        btn.classList.toggle('active', isActive)
-      }
-
-      for (const card of cards) {
-        if (filter === 'all' || card.dataset.eventType === filter) {
-          card.classList.remove('hidden')
-        } else {
-          card.classList.add('hidden')
+    for (const button of buttons) {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter
+        let visibleCount = 0
+        for (const year of years) {
+          const entries = year.querySelectorAll<HTMLElement>('[data-event-type]')
+          let visibleInYear = 0
+          for (const entry of entries) {
+            entry.hidden = filter !== 'all' && entry.dataset.eventType !== filter
+            if (!entry.hidden) visibleInYear += 1
+          }
+          year.hidden = visibleInYear === 0
+          visibleCount += visibleInYear
         }
-      }
-
-      // Hide year groups that have no visible cards
-      for (const group of yearGroups) {
-        const visibleCards = group.querySelectorAll('.speaking-card:not(.hidden)')
-        group.classList.toggle('hidden', visibleCards.length === 0)
-      }
-    }
-
-    for (const btn of buttons) {
-      btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter ?? 'all'
-        setFilter(filter)
+        for (const other of buttons) other.setAttribute('aria-pressed', String(other === button))
+        count.textContent = visibleCount === 1 ? '1 appearance' : `${visibleCount} appearances`
         if (typeof window.plausible !== 'undefined') {
           window.plausible('Speaking Filter', { props: { eventType: filter } })
         }
       })
     }
+
+    filterPanel.hidden = false
   }
 
   document.addEventListener('astro:page-load', initSpeakingFilters)
