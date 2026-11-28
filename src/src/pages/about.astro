@@ -3,7 +3,7 @@ import Layout from '../layouts/BaseLayout.astro'
 import Container from '../components/containers/Container.astro'
 import PageHeader from '../components/partials/PageHeader.astro'
 import ProfileSection from '../components/partials/ProfileSection.astro'
-import { aboutDescription, profileRole } from '../config/personal'
+import { aboutDescription, globalAiOrganizerAward, profileRole } from '../config/personal'
 import portrait from '../assets/chris/portrait.jpg'
 ---
 
@@ -11,7 +11,7 @@ import portrait from '../assets/chris/portrait.jpg'
   title="About"
   description={aboutDescription}
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={new Date('1 March 2026')}
+  updatedDate={new Date('2026-11-27')}
 >
   <Container>
     <PageHeader
@@ -37,7 +37,7 @@ import portrait from '../assets/chris/portrait.jpg'
           At Kyndryl, I created the Forward Deployed Engineering capability with a three-year target of 22,000 engineers. Engineers worked alongside clients and remained responsible for the software they built together. At Avanade, I founded Platforms &amp; Incubation and hired the product team for Avanade.ai.
         </p>
         <p>
-          I'm a seven-time Microsoft MVP in AI and Developer Technologies, a member of the Institution of Engineering and Technology (MIET), and the <a href="https://globalai.community/chapters/seattle/">Seattle Chapter Lead for Global AI Community</a>.
+          I'm a seven-time Microsoft MVP in AI and Developer Technologies and a member of the Institution of Engineering and Technology (MIET). I co-lead the <a href="https://globalai.community/chapters/seattle/">Seattle chapter of Global AI Community</a>. Global AI Community named me <a href={globalAiOrganizerAward.url}>{globalAiOrganizerAward.title}</a> for the week of {globalAiOrganizerAward.weekOf}.
         </p>
         <p>
           I'm a doctoral candidate at the University of East London, where I research Green AI and Green Software Engineering. I previously served as Steering Committee Vice-Chair of the Green Software Foundation and contributed to <a href="https://www.iso.org/standard/86612.html" target="_blank" rel="noopener noreferrer">ISO/IEC 21031:2024</a>, the international standard for Software Carbon Intensity. You can find my research profile on <a href="https://orcid.org/0000-0001-7995-7865" target="_blank" rel="noopener noreferrer">ORCID</a>.

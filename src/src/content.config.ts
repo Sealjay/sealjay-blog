@@ -64,6 +64,7 @@ const speaking = defineCollection({
       url: z.string().url().transform(tagMvpUrl),
       thumbnail: image().optional(),
       blogPostSlug: z.string().optional(),
+      previewUrl: z.string().url().transform(tagMvpUrl).optional(),
       featured: z.boolean().default(false),
       videoEmbedUrl: z.string().url().optional(),
     }),
