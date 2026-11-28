@@ -45,9 +45,8 @@ const notesByDay = groupNotesByDay(notes)
 
 const sortedDayKeys = [...notesByDay.keys()].sort((a, b) => b.localeCompare(a))
 
-// Collect notes from multiple recent days — fill to >=5 previews, max 3 days
+// Collect previews from up to three recent days.
 const MAX_DAYS = 3
-const MIN_PREVIEWS = 5
 const PREVIEWS_PER_DAY = 3
 
 interface DayGroup {
@@ -60,10 +59,8 @@ interface DayGroup {
 }
 
 const dayGroups: DayGroup[] = []
-let totalPreviews = 0
 
 for (const dayKey of sortedDayKeys) {
-  if (dayGroups.length >= MAX_DAYS && totalPreviews >= MIN_PREVIEWS) break
   if (dayGroups.length >= MAX_DAYS) break
 
   const dayNotes = [...notesByDay.get(dayKey)!].sort(
@@ -89,7 +86,6 @@ for (const dayKey of sortedDayKeys) {
     dayUrl: `/notes/${dayKey}/`,
     previews,
   })
-  totalPreviews += previews.length
 }
 
 const totalNoteCount = dayGroups.reduce((sum, g) => sum + g.totalCount, 0)

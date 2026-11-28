@@ -1,6 +1,12 @@
 import MarkdownIt from 'markdown-it'
 
 const parser = new MarkdownIt()
+const imageImports = import.meta.glob('../assets/images/**', {
+  eager: true,
+  import: 'default',
+  query: '?url&no-inline',
+})
+const legacyImages = Object.fromEntries(Object.entries(imageImports).map(([path, url]) => [encodeURI(path), url]))
 
 /** Strip MDX-specific syntax (imports, JSX components) from body text. */
 function stripMdx(body) {
@@ -15,7 +21,10 @@ function stripMdx(body) {
 /** Rewrite root-relative src/href URLs in rendered HTML to absolute URLs. */
 function absolutizeRootRelativeUrls(html, site) {
   return html.replace(/(href|src)="\/(?!\/)([^"]*)"/g, (_, attribute, path) => {
-    return `${attribute}="${new URL(`/${path}`, site).href}"`
+    const url = new URL(`/${path}`, site)
+    const image = attribute === 'src' && legacyImages[`../assets${url.pathname}`]
+    if (image) url.pathname = image
+    return `${attribute}="${url.href}"`
   })
 }
 

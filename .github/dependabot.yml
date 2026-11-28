@@ -12,7 +12,7 @@ updates:
         patterns:
           - '*'
     ignore:
-      # Tailwind majors held on v3 deliberately - see CLAUDE.md / memory
+      # Tailwind majors held on v3 deliberately - see AGENTS.md
       - dependency-name: 'tailwindcss'
         update-types: ['version-update:semver-major']
       - dependency-name: '@astrojs/tailwind'

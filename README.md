@@ -64,10 +64,11 @@ bun run send:webmentions                             # Send queued webmentions f
 
 ## CI/CD
 
-Two GitHub Actions workflows handle deployment and content freshness automatically — you do not need to trigger these manually.
+- `pr-check.yml` lints and builds pull requests that change the app or the check workflow.
+- `swa-deploy.yml` publishes production changes to Azure and sends Webmentions after publication.
+- `sync-content.yml` runs Mondays at 06:00 UTC and deploys when it commits new content.
 
-- **`swa-deploy.yml`** — Builds and deploys to Azure Static Web Apps on push/PR to `main` (when `src/**` changes), then sends webmentions.
-- **`sync-content.yml`** — Runs weekly (Mondays 06:00 UTC) to sync Securing Quest posts, webmentions, Mastodon toots, and YouTube talks.
+See [AGENTS.md](./AGENTS.md) for repo instructions and content workflows.
 
 ## Licensing
 
