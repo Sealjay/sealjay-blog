@@ -184,7 +184,9 @@
   "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://github.com/Sealjay/py-cognitive-search": {
     "status": "no-endpoint"
   },
-  "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://www.legislation.gov.uk/": "no-endpoint",
+  "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://www.legislation.gov.uk/": {
+    "status": "no-endpoint"
+  },
   "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://azure.microsoft.com/en-gb/free/": "no-endpoint",
   "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://portal.azure.com/#create/Microsoft.StorageAccount-ARM": "no-endpoint",
   "https://sealjay.com/blog/cognitive-search-law-part1-indexer/ -> https://azure.microsoft.com/en-gb/features/storage-explorer/": "no-endpoint",
@@ -202,7 +204,9 @@
   },
   "https://sealjay.com/blog/cognitive-search-series/ -> https://docs.microsoft.com/en-us/azure/search/cognitive-search-concept-intro": "no-endpoint",
   "https://sealjay.com/blog/cognitive-search-series/ -> https://docs.microsoft.com/en-us/azure/search/search-indexer-overview": "no-endpoint",
-  "https://sealjay.com/blog/cognitive-search-series/ -> https://www.legislation.gov.uk/new/data.feed": "no-endpoint",
+  "https://sealjay.com/blog/cognitive-search-series/ -> https://www.legislation.gov.uk/new/data.feed": {
+    "status": "no-endpoint"
+  },
   "https://sealjay.com/blog/cognitive-search-series/ -> https://likegeeks.com/python-web-crawler-scrapy/#:~:text=Scrapy%20is%20a%20Python%20web%20framework%20that%20you,data%20in%20spreadsheets%20or%20any%20other%20business%20need.": "no-endpoint",
   "https://sealjay.com/blog/cognitive-search-series/ -> https://tailwindui.com/components?utm_source=tailwindcss&utm_medium=navigation": {
     "status": "no-endpoint"
