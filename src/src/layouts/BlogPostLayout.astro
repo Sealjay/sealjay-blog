@@ -527,8 +527,13 @@ const breadcrumbJsonLd = JSON.stringify({
   /* Article grid for ToC sidebar */
   .article-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
+  }
+
+  .article-grid > .prose {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
   }
 
   @media (min-width: 1024px) {

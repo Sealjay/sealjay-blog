@@ -136,7 +136,7 @@ const badgeLabels: Record<StreamItem['type'], string> = {
   <Container>
     <PageHeader
       title="Stream"
-      subtitle="every article, talk, note, and project in one feed"
+      subtitle="Writing, speaking, notes and projects in date order."
      
       breadcrumbs={[
         { label: 'Home', href: '/' },
@@ -145,13 +145,15 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     />
 
     {/* Filter Pills */}
-    <div class="stream-filters" id="stream-filters">
-      <button data-filter="all" class="stream-filter-btn stream-filter-btn--active">All</button>
-      <button data-filter="article" class="stream-filter-btn">Articles</button>
-      <button data-filter="talk" class="stream-filter-btn">Speaking</button>
-      <button data-filter="note" class="stream-filter-btn">Notes</button>
-      <button data-filter="project" class="stream-filter-btn">Projects</button>
+    <div class="stream-filters" id="stream-filters" role="group" aria-label="Filter stream" hidden>
+      <button data-filter="all" class="stream-filter-btn" aria-pressed="true">All</button>
+      <button data-filter="article" class="stream-filter-btn" aria-pressed="false">Articles</button>
+      <button data-filter="talk" class="stream-filter-btn" aria-pressed="false">Speaking</button>
+      <button data-filter="note" class="stream-filter-btn" aria-pressed="false">Notes</button>
+      <button data-filter="project" class="stream-filter-btn" aria-pressed="false">Projects</button>
     </div>
+
+    <p class="stream-count" role="status" hidden></p>
 
     {/* Stream Items Grouped by Month */}
     {Object.entries(groupedItems).map(([monthYear, items]) => (
@@ -266,42 +268,42 @@ const badgeLabels: Record<StreamItem['type'], string> = {
 
 <script>
   function initStreamFilters() {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.stream-filter-btn')
-    const items = document.querySelectorAll<HTMLElement>('.stream-item')
-    const monthGroups = document.querySelectorAll<HTMLElement>('.stream-month')
+    const filters = document.querySelector<HTMLElement>('#stream-filters')
+    const status = document.querySelector<HTMLElement>('.stream-count')
+    if (!filters || !status || filters.dataset.ready) return
+    filters.dataset.ready = 'true'
+
+    const buttons = filters.querySelectorAll<HTMLButtonElement>('.stream-filter-btn')
+    const groups = document.querySelectorAll<HTMLElement>('.stream-month')
+
+    function showEntries(filter: string) {
+      let count = 0
+      for (const group of groups) {
+        let visible = 0
+        for (const item of group.querySelectorAll<HTMLElement>('.stream-item')) {
+          item.hidden = filter !== 'all' && filter !== item.dataset.type
+          if (!item.hidden) visible++
+        }
+        group.hidden = visible === 0
+        count += visible
+      }
+      return count
+    }
 
     function setFilter(filter: string) {
-      // Update button styles
-      for (const btn of buttons) {
-        const isActive = btn.dataset.filter === filter
-        btn.classList.toggle('stream-filter-btn--active', isActive)
+      for (const button of buttons) {
+        button.setAttribute('aria-pressed', String(button.dataset.filter === filter))
       }
-
-      // Show/hide items
-      for (const item of items) {
-        if (filter === 'all' || item.dataset.type === filter) {
-          item.classList.remove('hidden')
-        } else {
-          item.classList.add('hidden')
-        }
-      }
-
-      // Hide empty month groups
-      for (const group of monthGroups) {
-        const visibleItems = group.querySelectorAll('.stream-item:not(.hidden)')
-        if (visibleItems.length === 0) {
-          group.classList.add('hidden')
-        } else {
-          group.classList.remove('hidden')
-        }
-      }
+      const count = showEntries(filter)
+      status.textContent = count === 1 ? '1 entry' : `${count} entries`
     }
 
-    for (const btn of buttons) {
-      btn.addEventListener('click', () => {
-        setFilter(btn.dataset.filter ?? 'all')
-      })
+    for (const button of buttons) {
+      button.addEventListener('click', () => setFilter(button.dataset.filter ?? 'all'))
     }
+    setFilter('all')
+    filters.hidden = false
+    status.hidden = false
   }
 
   // Run on initial load and on Astro page transitions
@@ -315,7 +317,19 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .stream-filters[hidden],
+  .stream-item[hidden],
+  .stream-month[hidden] {
+    display: none;
+  }
+
+  .stream-count {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
   }
 
   .stream-filter-btn {
@@ -338,14 +352,14 @@ const badgeLabels: Record<StreamItem['type'], string> = {
     color: var(--color-text);
   }
 
-  .stream-filter-btn--active {
+  .stream-filter-btn[aria-pressed="true"] {
     background: var(--color-primary);
-    color: #ffffff;
+    color: var(--color-on-primary, #fff);
     border-color: var(--color-primary);
   }
 
-  .stream-filter-btn--active:hover {
-    color: #ffffff;
+  .stream-filter-btn[aria-pressed="true"]:hover {
+    color: var(--color-on-primary, #fff);
     filter: brightness(1.1);
   }
 

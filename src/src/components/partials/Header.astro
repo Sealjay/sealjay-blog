@@ -16,100 +16,53 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
       <span class="logo-wordmark">sealjay</span>
     </a>
 
-    <div class="header-right">
-      <nav role="navigation" aria-label="Main navigation" class="desktop-nav">
-        <ul class="nav-list">
-          {
-            SITE_NAV.map((navitem) => (
-              <li>
-                <HeaderLink href={navitem.path}>{navitem.name}</HeaderLink>
-              </li>
-            ))
-          }
-        </ul>
-        <div class="more-dropdown">
-          <button
-            type="button"
-            class="more-trigger"
-            aria-haspopup="true"
-            aria-expanded="false"
-            id="more-menu-trigger"
-          >
-            More
-            <svg xmlns="http://www.w3.org/2000/svg" class="more-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div class="more-panel" id="more-menu-panel" role="menu">
-            {SITE_SECONDARY_NAV.map((item) => (
-              <a href={item.path} class="more-panel__link" role="menuitem">{item.name}</a>
-            ))}
-          </div>
-        </div>
-      </nav>
+    <nav aria-label="Main navigation" class="desktop-nav">
+      <ul class="nav-list">
+        {SITE_NAV.map((item) => (
+          <li><HeaderLink href={item.path}>{item.name}</HeaderLink></li>
+        ))}
+        <li>
+          <details class="more-dropdown" data-nav-disclosure>
+            <summary class="more-trigger">
+              More
+              <svg xmlns="http://www.w3.org/2000/svg" class="more-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <ul class="more-panel">
+              {SITE_SECONDARY_NAV.map((item) => (
+                <li><HeaderLink href={item.path}>{item.name}</HeaderLink></li>
+              ))}
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </nav>
 
-      <div class="header-actions">
-        <SearchDialog />
-        <DarkModeToggle />
-      </div>
+    <div class="header-actions">
+      <SearchDialog />
+      <DarkModeToggle />
+    </div>
 
-      <button
-        type="button"
-        class="mobile-menu-btn"
-        aria-label="Toggle menu"
-        id="mobile-menu-button"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-      >
-        <svg class="menu-icon-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-open-icon" aria-hidden="true">
+    <details class="mobile-menu" data-nav-disclosure>
+      <summary class="mobile-menu-trigger" aria-label="Menu">
+        <svg class="menu-icon-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <svg class="menu-icon-close" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-close-icon" aria-hidden="true">
+        <svg class="menu-icon-close" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
-    </div>
+      </summary>
+      <nav aria-label="Main navigation" class="mobile-nav">
+        <ul>
+          {[...SITE_NAV, ...SITE_SECONDARY_NAV].map((item) => (
+            <li><HeaderLink href={item.path}>{item.name}</HeaderLink></li>
+          ))}
+        </ul>
+      </nav>
+    </details>
   </div>
 </header>
-
-<!-- Mobile menu overlay – must live outside <header> because its
-     backdrop-filter creates a containing block that breaks position:fixed -->
-<div class="mobile-overlay" id="mobile-menu" aria-label="Mobile navigation">
-  <nav role="navigation" aria-label="Mobile navigation">
-    <ul class="mobile-nav-list">
-      {
-        SITE_NAV.map((navitem, index) => (
-          <li style={`--stagger: ${index}`}>
-            <a
-              href={navitem.path}
-              class:list={[
-                'mobile-nav-link',
-                { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
-              ]}
-            >
-              {navitem.name}
-            </a>
-          </li>
-        ))
-      }
-      {
-        SITE_SECONDARY_NAV.map((navitem, index) => (
-          <li style={`--stagger: ${SITE_NAV.length + index}`}>
-            <a
-              href={navitem.path}
-              class:list={[
-                'mobile-nav-link mobile-nav-link--secondary',
-                { 'mobile-nav-link--active': Astro.url.pathname === navitem.path || Astro.url.pathname === navitem.path.replace(/\/$/, '') },
-              ]}
-            >
-              {navitem.name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
-</div>
 
 <style>
   .site-header {
@@ -123,13 +76,26 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
   }
 
   .header-inner {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 44px;
     align-items: center;
-    justify-content: space-between;
     max-width: 1120px;
     margin: 0 auto;
     padding: 0 16px;
-    height: 60px;
+    min-height: 60px;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    margin-top: 8px;
+  }
+
+  .header-actions :global(mode-toggle:not(:defined)) {
+    display: none !important;
   }
 
   /* Logo */
@@ -139,6 +105,11 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     gap: 10px;
     text-decoration: none;
     flex-shrink: 0;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    justify-self: start;
+    margin-top: 15px;
   }
 
   .logo-avatar-ring {
@@ -173,75 +144,44 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     border-radius: 4px;
   }
 
-  /* Right side */
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* Desktop nav */
   .desktop-nav {
     display: none;
-  }
-
-  @media (min-width: 768px) {
-    .desktop-nav {
-      display: flex;
-      align-items: center;
-    }
   }
 
   .nav-list {
     display: flex;
     align-items: center;
     gap: 2px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
   }
 
-  /* More dropdown */
   .more-dropdown {
     position: relative;
-    display: none;
   }
 
-  @media (min-width: 768px) {
-    .more-dropdown {
-      display: block;
-    }
-  }
-
-  .more-trigger {
-    display: inline-flex;
+  .more-trigger,
+  .mobile-menu-trigger {
+    display: flex;
     align-items: center;
-    gap: 2px;
+    justify-content: center;
     min-height: 44px;
     padding: 6px 12px;
     border-radius: var(--radius-sm);
-    border: none;
-    background: transparent;
     color: var(--color-text-muted);
-    font-family: var(--font-body);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out),
-                background var(--duration-fast) var(--ease-out);
+    list-style: none;
   }
 
-  .more-trigger:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-muted);
+  .more-trigger::-webkit-details-marker,
+  .mobile-menu-trigger::-webkit-details-marker {
+    display: none;
   }
 
-  .more-trigger:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .more-trigger[aria-expanded="true"] {
+  .more-trigger:hover,
+  .more-dropdown[open] .more-trigger,
+  .mobile-menu-trigger:hover,
+  .mobile-menu[open] .mobile-menu-trigger {
     color: var(--color-primary);
     background: var(--color-primary-muted);
   }
@@ -249,100 +189,42 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
   .more-chevron {
     width: 14px;
     height: 14px;
-    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .more-trigger[aria-expanded="true"] .more-chevron {
+  .more-dropdown[open] .more-chevron {
     transform: rotate(180deg);
   }
 
   .more-panel {
-    display: none;
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
     min-width: 160px;
     padding: 4px;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
     box-shadow: var(--color-card-glow), 0 8px 24px rgba(0, 0, 0, 0.12);
-    z-index: 50;
   }
 
-  .more-panel.open {
-    display: block;
-  }
-
-  .more-panel__link {
-    display: block;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out),
-                background var(--duration-fast) var(--ease-out);
-  }
-
-  .more-panel__link:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-muted);
-  }
-
-  .more-panel__link:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: -2px;
-  }
-
-  /* Secondary mobile nav items */
-  .mobile-nav-link--secondary {
-    font-size: 14px;
-    color: var(--color-text-subtle);
-  }
-
-  /* Header actions (search + dark mode) */
-  .header-actions {
+  .more-panel :global(.header-link),
+  .mobile-nav :global(.header-link) {
     display: flex;
-    align-items: center;
-    gap: 0;
-    margin-left: 8px;
   }
 
-  /* Mobile menu button */
-  .mobile-menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .mobile-menu {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    pointer-events: none;
+  }
+
+  .mobile-menu-trigger {
+    margin-inline-start: auto;
     width: 44px;
-    height: 44px;
     padding: 0;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: background-color var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
-    margin-left: 2px;
-  }
-
-  @media (min-width: 768px) {
-    .mobile-menu-btn {
-      display: none;
-    }
-  }
-
-  .mobile-menu-btn:hover {
-    background: var(--color-primary-muted);
-    color: var(--color-primary);
-  }
-
-  .mobile-menu-btn:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    pointer-events: auto;
   }
 
   .menu-icon-open,
@@ -351,219 +233,73 @@ import avatarSrc from '../../assets/chris/avatar.jpg'
     height: 24px;
   }
 
-  .menu-icon-close {
+  .menu-icon-close,
+  .mobile-menu[open] .menu-icon-open {
     display: none;
   }
 
-  /* Mobile overlay */
-  .mobile-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 99;
-    background: var(--color-bg);
-    padding: 16px;
-    padding-top: 76px;
-    overflow-y: auto;
-  }
-
-  .mobile-overlay.open {
+  .mobile-menu[open] .menu-icon-close {
     display: block;
   }
 
-  .mobile-nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .mobile-overlay.open .mobile-nav-list li {
-    animation: stagger-fade-in 300ms var(--ease-out) both;
-    animation-delay: calc(var(--stagger, 0) * 60ms);
-  }
-
-  @keyframes stagger-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .mobile-nav-link {
-    display: flex;
-    align-items: center;
-    min-height: 52px;
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    text-decoration: none;
-    transition: all var(--duration-fast) var(--ease-out);
-  }
-
-  .mobile-nav-link:hover,
-  .mobile-nav-link--active {
-    color: var(--color-primary);
-    background: var(--color-primary-muted);
-  }
-
-  .mobile-nav-link:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+  .mobile-nav {
+    max-height: 50dvh;
+    margin-top: 8px;
+    padding: 8px 0 4px;
+    overflow-y: auto;
+    border-top: 1px solid var(--color-border);
+    pointer-events: auto;
   }
 
   @media (min-width: 768px) {
-    .mobile-overlay {
-      display: none !important;
+    .header-inner {
+      grid-template-columns: 1fr auto auto;
+    }
+
+    .desktop-nav {
+      display: flex;
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .header-actions {
+      grid-column: 3;
+    }
+
+    .mobile-menu {
+      display: none;
     }
   }
 </style>
 
 <script>
-  function initHeader() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button')
-    const mobileMenu = document.getElementById('mobile-menu')
-    const menuOpenIcon = document.getElementById('menu-open-icon')
-    const menuCloseIcon = document.getElementById('menu-close-icon')
+  const disclosures = document.querySelectorAll<HTMLDetailsElement>('[data-nav-disclosure]')
 
-    if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
-      function openMenu() {
-        mobileMenuButton!.setAttribute('aria-expanded', 'true')
-        mobileMenu!.classList.add('open')
-        menuOpenIcon!.style.display = 'none'
-        menuCloseIcon!.style.display = 'block'
-        document.body.style.overflow = 'hidden'
-      }
-
-      function closeMenu() {
-        mobileMenuButton!.setAttribute('aria-expanded', 'false')
-        mobileMenu!.classList.remove('open')
-        menuOpenIcon!.style.display = 'block'
-        menuCloseIcon!.style.display = 'none'
-        document.body.style.overflow = ''
-      }
-
-      mobileMenuButton.addEventListener('click', () => {
-        const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true'
-        if (expanded) {
-          closeMenu()
-        } else {
-          openMenu()
-        }
-      })
-
-      // Close menu when clicking a link
-      const mobileLinks = mobileMenu.querySelectorAll('a')
-      for (const link of mobileLinks) {
-        link.addEventListener('click', () => closeMenu())
-      }
-
-      // Close menu when clicking outside
-      document.addEventListener('click', (event) => {
-        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true'
-        if (
-          isExpanded &&
-          !mobileMenu.contains(event.target as Node) &&
-          !mobileMenuButton.contains(event.target as Node)
-        ) {
-          closeMenu()
-        }
-      })
-
-      // Close menu on Escape key
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && mobileMenuButton.getAttribute('aria-expanded') === 'true') {
-          closeMenu()
-          mobileMenuButton.focus()
-        }
-      })
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || event.defaultPrevented || document.querySelector('dialog[open]')) return
+    for (const disclosure of disclosures) {
+      if (!disclosure.open || !disclosure.getClientRects().length) continue
+      event.preventDefault()
+      disclosure.open = false
+      disclosure.querySelector('summary')?.focus()
     }
+  })
 
-    // More dropdown
-    const moreTrigger = document.getElementById('more-menu-trigger')
-    const morePanel = document.getElementById('more-menu-panel')
-    const navList = document.querySelector('.nav-list')
-
-    if (moreTrigger && morePanel) {
-      function openMore() {
-        moreTrigger!.setAttribute('aria-expanded', 'true')
-        morePanel!.classList.add('open')
-        navList?.classList.add('nav-list--more-open')
+  for (const disclosure of disclosures) {
+    disclosure.addEventListener('focusout', (event) => {
+      if (event.relatedTarget instanceof Node && !disclosure.contains(event.relatedTarget)) {
+        disclosure.open = false
       }
+    })
 
-      function closeMore() {
-        moreTrigger!.setAttribute('aria-expanded', 'false')
-        morePanel!.classList.remove('open')
-        navList?.classList.remove('nav-list--more-open')
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !disclosure.contains(event.target)) {
+        disclosure.open = false
       }
-
-      moreTrigger.addEventListener('click', (e) => {
-        e.stopPropagation()
-        const expanded = moreTrigger.getAttribute('aria-expanded') === 'true'
-        if (expanded) {
-          closeMore()
-        } else {
-          openMore()
-        }
-      })
-
-      document.addEventListener('click', (event) => {
-        if (
-          moreTrigger.getAttribute('aria-expanded') === 'true' &&
-          !moreTrigger.contains(event.target as Node) &&
-          !morePanel.contains(event.target as Node)
-        ) {
-          closeMore()
-        }
-      })
-
-      moreTrigger.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowDown') {
-          event.preventDefault()
-          openMore()
-          const firstLink = morePanel.querySelector<HTMLAnchorElement>('.more-panel__link')
-          firstLink?.focus()
-        }
-      })
-
-      morePanel.addEventListener('keydown', (event) => {
-        const links = Array.from(morePanel.querySelectorAll<HTMLAnchorElement>('.more-panel__link'))
-        const currentIndex = links.indexOf(document.activeElement as HTMLAnchorElement)
-
-        if (event.key === 'ArrowDown') {
-          event.preventDefault()
-          const next = links[currentIndex + 1] || links[0]
-          next?.focus()
-        } else if (event.key === 'ArrowUp') {
-          event.preventDefault()
-          if (currentIndex <= 0) {
-            closeMore()
-            moreTrigger.focus()
-          } else {
-            links[currentIndex - 1]?.focus()
-          }
-        } else if (event.key === 'Escape') {
-          closeMore()
-          moreTrigger.focus()
-        }
-      })
-    }
+    })
   }
 
-  // Initialize immediately (module scripts run after DOM parsing)
-  initHeader()
-  // Future-proof for View Transitions
-  document.addEventListener('astro:page-load', initHeader)
+  matchMedia('(min-width: 768px)').addEventListener('change', () => {
+    for (const disclosure of disclosures) disclosure.open = false
+  })
 </script>

@@ -1,439 +1,103 @@
 ---
-interface NotePreview {
-  description?: string
-  title?: string
-  time: string
-  url: string
-}
-
-interface DayGroup {
-  dateKey: string
-  date: Date
-  daySummary?: string
-  totalCount: number
-  dayUrl: string
-  previews: NotePreview[]
-}
+import type { CollectionEntry } from 'astro:content'
 
 interface Props {
-  dayGroups: DayGroup[]
-  totalNoteCount: number
-  hasMoreContent?: boolean
+  dayGroups: [string, CollectionEntry<'note'>[]][]
 }
 
-const { dayGroups, totalNoteCount, hasMoreContent = false } = Astro.props
-
-/* Truncate content to 140 chars */
-function truncate(text: string, max = 140): string {
-  if (text.length <= max) return text
-  return `${text.slice(0, max).trimEnd()}\u2026`
-}
-
-/* Format a date as "1 Mar" or "26 Feb" */
-function shortDate(date: Date): string {
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-}
-
-/* Format the header date range */
-function dateRangeLabel(groups: DayGroup[]): string {
-  if (groups.length === 0) return ''
-  const newest = groups[0].date
-  if (groups.length === 1) {
-    return newest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
-  }
-  const oldest = groups[groups.length - 1].date
-  const newestYear = newest.toLocaleDateString('en-GB', { year: 'numeric', timeZone: 'UTC' })
-  const oldestFmt = oldest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-  const newestFmt = newest.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-  return `${oldestFmt} \u2013 ${newestFmt} ${newestYear}`
-}
-
-/* First day group's summary (most recent day) */
-const leadSummary = dayGroups[0]?.daySummary
-
-/* Build a flat list of scroll items: separators + cards + overflow indicators */
-interface ScrollSeparator { type: 'separator'; label: string; dayUrl: string }
-interface ScrollCard { type: 'card'; note: NotePreview; index: number }
-interface ScrollOverflow { type: 'overflow'; count: number; dayUrl: string; index: number }
-interface ScrollViewAll { type: 'viewall'; index: number }
-
-type ScrollItem = ScrollSeparator | ScrollCard | ScrollOverflow | ScrollViewAll
-
-interface ScrollSeparatorIndexed extends ScrollSeparator { index: number }
-const scrollItems: (ScrollSeparatorIndexed | ScrollCard | ScrollOverflow | ScrollViewAll)[] = []
-let itemIndex = 0
-
-for (const group of dayGroups) {
-  scrollItems.push({ type: 'separator', label: shortDate(group.date), dayUrl: group.dayUrl, index: itemIndex++ })
-  for (const note of group.previews) {
-    scrollItems.push({ type: 'card', note, index: itemIndex++ })
-  }
-  const overflow = group.totalCount - group.previews.length
-  if (overflow > 0) {
-    scrollItems.push({ type: 'overflow', count: overflow, dayUrl: group.dayUrl, index: itemIndex++ })
-  }
-}
-
-if (hasMoreContent) {
-  scrollItems.push({ type: 'viewall', index: itemIndex++ })
-}
+const { dayGroups } = Astro.props
+const dayFormat = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
 ---
 
-<div class="notes-strip-wrapper">
-  <div class="notes-strip-header">
-    <span class="notes-badge font-heading">Notes</span>
-    <span class="notes-meta">
-      {dateRangeLabel(dayGroups)} &middot; {totalNoteCount} {totalNoteCount === 1 ? 'note' : 'notes'}
-    </span>
-    <a href="/notes" class="notes-view-all">
-      View all notes
-      <svg xmlns="http://www.w3.org/2000/svg" class="notes-view-all-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
-  </div>
-
-  {leadSummary && (
-    <p class="notes-summary">{leadSummary}</p>
-  )}
-
-  <div class="notes-scroll-container">
-    {scrollItems.map((item) => {
-      if (item.type === 'separator') {
-        return (
-          <a
-            href={item.dayUrl}
-            class="day-separator note-anim"
-            style={`--anim-index: ${item.index}`}
-            aria-label={`Notes from ${item.label}`}
-          >
-            <span class="day-separator__accent" aria-hidden="true" />
-            <span class="day-separator__label font-heading">{item.label}</span>
-          </a>
-        )
-      }
-      if (item.type === 'card') {
-        const content = item.note.description || item.note.title || 'Note'
-        return (
-          <a
-            href={item.note.url}
-            class="note-card note-anim"
-            style={`--anim-index: ${item.index}`}
-          >
-            <span class="note-card__time font-code">{item.note.time}</span>
-            <span class="note-card__content">{truncate(content)}</span>
-          </a>
-        )
-      }
-      if (item.type === 'overflow') {
-        return (
-          <a
-            href={item.dayUrl}
-            class="note-card note-card--overflow note-anim"
-            style={`--anim-index: ${item.index}`}
-            aria-label={`${item.count} more notes from this day`}
-          >
-            <span class="note-card__overflow-text">+{item.count} more &rarr;</span>
-          </a>
-        )
-      }
-      if (item.type === 'viewall') {
-        return (
-          <a
-            href="/notes"
-            class="note-card note-card--viewall note-anim"
-            style={`--anim-index: ${item.index}`}
-            aria-label="View all notes"
-          >
-            <span class="note-card__overflow-text">View all &rarr;</span>
-          </a>
-        )
-      }
-    })}
-  </div>
+<div class="note-days">
+  {dayGroups.map(([dateKey, notes]) => {
+    const dayUrl = `/notes/${dateKey}/`
+    const summary = notes.find((note) => note.data.daySummary)?.data.daySummary
+    const previews = notes.slice(-3).reverse()
+    return (
+      <div class="note-day">
+        <h3><a href={dayUrl}><time datetime={dateKey}>{dayFormat.format(new Date(dateKey))}</time></a></h3>
+        <div class="note-day__content">
+          {summary && <p class="note-day__summary">{summary}</p>}
+          <ul>
+            {previews.map(({ id, data }) => (
+              <li><a href={`${dayUrl}#${id}`}>{data.description || data.title || 'Read note'}</a></li>
+            ))}
+          </ul>
+          {notes.length > previews.length && <a class="note-day__more" href={dayUrl}>All notes from this day</a>}
+        </div>
+      </div>
+    )
+  })}
 </div>
 
 <style>
-  .notes-strip-wrapper {
-    position: relative;
-    overflow: hidden;
+  .note-days {
+    border-top: 1px solid var(--color-border-strong);
   }
 
-  .notes-strip-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
+  .note-day {
+    display: grid;
+    gap: 0.4rem 1.5rem;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--color-border-strong);
   }
 
-  .notes-badge {
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
-    border-radius: var(--radius-full);
-    background: var(--color-primary-muted);
+  .note-day h3,
+  .note-day__more {
+    font-size: 0.9375rem;
+    font-family: var(--font-heading);
+    font-weight: 650;
+  }
+
+  .note-day a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-strong);
+    text-underline-offset: 0.16em;
+  }
+
+  .note-day a:hover {
     color: var(--color-primary);
-    padding: 0.125rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
+    text-decoration-color: currentColor;
   }
 
-  .notes-meta {
-    font-size: 0.75rem;
-    color: var(--color-text-subtle);
+  .note-day__content {
+    min-width: 0;
+    max-width: 72ch;
+    overflow-wrap: anywhere;
   }
 
-  .notes-view-all {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .notes-view-all:hover {
-    color: var(--color-text);
-  }
-
-  .notes-view-all-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-  }
-
-  .notes-summary {
-    font-size: 0.875rem;
+  .note-day__summary {
+    margin-bottom: 0.35rem;
     color: var(--color-text-muted);
     font-style: italic;
-    margin: 0 0 0.75rem;
   }
 
-  /* ============================================================
-     Horizontal scroll strip
-     ============================================================ */
-  .notes-scroll-container {
-    position: relative;
-    display: flex;
-    align-items: stretch;
-    gap: var(--space-sm);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 0.25rem;
+  .note-day ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .notes-scroll-container::-webkit-scrollbar {
-    display: none;
+  .note-day li + li {
+    margin-top: 0.4rem;
   }
 
-  /* Fade gradient on the left edge — visible when scrolled away from start */
-  .notes-strip-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 40px;
-    background: linear-gradient(to right, var(--color-bg-alt), transparent);
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .notes-strip-wrapper.is-scrolled::before {
-    opacity: 1;
-  }
-
-  /* Fade gradient on the right edge — hidden when scrolled to end */
-  .notes-strip-wrapper::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 60px;
-    background: linear-gradient(to right, transparent, var(--color-bg-alt));
-    pointer-events: none;
-    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .notes-strip-wrapper.is-overflowing::after {
-    opacity: 1;
-  }
-
-  /* ============================================================
-     Day separator — slim inline element in the scroll strip
-     ============================================================ */
-  .day-separator {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 56px;
-    max-width: 64px;
-    padding: 0.5rem 0.25rem;
-    text-decoration: none;
-    gap: 0.375rem;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .day-separator:hover {
-    opacity: 0.75;
-  }
-
-  .day-separator__accent {
-    width: 20px;
-    height: 2px;
-    border-radius: var(--radius-full);
-    background: var(--color-primary);
-  }
-
-  .day-separator__label {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    color: var(--color-text-subtle);
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  /* ============================================================
-     Note cards
-     ============================================================ */
-  .note-card {
-    min-width: 280px;
-    max-width: 320px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    transition: border-color var(--duration-fast) var(--ease-out),
-                box-shadow var(--duration-fast) var(--ease-out),
-                transform var(--duration-fast) var(--ease-out);
-  }
-
-  .note-card:hover {
-    border-color: var(--color-border-strong);
-    box-shadow: var(--color-card-glow);
-    transform: translateY(-2px);
-  }
-
-  .note-card:focus-visible {
-    border-color: var(--color-border-strong);
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .note-card--overflow,
-  .note-card--viewall {
-    min-width: auto;
-    max-width: none;
-    justify-content: center;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-  }
-
-  .note-card__time {
-    font-size: 0.75rem;
-    color: var(--color-text-subtle);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .note-card__content {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-
-  .note-card__overflow-text {
-    font-size: 0.75rem;
-    font-weight: 500;
+  .note-day__more {
+    display: inline-block;
+    margin-top: 0.4rem;
     color: var(--color-primary);
-    white-space: nowrap;
   }
 
-  /* ============================================================
-     Mobile: narrower cards
-     ============================================================ */
-  @media (max-width: 767px) {
-    .note-card {
-      min-width: 220px;
-      max-width: 260px;
-    }
-  }
-
-  /* ============================================================
-     Staggered fade-in-up animation
-     ============================================================ */
-  @media (prefers-reduced-motion: no-preference) {
-    .note-anim {
-      opacity: 0;
-      animation: note-fade-in-up 0.5s var(--ease-out) forwards;
-      animation-delay: calc(var(--anim-index, 0) * 0.07s + 0.1s);
-    }
-
-    @keyframes note-fade-in-up {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .note-anim {
-      opacity: 1;
+  @media (min-width: 640px) {
+    .note-day {
+      grid-template-columns: 7rem minmax(0, 1fr);
+      align-items: baseline;
     }
   }
 </style>
-
-<script>
-  function initNotesScroll() {
-    const wrapper = document.querySelector('.notes-strip-wrapper')
-    const container = wrapper?.querySelector('.notes-scroll-container') as HTMLElement | null
-    if (!wrapper || !container) return
-
-    function updateFades() {
-      const hasOverflow = container.scrollWidth > container.clientWidth + 2
-      const atStart = container.scrollLeft <= 2
-      const atEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2
-
-      wrapper.classList.toggle('is-overflowing', hasOverflow && !atEnd)
-      wrapper.classList.toggle('is-scrolled', hasOverflow && !atStart)
-    }
-
-    updateFades()
-    container.addEventListener('scroll', updateFades, { passive: true })
-    window.addEventListener('resize', updateFades)
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initNotesScroll)
-  } else {
-    initNotesScroll()
-  }
-</script>

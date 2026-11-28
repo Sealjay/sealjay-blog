@@ -103,6 +103,13 @@
   font-family: var(--font-code);
 }
 
+/* Keep wide code inside the reading column. */
+.prose pre {
+  max-inline-size: 100%;
+  overflow-x: auto;
+  overflow-wrap: normal;
+}
+
 /* Images — responsive sizing and shadow (border-radius from Tailwind) */
 .prose img {
   max-width: 100%;

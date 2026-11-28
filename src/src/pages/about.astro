@@ -1,10 +1,13 @@
 ---
-import Layout from '../layouts/BaseLayout.astro'
+import portrait from '../assets/chris/portrait.jpg'
 import Container from '../components/containers/Container.astro'
+import SocialLinks from '../components/partials/IndexSocialLinks.astro'
 import PageHeader from '../components/partials/PageHeader.astro'
 import ProfileSection from '../components/partials/ProfileSection.astro'
-import { aboutDescription, globalAiOrganizerAward, profileRole } from '../config/personal'
-import portrait from '../assets/chris/portrait.jpg'
+import { aboutDescription, formerRoles, globalAiOrganizerAward, profileRole, professionalBadges } from '../config/personal'
+import Layout from '../layouts/BaseLayout.astro'
+
+const mvp = professionalBadges.find(({ text }) => text.startsWith('Seven-time Microsoft MVP'))
 ---
 
 <Layout
@@ -15,37 +18,145 @@ import portrait from '../assets/chris/portrait.jpg'
 >
   <Container>
     <PageHeader
-      title="About"
+      title="About Chris Lloyd-Jones"
       breadcrumbs={[
         { label: 'Home', href: '/' },
         { label: 'About' },
       ]}
-     
     />
 
-    <ProfileSection
-      imageSrc={portrait}
-      imageAlt="Chris Lloyd-Jones"
-      showBadges={true}
-      showFormerRoles={true}
-    >
-      <div slot="bio">
-        <p>
-          I'm an {profileRole} based in the Seattle area. I started writing IRC bots at nine. I went into law before returning to engineering, and my legal training still shapes what I ask when an AI agent can act on someone's behalf. Who gave it permission, what can it do, and who's accountable for the result?
-        </p>
-        <p>
-          At Kyndryl, I created the Forward Deployed Engineering capability with a three-year target of 22,000 engineers. Engineers worked alongside clients and remained responsible for the software they built together. At Avanade, I founded Platforms &amp; Incubation and hired the product team for Avanade.ai.
-        </p>
-        <p>
-          I'm a seven-time Microsoft MVP in AI and Developer Technologies and a member of the Institution of Engineering and Technology (MIET). I co-lead the <a href="https://globalai.community/chapters/seattle/">Seattle chapter of Global AI Community</a>. Global AI Community named me <a href={globalAiOrganizerAward.url}>{globalAiOrganizerAward.title}</a> for the week of {globalAiOrganizerAward.weekOf}.
-        </p>
-        <p>
-          I'm a doctoral candidate at the University of East London, where I research Green AI and Green Software Engineering. I previously served as Steering Committee Vice-Chair of the Green Software Foundation and contributed to <a href="https://www.iso.org/standard/86612.html" target="_blank" rel="noopener noreferrer">ISO/IEC 21031:2024</a>, the international standard for Software Carbon Intensity. You can find my research profile on <a href="https://orcid.org/0000-0001-7995-7865" target="_blank" rel="noopener noreferrer">ORCID</a>.
-        </p>
-        <p>
-          I co-host <a href="https://securing.quest" target="_blank" rel="noopener noreferrer">Securing the Realm</a> with Josh McDonald, where we talk about AI governance and AI-driven development. If you're considering me for a talk or panel, my <a href="/speaking/kit" class="plausible-event-name=Speaker+Kit+Click plausible-event-source=about">speaker kit</a> has topics, bios and booking details.
-        </p>
-      </div>
+    <ProfileSection imageSrc={portrait} imageAlt="Chris Lloyd-Jones">
+      <p class="about-intro">
+        I started writing IRC bots at nine. Today I'm a Seattle-area {profileRole}. I went into law before returning to engineering, and my legal training still shapes what I ask when an AI agent can act on someone's behalf. Who gave it permission, what can it do, and who's accountable for the result?
+      </p>
+      <a href="/speaking/kit/" class="about-speaker-link plausible-event-name=Speaker+Kit+Click plausible-event-source=about">
+        View the speaker kit <span aria-hidden="true">→</span>
+      </a>
     </ProfileSection>
+
+    <div class="about-sections">
+      <section aria-labelledby="career">
+        <h2 id="career">Career</h2>
+        <p>
+          At Kyndryl, I created the Forward Deployed Engineering capability with a three-year target of 22,000 engineers. Engineers worked alongside clients and remained responsible for the software they built together.
+        </p>
+        <p>
+          At Avanade, I founded Platforms &amp; Incubation and hired the product team for Avanade.ai.
+        </p>
+        <details>
+          <summary>Former affiliations</summary>
+          <ul>
+            {formerRoles.map(({ text, url }) => (
+              <li>{url ? <a href={url}>{text}</a> : text}</li>
+            ))}
+          </ul>
+        </details>
+      </section>
+
+      <section aria-labelledby="research-and-community">
+        <h2 id="research-and-community">Research and community</h2>
+        <p>
+          I'm a doctoral candidate at the University of East London, where I research Green AI and green software engineering. I previously served as Steering Committee Vice-Chair of the Green Software Foundation and contributed to <a href="https://www.iso.org/standard/86612.html">ISO/IEC 21031:2024</a>, the international standard for Software Carbon Intensity. My research profile is on <a href="https://orcid.org/0000-0001-7995-7865">ORCID</a>.
+        </p>
+        <p>
+          I'm a <a href={mvp?.url}>seven-time Microsoft MVP in AI and Developer Technologies</a> and a member of the Institution of Engineering and Technology (MIET). I co-lead the <a href="https://globalai.community/chapters/seattle/">Seattle chapter of Global AI Community</a>. Global AI Community named me <a href={globalAiOrganizerAward.url}>{globalAiOrganizerAward.title}</a> for the week of {globalAiOrganizerAward.weekOf}.
+        </p>
+        <p>
+          I'm an <a href="https://openuk.uk/">OpenUK Ambassador</a> and lead its <a href="https://openuk.uk/datacentregroup/">Data Centre Group</a>. OpenUK named me in its <a href="https://openuk.uk/honours/">2025/26 New Year’s Honours</a>.
+        </p>
+      </section>
+
+      <section aria-labelledby="connect">
+        <h2 id="connect">Connect</h2>
+        <p>
+          I co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald, where we talk about AI governance and AI-driven development.
+        </p>
+        <SocialLinks />
+      </section>
+    </div>
   </Container>
 </Layout>
+
+<style>
+  .about-intro {
+    max-width: 60ch;
+    font-size: clamp(1.125rem, 2.1vw, 1.4rem);
+    line-height: 1.55;
+  }
+
+  .about-speaker-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 650;
+  }
+
+  .about-speaker-link:hover {
+    background: var(--color-surface-hover);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+
+  .about-sections {
+    max-width: 68ch;
+    margin-top: clamp(2rem, 5vw, 4rem);
+    padding-bottom: clamp(2rem, 5vw, 4rem);
+  }
+
+  .about-sections section {
+    padding-block: clamp(1.25rem, 3vw, 1.75rem);
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .about-sections h2 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .about-sections p,
+  .about-sections details {
+    margin-top: 0.75rem;
+    color: var(--color-text);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  .about-sections a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+
+  .about-sections summary {
+    width: fit-content;
+    padding-block: 0.35rem;
+    font-family: var(--font-heading);
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .about-sections details ul {
+    margin-top: 0.4rem;
+    padding-inline-start: 1.35rem;
+    list-style: disc;
+  }
+
+  .about-sections :global(.social-links) {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+</style>
