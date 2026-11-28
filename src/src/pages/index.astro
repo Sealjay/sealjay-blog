@@ -1,17 +1,16 @@
 ---
 import { getCollection } from 'astro:content'
 import FeaturedProjects from '../components/home/FeaturedProjects.astro'
-import LatestArticle from '../components/home/LatestArticle.astro'
+import RecentWorkRow from '../components/home/RecentWorkRow.astro'
 import LatestNotes from '../components/home/LatestNotes.astro'
 import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
 import { profileRole } from '../config/personal'
 import Layout from '../layouts/BaseLayout.astro'
 import { groupNotesByDay } from '../lib/notes'
+import { getRecentWork } from '../lib/recent-work'
 
-const recentPosts = (await getCollection('blog'))
-  .sort((a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf())
-  .slice(0, 3)
+const recentWork = await getRecentWork()
 const projects = (await getCollection('project')).sort((a, b) =>
   Number(b.data.featured) - Number(a.data.featured) || b.data.date.valueOf() - a.data.date.valueOf()
 ).slice(0, 3)
@@ -25,40 +24,54 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
   description={`Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole} and seven-time Microsoft MVP in AI and Developer Technologies.`}
   pubDateTime={new Date('1 March 2023')}
   updatedDate={new Date('2026-11-27')}
+  bodyClass="home-page"
 >
   <div class="home-hero">
     <Container>
-      <div class="h-card">
-        <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
-        <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
-        <data class="p-nickname" value="Sealjay" hidden />
-        <h1 class="hero-title font-heading p-name">Chris Lloyd-Jones</h1>
-        <p class="hero-tagline">Engineering AI that works in the real world</p>
-        <p class="hero-intro p-note">
-          I'm a Seattle-area <span class="p-job-title">{profileRole}</span>. I work on getting AI into production with clear permissions and accountability. I research Green AI and co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald.
-        </p>
-      </div>
-      <div class="hero-actions">
-        <a href="/blog/">Read the writing <span aria-hidden="true">→</span></a>
-        <a href="/speaking/">Explore speaking <span aria-hidden="true">→</span></a>
+      <div class="hero-grid">
+        <div>
+          <div class="h-card">
+            <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
+            <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
+            <data class="p-nickname" value="Sealjay" hidden />
+            <h1 class="hero-title font-heading p-name">Chris Lloyd-Jones</h1>
+            <p class="hero-tagline">Engineering AI that works in the real world</p>
+            <p class="hero-intro p-note">
+              I'm a Seattle-area <span class="p-job-title">{profileRole}</span>. I work on getting AI into production with clear permissions and accountability. I research Green AI and co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="hero-primary" href="https://securing.quest/#listen">Listen to Securing the Realm <span aria-hidden="true">↗</span></a>
+            <a class="hero-secondary" href="/speaking/">Explore speaking <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <picture class="hero-art">
+          <source media="(min-width: 36rem)" srcset="/images/sealjay-forest-lake.svg" />
+          <img
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt=""
+            width="560"
+            height="460"
+          />
+        </picture>
       </div>
     </Container>
   </div>
 
-  {recentPosts.length > 0 && (
-    <Section ariaLabel="Recent writing">
-      <Container>
-        <h2 class="section-title">Recent writing</h2>
-        <ul class="writing-list">
-          {recentPosts.map((post) => <LatestArticle post={post} />)}
+  <Section ariaLabel="Recent work">
+    <Container>
+      <h2 class="section-title">Recent work</h2>
+      {recentWork.length > 0 && (
+        <ul class="work-list" role="list">
+          {recentWork.map((item) => <RecentWorkRow {...item} />)}
         </ul>
-        <a class="archive-link" href="/blog/">All writing <span aria-hidden="true">→</span></a>
-      </Container>
-    </Section>
-  )}
+      )}
+      <a class="archive-link" href="/stream/">View the Stream <span aria-hidden="true">→</span></a>
+    </Container>
+  </Section>
 
   {projects.length > 0 && (
-    <Section bg="alt" ariaLabel="Featured projects">
+    <Section bg="alt" class="projects-band" ariaLabel="Featured projects">
       <Container>
         <h2 class="section-title">Featured projects</h2>
         <FeaturedProjects projects={projects} />
@@ -79,14 +92,90 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
 </Layout>
 
 <style>
+  :global(.home-page) {
+    --color-bg: #F7F6FA;
+    --color-bg-alt: #EDEBF6;
+    --color-surface: #FEFCFF;
+    --color-surface-hover: #F3EFFA;
+    --color-text: #201A38;
+    --color-text-muted: #524969;
+    --color-text-subtle: var(--color-text-muted);
+    --color-primary: #5B3696;
+    --color-primary-hover: #472775;
+    --color-primary-muted: rgb(91 54 150 / 8%);
+    --color-on-primary: #FFFFFF;
+    --color-border: #D8D0E8;
+    --color-border-strong: #9182AD;
+    --home-hero-bg: #EEEBF8;
+    --home-hero-glow: rgb(255 255 255 / 47%);
+    --home-primary-fill: #5B3696;
+    --home-hero-control-border: #8F80AB;
+  }
+
+  :global([data-theme="dark"] .home-page) {
+    --color-bg: #100D1C;
+    --color-bg-alt: #181225;
+    --color-surface: #20182E;
+    --color-surface-hover: #2A2038;
+    --color-text: #F2ECFC;
+    --color-text-muted: #C5B9D8;
+    --color-primary: #DAC0FF;
+    --color-primary-hover: #E8D8FF;
+    --color-primary-muted: rgb(218 192 255 / 13%);
+    --color-on-primary: #211633;
+    --color-border: #3D3052;
+    --color-border-strong: #85709E;
+    --home-hero-bg: #221831;
+    --home-hero-glow: rgb(111 75 152 / 12%);
+    --home-primary-fill: #D8BAFF;
+    --home-hero-control-border: var(--color-border-strong);
+    --home-art-filter: brightness(0.8) saturate(0.9);
+  }
+
   .home-hero {
     padding-block: clamp(2.5rem, 7vw, 5.5rem);
-    background: var(--gradient-hero);
+    background: radial-gradient(ellipse at 19% 8%, var(--home-hero-glow), transparent 72%), var(--home-hero-bg);
     border-bottom: 1px solid var(--color-border);
   }
 
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  .hero-art {
+    display: none;
+    justify-self: end;
+    width: min(100%, 360px);
+  }
+
+  .hero-art img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: var(--home-art-filter, none);
+  }
+
+  @media (min-width: 36rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+    }
+
+    .hero-art {
+      display: block;
+    }
+  }
+
+  @media (min-width: 56.25rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.58fr) minmax(0, 1fr);
+    }
+  }
+
   .hero-title {
-    font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+    font-size: clamp(2.125rem, 5.1vw, 4.125rem);
     line-height: 1.02;
     letter-spacing: -0.045em;
     font-weight: 750;
@@ -112,7 +201,7 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
   }
 
   .hero-intro a {
-    color: inherit;
+    color: var(--color-primary);
     text-decoration: underline;
     text-underline-offset: 0.18em;
   }
@@ -130,18 +219,33 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
     align-items: center;
     justify-content: space-between;
     min-height: 44px;
+    max-width: 100%;
     padding: 0.5rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--hero-action-border, transparent);
     border-radius: var(--radius-sm);
-    color: var(--color-text);
-    background: var(--color-surface);
     font-family: var(--font-heading);
     font-weight: 650;
     font-size: 0.9375rem;
+    line-height: 1.3;
   }
 
-  .hero-actions a:hover {
+  .hero-primary {
+    color: var(--color-on-primary);
+    background: var(--home-primary-fill);
+  }
+
+  .hero-secondary {
+    color: var(--color-text);
+    --hero-action-border: var(--home-hero-control-border);
+    background: var(--color-surface);
+  }
+
+  .hero-secondary:hover {
     background: var(--color-surface-hover);
+  }
+
+  .hero-actions a:hover,
+  .hero-actions a:focus-visible {
     text-decoration: underline;
     text-underline-offset: 0.18em;
   }
@@ -155,11 +259,15 @@ const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
     margin-bottom: 1rem;
   }
 
-  .writing-list {
+  .work-list {
     margin: 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--color-border-strong);
+    border-top: 1px solid var(--color-border);
+  }
+
+  :global(.home-page .projects-band) {
+    border-block: 1px solid var(--color-border);
   }
 
   .archive-link {

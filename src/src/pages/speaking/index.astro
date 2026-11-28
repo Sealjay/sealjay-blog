@@ -4,39 +4,11 @@ import Container from '../../components/containers/Container.astro'
 import PageHeader from '../../components/partials/PageHeader.astro'
 import Badge from '../../components/partials/Badge.astro'
 import FormattedDate from '../../components/partials/FormattedDate.astro'
-import { type CollectionEntry, getCollection } from 'astro:content'
-import { getYouTubeSpeakingEntries, extractYouTubeId } from '../../lib/youtube'
-import { youtubeFeeds } from '../../config/personal'
+import { getSpeakingEntries } from '../../lib/speaking'
 
-// Fetch MDX speaking entries and YouTube RSS entries
-const mdxEntries = await getCollection('speaking')
-const youtubeEntries = await getYouTubeSpeakingEntries(youtubeFeeds)
-
-// Build set of YouTube IDs that have MDX overrides
-const mdxYouTubeIds = new Set<string>()
-for (const entry of mdxEntries) {
-  const id = extractYouTubeId(entry.data.url) ?? extractYouTubeId(entry.data.videoEmbedUrl)
-  if (id) mdxYouTubeIds.add(id)
-}
-
-// Add YouTube entries that don't have MDX overrides
-const autoEntries = youtubeEntries
-  .filter((yt) => !mdxYouTubeIds.has(yt.youtubeId))
-  .map((yt): Pick<CollectionEntry<'speaking'>, 'data'> => ({
-    data: {
-      title: yt.title,
-      description: yt.description.slice(0, 200) || yt.title,
-      eventType: yt.eventType,
-      event: yt.event,
-      date: yt.date,
-      cta: yt.cta,
-      url: yt.url,
-      featured: false,
-    },
-  }))
-
-const speakingSlots = [...mdxEntries, ...autoEntries]
-const sortedSpeakingSlots = [...speakingSlots].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+const sortedSpeakingSlots = (await getSpeakingEntries()).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id),
+)
 
 const now = new Date()
 const upcomingTalks = sortedSpeakingSlots.filter((s) => s.data.date > now)

@@ -93,6 +93,7 @@ export const formerRoles: Badge[] = [
 export const youtubeFeeds = [
   {
     channelId: 'UCS4KTDaZTiyiMj2yZztwmlg',
+    podcastPlaylistId: 'PLo9Ah7HeyG1QVWTBPzOROBQNqinh0ZPWv',
     shortsPlaylistId: 'PLo9Ah7HeyG1Rkqq0cc1QJtttkywXKWd9g',
     event: 'Securing the Realm',
     defaultTags: ['YouTube', 'Security'],
