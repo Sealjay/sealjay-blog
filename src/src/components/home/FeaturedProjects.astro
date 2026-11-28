@@ -1,171 +1,85 @@
 ---
-interface ProjectEntry {
-  data: {
-    title: string
-    description: string
-    status: string
-    techStack: string[]
-    repoUrl?: string
-    demoUrl?: string
-    featured: boolean
-  }
-}
+import type { CollectionEntry } from 'astro:content'
 
 interface Props {
-  projects: ProjectEntry[]
+  projects: CollectionEntry<'project'>[]
 }
 
 const { projects } = Astro.props
-
-/* Map status to dot colour */
-const statusColor: Record<string, string> = {
-  Active: 'var(--color-status-active, #22c55e)',
-  Maintained: 'var(--color-status-maintained, #3b82f6)',
-  Archived: 'var(--color-status-archived, #9ca3af)',
-  Contribution: 'var(--color-status-contribution, #a855f7)',
-}
 ---
 
-<div>
-  <div class="projects-grid">
-    {projects.map((project) => {
-      const projectUrl = project.data.repoUrl ?? project.data.demoUrl ?? '/projects'
-      const isExternal = !!(project.data.repoUrl ?? project.data.demoUrl)
-      const dotColor = statusColor[project.data.status] ?? 'var(--color-text-muted)'
-      return (
-        <a
-          href={projectUrl}
-          target={isExternal ? '_blank' : undefined}
-          rel={isExternal ? 'noopener noreferrer' : undefined}
-          class="project-card"
-        >
-          <span class="project-status" style={`--dot-color: ${dotColor}`}>
-            <span class="project-status__dot" aria-hidden="true" />
-            {project.data.status}
-          </span>
-          <h3 class="project-title font-heading">{project.data.title}</h3>
-          <p class="project-desc">{project.data.description}</p>
-          {isExternal && <span class="sr-only">(opens in new tab)</span>}
-        </a>
-      )
-    })}
-  </div>
-  <a href="/projects" class="projects-view-all">
-    All projects
-    <svg xmlns="http://www.w3.org/2000/svg" class="projects-view-all-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-  </a>
+<div class="projects-grid">
+  {projects.map(({ data }) => (
+    <article class="project-card">
+      <h3>{data.title}</h3>
+      <p>{data.description}</p>
+      {(data.demoUrl || data.repoUrl) && (
+        <div class="project-actions">
+          {data.demoUrl && (
+            <a href={data.demoUrl}>
+              {new URL(data.demoUrl).hostname === 'orcid.org' ? 'Research profile' : 'Visit project'}
+              <span class="sr-only"> for {data.title}</span>
+            </a>
+          )}
+          {data.repoUrl && <a href={data.repoUrl}>GitHub<span class="sr-only"> for {data.title}</span></a>}
+        </div>
+      )}
+    </article>
+  ))}
 </div>
 
 <style>
   .projects-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  @media (min-width: 768px) {
-    .projects-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .projects-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
   }
 
   .project-card {
-    display: block;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.2rem;
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-md);
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--color-card-glow);
-    padding: 0.75rem;
-    text-decoration: none;
-    overflow: hidden;
-    transition: transform var(--duration-normal) var(--ease-out),
-                border-color var(--duration-normal) var(--ease-out),
-                box-shadow var(--duration-normal) var(--ease-out);
+    overflow-wrap: anywhere;
   }
 
-  .project-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-border-strong);
-    box-shadow: var(--color-card-glow), var(--color-card-glow-hover);
+  .project-card h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.125rem;
+    line-height: 1.3;
   }
 
-  .project-card:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-    transform: translateY(-2px);
-    border-color: var(--color-border-strong);
+  .project-card p {
+    color: var(--color-text-muted);
+    line-height: 1.55;
   }
 
-  .project-status {
+  .project-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: auto;
+  }
+
+  .project-actions a {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.5rem;
-  }
-
-  .project-status__dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--dot-color);
-    flex-shrink: 0;
-  }
-
-  .project-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text);
-    margin: 0;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .project-card:hover .project-title {
+    min-height: 32px;
     color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
   }
 
-  .project-desc {
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-    line-height: 1.4;
-    margin: 0.25rem 0 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .projects-view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .projects-view-all:hover {
-    color: var(--color-text);
-  }
-
-  .projects-view-all-icon {
-    width: 1rem;
-    height: 1rem;
+  @media (min-width: 900px) {
+    .projects-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>

@@ -1,237 +1,56 @@
 ---
 import type { ImageMetadata } from 'astro'
 import { Image } from 'astro:assets'
-import { profileRole, professionalBadges, formerRoles } from "../../config/personal";
-import SocialLinks from "./IndexSocialLinks.astro";
-import Badge from "./Badge.astro";
 
 interface Props {
-  imageSrc: ImageMetadata;
-  imageAlt: string;
-  title?: string;
-  job?: string;
-  showBadges?: boolean;
-  showFormerRoles?: boolean;
+  imageSrc: ImageMetadata
+  imageAlt: string
 }
 
-const {
-  imageSrc,
-  imageAlt,
-  showBadges = true,
-  showFormerRoles = true
-} = Astro.props;
+const { imageSrc, imageAlt } = Astro.props
 ---
 
 <div class="profile-section">
-  <!-- Image (Mobile: top, Desktop: left) -->
-  <div class="profile-section__image-col">
-    <div class="profile-section__image-wrapper">
-      <Image
-        src={imageSrc}
-        alt={imageAlt}
-        width={280}
-        height={280}
-        layout="constrained"
-        class="profile-section__photo"
-      />
-    </div>
-
-    <!-- Mobile Social Links -->
-    <div class="profile-section__social-mobile">
-      <h3 class="profile-section__social-heading">Connect with me</h3>
-      <SocialLinks />
-    </div>
-  </div>
-
-  <!-- Content (Mobile: bottom, Desktop: left) -->
-  <div class="profile-section__content">
-    <div class="profile-section__role-badge">
-      <span>{profileRole}</span>
-    </div>
-
-    <h2 class="profile-section__name">
-      I'm Chris Lloyd-Jones, Sealjay.
-    </h2>
-
-    <div class="profile-section__bio">
-      <slot name="bio" />
-    </div>
-
-    <div class="profile-section__badges">
-      <slot name="badges" />
-
-      {showBadges && professionalBadges.map(badge => (
-        <Badge
-          label={badge.text}
-          url={badge.url}
-          isFormerRole={badge.isFormerRole}
-        />
-      ))}
-
-      {showFormerRoles && formerRoles.map(role => (
-        <Badge
-          label={role.text}
-          url={role.url}
-          isFormerRole={role.isFormerRole}
-        />
-      ))}
-    </div>
-
-    <!-- Desktop Social Links -->
-    <div class="profile-section__social-desktop">
-      <h3 class="profile-section__social-heading">Connect with me</h3>
-      <SocialLinks />
-    </div>
-  </div>
+  <div class="profile-intro"><slot /></div>
+  <Image
+    src={imageSrc}
+    alt={imageAlt}
+    width={240}
+    layout="constrained"
+    class="profile-portrait"
+  />
 </div>
 
 <style>
   .profile-section {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
+    display: grid;
+    align-items: start;
+    gap: 1.5rem clamp(1.5rem, 6vw, 4.5rem);
+    max-width: 58rem;
   }
 
-  @media (min-width: 1024px) {
-    .profile-section {
-      flex-direction: row;
-      gap: 2.5rem;
-    }
-  }
-
-  .profile-section__image-col {
-    flex-shrink: 0;
-  }
-
-  @media (min-width: 1024px) {
-    .profile-section__image-col {
-      width: 280px;
-    }
-  }
-
-  .profile-section__image-wrapper {
-    max-width: 280px;
-    margin: 0 auto;
-    overflow: hidden;
-  }
-
-  @media (min-width: 1024px) {
-    .profile-section__image-wrapper {
-      max-width: none;
-    }
-  }
-
-  .profile-section__photo {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-  }
-
-  .profile-section__social-mobile {
-    margin-top: 1.25rem;
-  }
-
-  @media (min-width: 1024px) {
-    .profile-section__social-mobile {
-      display: none;
-    }
-  }
-
-  .profile-section__social-desktop {
-    display: none;
-    margin-top: 1.25rem;
-  }
-
-  @media (min-width: 1024px) {
-    .profile-section__social-desktop {
-      display: block;
-    }
-  }
-
-  .profile-section__social-heading {
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    margin-bottom: 0.5rem;
-  }
-
-  /* Left-align social icons within profile section */
-  .profile-section__social-desktop :global(.social-links),
-  .profile-section__social-mobile :global(.social-links) {
-    justify-content: flex-start;
-  }
-
-  .profile-section__content {
-    flex: 1;
+  .profile-intro {
     min-width: 0;
   }
 
-  .profile-section__role-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-full);
-    font-size: 0.875rem;
-    font-weight: 500;
-    background: var(--color-primary-muted);
-    color: var(--color-primary);
-    margin-bottom: 1rem;
+  .profile-portrait {
+    width: min(50vw, 10rem);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 40%;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-strong);
   }
 
-  .profile-section__name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.015em;
-    color: var(--color-text);
-  }
-
-  @media (min-width: 768px) {
-    .profile-section__name {
-      font-size: 1.875rem;
+  @media (min-width: 640px) {
+    .profile-section {
+      grid-template-columns: minmax(0, 1fr) minmax(10rem, 15rem);
+      align-items: center;
     }
-  }
 
-  .profile-section__bio {
-    margin-top: 1.5rem;
-    max-width: 65ch;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.75;
-    color: var(--color-text-muted);
-  }
-
-  /* Inter-paragraph spacing for slotted bio content */
-  .profile-section__bio :global(p) {
-    margin-bottom: 1em;
-  }
-
-  .profile-section__bio :global(p:last-child) {
-    margin-bottom: 0;
-  }
-
-  @media (min-width: 768px) {
-    .profile-section__bio {
-      font-size: 1.125rem;
+    .profile-portrait {
+      width: 100%;
     }
-  }
-
-  .profile-section__bio :global(a) {
-    color: var(--color-primary);
-    text-decoration: none;
-  }
-
-  .profile-section__bio :global(a:hover) {
-    text-decoration: underline;
-  }
-
-  .profile-section__badges {
-    margin-top: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
   }
 </style>

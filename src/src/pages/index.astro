@@ -1,490 +1,186 @@
 ---
 import { getCollection } from 'astro:content'
-import { groupNotesByDay } from '../lib/notes'
-import Layout from '../layouts/BaseLayout.astro'
-
-import SocialLinks from '../components/partials/IndexSocialLinks.astro'
-import Badge from '../components/partials/Badge.astro'
-import Button from '../components/partials/Button.astro'
-import LatestArticle from '../components/home/LatestArticle.astro'
-import RecentTalks from '../components/home/RecentTalks.astro'
 import FeaturedProjects from '../components/home/FeaturedProjects.astro'
+import LatestArticle from '../components/home/LatestArticle.astro'
 import LatestNotes from '../components/home/LatestNotes.astro'
 import Container from '../components/containers/Container.astro'
 import Section from '../components/containers/Section.astro'
-import FormattedDate from '../components/partials/FormattedDate.astro'
 import { profileRole } from '../config/personal'
+import Layout from '../layouts/BaseLayout.astro'
+import { groupNotesByDay } from '../lib/notes'
 
-// --- Data fetching ---
-const posts = (await getCollection('blog')).sort(
-  (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
-)
-const speakingEntries = (await getCollection('speaking')).sort(
-  (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
-)
-const notes = (await getCollection('note')).sort(
-  (b, a) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
-)
-const projectEntries = (await getCollection('project')).sort(
-  (b, a) => a.data.date.valueOf() - b.data.date.valueOf(),
-)
-
-// --- Curated section data ---
-const latestPost = posts[0]
-const recentPosts = posts.slice(0, 3)
-const nextTalk = speakingEntries.slice(0, 1)
-const featuredProjects = (() => {
-  const featured = projectEntries.filter((p) => p.data.featured)
-  if (featured.length >= 3) return featured.slice(0, 3)
-  const remaining = projectEntries.filter((p) => !p.data.featured)
-  return [...featured, ...remaining].slice(0, 3)
-})()
-
-// --- Notes multi-day group data ---
-const notesByDay = groupNotesByDay(notes)
-
-const sortedDayKeys = [...notesByDay.keys()].sort((a, b) => b.localeCompare(a))
-
-// Collect previews from up to three recent days.
-const MAX_DAYS = 3
-const PREVIEWS_PER_DAY = 3
-
-interface DayGroup {
-  dateKey: string
-  date: Date
-  daySummary?: string
-  totalCount: number
-  dayUrl: string
-  previews: { description?: string; title?: string; time: string; url: string }[]
-}
-
-const dayGroups: DayGroup[] = []
-
-for (const dayKey of sortedDayKeys) {
-  if (dayGroups.length >= MAX_DAYS) break
-
-  const dayNotes = [...notesByDay.get(dayKey)!].sort(
-    (a, b) => a.data.pubDateTime.valueOf() - b.data.pubDateTime.valueOf(),
-  )
-  const daySummary = dayNotes.find((n) => n.data.daySummary)?.data.daySummary
-  const previews = dayNotes.slice(0, PREVIEWS_PER_DAY).map((n) => ({
-    description: n.data.description,
-    title: n.data.title,
-    time: new Date(n.data.pubDateTime).toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }),
-    url: `/notes/${dayKey}/#${n.id}`,
-  }))
-
-  dayGroups.push({
-    dateKey: dayKey,
-    date: new Date(`${dayKey}T00:00:00Z`),
-    daySummary,
-    totalCount: dayNotes.length,
-    dayUrl: `/notes/${dayKey}/`,
-    previews,
-  })
-}
-
-const totalNoteCount = dayGroups.reduce((sum, g) => sum + g.totalCount, 0)
-const hasMoreContent = sortedDayKeys.length > dayGroups.length
-  || dayGroups.some((g) => g.totalCount > g.previews.length)
-
-// --- Expertise tags for hero ---
-const expertiseTags = ['AI Transformation', 'Green Software', 'Open Source', 'AI MVP', 'DevTech MVP']
-
+const recentPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf())
+  .slice(0, 3)
+const projects = (await getCollection('project')).sort((a, b) =>
+  Number(b.data.featured) - Number(a.data.featured) || b.data.date.valueOf() - a.data.date.valueOf()
+).slice(0, 3)
+const notes = (await getCollection('note'))
+  .sort((a, b) => b.data.pubDateTime.valueOf() - a.data.pubDateTime.valueOf())
+const recentNoteDays = [...groupNotesByDay(notes)].slice(0, 3)
 ---
 
 <Layout
   title="Chris Lloyd-Jones, Sealjay"
   description={`Chris Lloyd-Jones (Sealjay) is a Seattle-area ${profileRole} and seven-time Microsoft MVP in AI and Developer Technologies.`}
   pubDateTime={new Date('1 March 2023')}
-  updatedDate={new Date('1 March 2026')}
+  updatedDate={new Date('2026-11-27')}
 >
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <!-- Ambient radial glow -->
-    <div class="hero-glow" aria-hidden="true" />
-    <Container class="hero-content">
+  <div class="home-hero">
+    <Container>
       <div class="h-card">
         <a href="https://sealjay.com" class="u-url u-uid hidden" aria-hidden="true">Chris Lloyd-Jones</a>
         <a href="https://orcid.org/0000-0001-7995-7865" class="u-url hidden" rel="me" aria-hidden="true">ORCID</a>
-
-        <!-- Name -->
-        <h1 class="hero-title font-heading hero-anim" style="animation-delay: 0.08s;">
-          <span class="p-name">Chris Lloyd-Jones</span>
-        </h1>
-
-        <!-- Subtitle -->
-        <p class="hero-subtitle font-body hero-anim" style="animation-delay: 0.16s;">
-          Engineering AI that works in the real world
+        <data class="p-nickname" value="Sealjay" hidden />
+        <h1 class="hero-title font-heading p-name">Chris Lloyd-Jones</h1>
+        <p class="hero-tagline">Engineering AI that works in the real world</p>
+        <p class="hero-intro p-note">
+          I'm a Seattle-area <span class="p-job-title">{profileRole}</span>. I work on getting AI into production with clear permissions and accountability. I research Green AI and co-host <a href="https://securing.quest">Securing the Realm</a> with Josh McDonald.
         </p>
-
-        <!-- Bio -->
-        <p class="hero-bio font-body p-note hero-anim" style="animation-delay: 0.24s;">
-          I'm Chris Lloyd-Jones (<span class="p-nickname">Sealjay</span>), a Seattle-area <span class="p-job-title">{profileRole}</span>. I work on getting AI into production with clear permissions and accountability. I research Green AI and co-host <a href="https://securing.quest" class="hero-bio-link">Securing the Realm</a> with Josh McDonald.
-        </p>
-
-        <!-- Expertise tags -->
-        <div class="hero-tags hero-anim" style="animation-delay: 0.28s;">
-          {expertiseTags.map((tag) => (
-            <Badge label={tag} variant="default" />
-          ))}
-        </div>
-
-        <!-- Bento grid: Latest Article + Next Speaking -->
-        <div class="hero-bento hero-anim" style="animation-delay: 0.36s;">
-          {latestPost && <LatestArticle post={latestPost} />}
-          {nextTalk.length > 0 && <RecentTalks entries={nextTalk} />}
-        </div>
-
-        <!-- Code signature -->
-        <div class="hero-code-signature hero-anim" style="animation-delay: 0.44s;">
-          <code><span class="code-comment">// </span><span class="code-keyword">open</span>, sustainable, real</code>
-        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="/blog/">Read the writing <span aria-hidden="true">→</span></a>
+        <a href="/speaking/">Explore speaking <span aria-hidden="true">→</span></a>
       </div>
     </Container>
   </div>
 
-  <!-- Recent Writing Section -->
-  <Section bg="alt" ariaLabel="Recent writing">
-    <Container>
-      <h2 class="section-title font-heading">Recent Writing</h2>
-      <div class="writing-list">
-        {recentPosts.map((post) => {
-          const firstTag = post.data.tags?.[0]
-          const words = post.body?.split(/\s+/).length ?? 0
-          const readingTime = Math.max(1, Math.ceil(words / 200))
-          return (
-            <a href={`/blog/${post.id}/`} class="writing-card">
-              <div class="writing-card__row">
-                {firstTag && (
-                  <span class="writing-card__tag">{firstTag}</span>
-                )}
-                <FormattedDate date={post.data.pubDateTime} class="writing-card__date" />
-                <span class="writing-card__reading-time">{readingTime} min read</span>
-              </div>
-              <h3 class="writing-card__title font-heading">{post.data.title}</h3>
-            </a>
-          )
-        })}
-      </div>
-      <div class="section-cta">
-        <Button variant="ghost" href="/blog" size="sm">View all writing &rarr;</Button>
-      </div>
-    </Container>
-  </Section>
+  {recentPosts.length > 0 && (
+    <Section ariaLabel="Recent writing">
+      <Container>
+        <h2 class="section-title">Recent writing</h2>
+        <ul class="writing-list">
+          {recentPosts.map((post) => <LatestArticle post={post} />)}
+        </ul>
+        <a class="archive-link" href="/blog/">All writing <span aria-hidden="true">→</span></a>
+      </Container>
+    </Section>
+  )}
 
-  <!-- Featured Projects Section -->
-  <Section bg="default" ariaLabel="Featured projects">
-    <Container>
-      <h2 class="section-title font-heading">Featured Projects</h2>
-      {featuredProjects.length > 0 && <FeaturedProjects projects={featuredProjects} />}
-    </Container>
-  </Section>
+  {projects.length > 0 && (
+    <Section bg="alt" ariaLabel="Featured projects">
+      <Container>
+        <h2 class="section-title">Featured projects</h2>
+        <FeaturedProjects projects={projects} />
+        <a class="archive-link" href="/projects/">All projects <span aria-hidden="true">→</span></a>
+      </Container>
+    </Section>
+  )}
 
-  <!-- Latest Notes Section -->
-  <Section bg="alt" ariaLabel="Latest notes">
-    <Container>
-      <h2 class="section-title font-heading">Latest Notes</h2>
-      {dayGroups.length > 0 && (
-        <LatestNotes
-          dayGroups={dayGroups}
-          totalNoteCount={totalNoteCount}
-          hasMoreContent={hasMoreContent}
-        />
-      )}
-    </Container>
-  </Section>
-
-  <!-- Social Links -->
-  <Section bg="default" ariaLabel="Social links">
-    <Container>
-      <SocialLinks />
-    </Container>
-  </Section>
+  {recentNoteDays.length > 0 && (
+    <Section ariaLabel="Latest notes">
+      <Container>
+        <h2 class="section-title">Latest notes</h2>
+        <LatestNotes dayGroups={recentNoteDays} />
+        <a class="archive-link" href="/notes/">All notes <span aria-hidden="true">→</span></a>
+      </Container>
+    </Section>
+  )}
 </Layout>
 
 <style>
-  /* ============================================================
-     Hero Section
-     ============================================================ */
-  .hero-section {
-    position: relative;
+  .home-hero {
+    padding-block: clamp(2.5rem, 7vw, 5.5rem);
     background: var(--gradient-hero);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    overflow: hidden;
-  }
-
-  @media (min-width: 768px) {
-    .hero-section {
-      padding-top: 3.5rem;
-      padding-bottom: 2.5rem;
-    }
-  }
-
-  .hero-glow {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
-    top: -150px;
-    right: -80px;
-    pointer-events: none;
-  }
-
-  @media (max-width: 640px) {
-    .hero-glow {
-      width: 300px;
-      height: 300px;
-      top: -100px;
-      right: -100px;
-    }
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .hero-title {
-    font-size: 2rem;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-    font-weight: 700;
+    font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    font-weight: 750;
+    text-wrap: balance;
+  }
+
+  .hero-tagline {
+    max-width: 40ch;
+    margin-top: 0.8rem;
+    font-family: var(--font-body);
+    font-size: clamp(1.2rem, 2.4vw, 1.75rem);
+    line-height: 1.35;
     color: var(--color-text);
-    margin: 0 0 0.5rem;
+    text-wrap: balance;
   }
 
-  @media (min-width: 768px) {
-    .hero-title {
-      font-size: 2.75rem;
-    }
-  }
-
-  .hero-subtitle {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    margin: 0 0 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .hero-subtitle {
-      font-size: 1.125rem;
-    }
-  }
-
-  .hero-bio {
-    color: var(--color-text-muted);
-    font-size: 0.9375rem;
-    line-height: 1.75;
-    max-width: 520px;
-    margin: 0 0 2rem;
-  }
-
-  .hero-bio :global(.hero-bio-link) {
-    color: var(--color-primary);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-
-  .hero-bio :global(.hero-bio-link:hover) {
+  .hero-intro {
+    max-width: 58ch;
+    margin-top: 1.25rem;
     color: var(--color-text);
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.65;
+  }
+
+  .hero-intro a {
+    color: inherit;
     text-decoration: underline;
+    text-underline-offset: 0.18em;
   }
 
-  @media (min-width: 768px) {
-    .hero-bio {
-      font-size: 1rem;
-    }
-  }
-
-  /* Bento grid */
-  .hero-bento {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  @media (min-width: 768px) {
-    .hero-bento {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  /* ============================================================
-     Hero Code Signature
-     ============================================================ */
-  .hero-code-signature {
+  .hero-actions {
     margin-top: 1.5rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 12px 20px;
-    font-family: var(--font-code);
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    max-width: 100%;
-  }
-
-  .hero-code-signature code {
-    font-family: inherit;
-    font-size: inherit;
-  }
-
-  .code-comment {
-    color: var(--color-text-subtle);
-  }
-
-  .code-keyword {
-    color: var(--color-warm);
-    font-weight: 600;
-  }
-
-  /* ============================================================
-     Hero Staggered Fade-in-up Animations
-     ============================================================ */
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-anim {
-      opacity: 0;
-      animation: hero-fade-in-up 0.6s var(--ease-out) forwards;
-    }
-
-    @keyframes hero-fade-in-up {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-anim {
-      opacity: 1;
-    }
-  }
-
-  /* ============================================================
-     Section Titles
-     ============================================================ */
-  .section-title {
-    font-size: 1.375rem;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    font-weight: 600;
-    color: var(--color-text);
-    margin: 0 0 1.5rem;
-  }
-
-  @media (min-width: 768px) {
-    .section-title {
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-    }
-  }
-
-  /* ============================================================
-     Recent Writing — Compact Text-Only Cards
-     ============================================================ */
-  .writing-list {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 0.65rem;
   }
 
-  .writing-card {
-    display: block;
-    padding: 1rem 1.5rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--color-card-glow);
-    text-decoration: none;
-    cursor: pointer;
-    transition: transform 0.2s var(--ease-out),
-                border-color 0.2s var(--ease-out),
-                box-shadow 0.2s var(--ease-out);
-  }
-
-  .writing-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-border-strong);
-  }
-
-  .writing-card:focus-visible {
-    transform: translateY(-2px);
-    border-color: var(--color-border-strong);
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .writing-card__row {
-    display: flex;
+  .hero-actions a {
+    display: inline-flex;
+    gap: 0.5rem;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 5px;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    background: var(--color-surface);
+    font-family: var(--font-heading);
+    font-weight: 650;
+    font-size: 0.9375rem;
   }
 
-  .writing-card__tag {
+  .hero-actions a:hover {
+    background: var(--color-surface-hover);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .writing-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .archive-link {
     display: inline-flex;
     align-items: center;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    background: var(--color-primary-muted);
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    min-height: 44px;
     color: var(--color-primary);
-    font-weight: 500;
+    font-family: var(--font-heading);
+    font-size: 0.9375rem;
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
   }
 
-  /* Override FormattedDate scoped styles when used as compact date */
-  .writing-card :global(.formatted-date.writing-card__date) {
-    font-size: 11px;
-    color: var(--color-text-subtle);
-    line-height: 1;
+  @media (max-width: 374px) {
+    .hero-actions a {
+      font-size: 0.875rem;
+      padding-inline: 0.65rem;
+      gap: 0.35rem;
+    }
   }
-
-  .writing-card__reading-time {
-    font-size: 11px;
-    color: var(--color-text-subtle);
-    line-height: 1;
-  }
-
-  .writing-card__title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text);
-    line-height: 1.35;
-    margin: 0;
-    transition: color 0.2s var(--ease-out);
-  }
-
-  .writing-card:hover .writing-card__title {
-    color: var(--color-primary);
-  }
-
-  /* ============================================================
-     Section CTA
-     ============================================================ */
-  .section-cta {
-    margin-top: 1.5rem;
-    text-align: center;
-  }
-
 </style>
